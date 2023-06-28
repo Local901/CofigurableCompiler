@@ -17,7 +17,7 @@ namespace CC
             //MakeTokens();
             MakeCCompiler();
 
-            var p = @"C:\Users\ThomasVermeulen\source\repos\CC\CC\Resources\TextFile2.txt";
+            var p = @"Resources\TextFile2.txt";
             var l = bc.Lex(File.ReadAllText(p));
             //var g = bc.GetGroups();
             //bc.IterationParcing(l, bc.Constructs, g);

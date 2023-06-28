@@ -21,6 +21,11 @@ namespace CC.Parcing
             _key = Key;
             _content = new List<IBlock>();
         }
+        private ConstructParsingArgs(IConstruct Key, List<IBlock> Content)
+        {
+            _key = Key;
+            _content = Content;
+        }
 
         public IBlock MakeBlock()
         {
@@ -38,6 +43,11 @@ namespace CC.Parcing
         public IConstructParseResult TryUseBlock(IBlock block)
         {
             throw new NotImplementedException();
+        }
+
+        public IConstructParsingArgs Copy()
+        {
+            return new ConstructParsingArgs(_key, _content);
         }
     }
 }

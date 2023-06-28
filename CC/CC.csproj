@@ -13,4 +13,13 @@
     <ProjectReference Include="..\BranchList\BranchList.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\TextFile1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\TextFile2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -12,5 +12,6 @@ namespace CC.Parcing.Contracts
 
         public IConstructParseResult TryUseBlock(IBlock block);
         public IBlock MakeBlock();
+        public IConstructParsingArgs Copy();
     }
 }

@@ -23,6 +23,11 @@ namespace CC.Parcing
             KeyCollection = keyCollection;
         }
 
+        /// <summary>
+        /// Parse using the FileLexer and output the a block with the created tree.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="startConstruct"></param>
         public void DoParse(out IBlock block, IConstruct startConstruct)
         {
             ResultBlock = new Block { Key = startConstruct };
@@ -40,7 +45,12 @@ namespace CC.Parcing
             block = ResultBlock;
         }
 
-        public bool TryGetNextBlock(out IBlock nextBlock)
+        /// <summary>
+        /// Get the next block from the FileLexer.
+        /// </summary>
+        /// <param name="nextBlock"></param>
+        /// <returns>True if the block has been created.</returns>
+        private bool TryGetNextBlock(out IBlock nextBlock)
         {
             return FileLexer.TryNextBlock(out nextBlock);
         }
