@@ -8,14 +8,9 @@ namespace CC.Parcing
 {
     public class Construct : IConstruct
     {
-        private List<IComponent> _components;
-        public IReadOnlyList<IComponent> Components => _components;
-
-
-        public Construct()
-        {
-            _components = new List<IComponent>();
-        }
+        public Construct(IComponent components)
+            : base(components)
+        { }
 
 
         public override IKey GetKey(object value)

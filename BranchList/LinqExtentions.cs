@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BranchList
@@ -14,6 +15,12 @@ namespace BranchList
                 action(enumerotor.Current);
             }
             return list;
+        }
+
+        public static IEnumerable<R> FilterCast<T,R>(this IEnumerable<T> list)
+        {
+            return list.Where(item => item is R)
+                .Cast<R>();
         }
     }
 }

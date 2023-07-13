@@ -15,7 +15,7 @@ namespace CC.Parcing
         private FileLexer FileLexer;
         private KeyCollection KeyCollection;
         private IBlock ResultBlock;
-        private BranchNode<IConstructParsingArgs> BranchList;
+        private ValueBranchNode<IConstructParsingArgs> BranchList;
         
         public FileParcer(FileLexer filelexer, KeyCollection keyCollection)
         {
@@ -23,22 +23,17 @@ namespace CC.Parcing
             KeyCollection = keyCollection;
         }
 
-        /// <summary>
-        /// Parse using the FileLexer and output the a block with the created tree.
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="startConstruct"></param>
         public void DoParse(out IBlock block, IConstruct startConstruct)
         {
             ResultBlock = new Block { Key = startConstruct };
 
             // start branch
-            BranchList = new BranchNode<IConstructParsingArgs>(new ConstructParsingArgs(startConstruct));
+            BranchList = new ValueBranchNode<IConstructParsingArgs>(new ConstructParsingArgs(startConstruct));
 
             IBlock nextBlock;
             while( TryGetNextBlock(out nextBlock) )
             {
-                UpdateBranches(BranchList);
+                AddSubConstructs(BranchList);
                 UseBlock(BranchList, nextBlock);
             }
 
@@ -55,14 +50,23 @@ namespace CC.Parcing
             return FileLexer.TryNextBlock(out nextBlock);
         }
 
-        private void UpdateBranches(BranchList<IConstructParsingArgs> branch)
+        private void AddSubConstructs(ValueBranchNode<IConstructParsingArgs> tree)
         {
-            // If current ends have an expectation for Constructs
-            // add a child branch.
-            throw new NotImplementedException();
+            tree.Ends()
+                .Where((arg) => !arg.Value.IsComplete && arg != tree)
+                .ForEach((arg) =>
+                {
+                    List<IComponent> components = arg.Value.GetWantedComponents();
+                    components.SelectMany((comp) => KeyCollection.GetRelation(comp.Key).Keys)
+                        .Distinct()
+                        .Where((key) => key is IConstruct)
+                        .Cast<IConstruct>()
+                        .ForEach((construct) => arg.Add(new ConstructParsingArgs(construct)));
+                    AddSubConstructs(arg);
+                });
         }
 
-        private void UseBlock(BranchList<IConstructParsingArgs> branch, IBlock nextBlock)
+        private void UseBlock(ValueBranchNode<IConstructParsingArgs> branch, IBlock nextBlock)
         {
             // Try use block on ends of branch.
 

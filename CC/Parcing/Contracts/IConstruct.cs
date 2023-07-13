@@ -7,6 +7,11 @@ namespace CC.Parcing.Contracts
 {
     public abstract class IConstruct : IKey
     {
-        public IReadOnlyList<IComponent> Components { get; }
+        public IComponent Components { get; }
+
+        public IConstruct (IComponent components)
+        {
+            Components = components;
+        }
     }
 }
