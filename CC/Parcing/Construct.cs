@@ -1,4 +1,5 @@
 ﻿using CC.Contract;
+using CC.Parcing.ComponentTypes;
 using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;

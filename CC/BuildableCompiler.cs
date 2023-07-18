@@ -46,7 +46,7 @@ namespace CC
         {
             var keys = GetGroups();
             FileLexer fileLexer = new FileLexer(code, keys);
-            return Lex(fileLexer, keys.GetAll<Token>());
+            return Lex(fileLexer, keys.GetAllKeysOfType<Token>());
         }
         public static IBlock Lex(FileLexer fileLexer, List<Token> tokens)
         {

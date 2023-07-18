@@ -27,7 +27,7 @@ namespace CC.Grouping
         public void AddKey(IKey key)
         {
             // No relations with key
-            if (GetRelation(key.Key) != null)
+            if (GetRelationOfKey(key.Key) != null)
                 throw new KeyAlreadyExistsException(key.Key);
 
             // add relation
@@ -37,7 +37,7 @@ namespace CC.Grouping
             // add relations
             if (key.IsGroup)
             {
-                r.Relations = r.Keys.Select(k => GetRelation(k.Key))
+                r.Relations = r.Keys.Select(k => GetRelationOfKey(k.Key))
                     .Where(r => r != null)
                     .ToList();
             }
@@ -51,32 +51,13 @@ namespace CC.Grouping
                     re.Relations.Add(r);
                 });
         }
-        /// <summary>
-        /// Reload rlated relations of all relations.
-        /// </summary>
-        public void ReloadRelations()
-        {
-            Relations.ForEach(re =>
-            {
-                if (re.Key.IsGroup)
-                {
-                    re.Relations = re.Keys.Select(k => GetRelation(k.Key))
-                        .Where(r => r != null)
-                        .ToList();
-                }
-                else
-                {
-                    re.Relations = new List<Relation>();
-                }
-            });
-        }
 
         /// <summary>
         /// Get the relation with provided key.
         /// </summary>
         /// <param name="key">Key of desired relation.</param>
         /// <returns>The relation if key was found else null.</returns>
-        public Relation GetRelation(string key)
+        public Relation GetRelationOfKey(string key)
         {
             return Relations.FirstOrDefault(r => r.Key.Key.CompareTo(key) == 0);
         }
@@ -84,9 +65,9 @@ namespace CC.Grouping
         /// <summary>
         /// Get all keys related to the key.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns>List of relavant keys.</returns>
-        public List<IKey> GetKeys(string key)
+        /// <param name="key">A single key string.</param>
+        /// <returns>List of related member keys.</returns>
+        public List<IKey> GetMemeberKeys(string key)
         {
             var r = Relations.FirstOrDefault(r => r.Key.Key.CompareTo(key) == 0);
             if (r == null) throw new Exceptions.KeyNotFoundException(key);
@@ -95,42 +76,31 @@ namespace CC.Grouping
         /// <summary>
         /// Get all keys related to the keys.
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns>List of distinct relavant keys.</returns>
-        public List<IKey> GetKeys(IEnumerable<string> keys)
+        /// <param name="keys">A list of keys</param>
+        /// <returns>List of distinct related member keys.</returns>
+        public List<IKey> GetMemberKeys(IEnumerable<string> keys)
         {
-            return keys.Select(k =>
+            return keys.SelectMany(k =>
             {
                 try
                 {
-                    return GetKeys(k);
+                    return GetMemeberKeys(k);
                 }
                 catch (Exceptions.KeyNotFoundException)
                 {
                     return new List<IKey>();
                 }
             })
-                .Aggregate((l1, l2) =>
-                {
-                    l1.AddRange(l2);
-                    return l1;
-                })
                 .Distinct()
                 .ToList();
         }
         /// <summary>
-        /// Get all keys.
+        /// Get all keys that have been added to the collection.
         /// </summary>
         /// <returns>List of distinct keys</returns>
-        public List<IKey> GetAll()
+        public List<IKey> GetAllKeys()
         {
-            return Relations.Select(r => r.Members)
-                .Aggregate((l1, l2) =>
-                {
-                    l1.AddRange(l2);
-                    return l1;
-                })
-                .Distinct()
+            return Relations.Select(r => r.Key)
                 .ToList();
         }
 
@@ -138,11 +108,11 @@ namespace CC.Grouping
         /// Get all objects of type T related to the key.
         /// </summary>
         /// <typeparam name="T">Type that inherited IKey.</typeparam>
-        /// <param name="key"></param>
+        /// <param name="key">A key string to get member keys.</param>
         /// <returns>List of type T related to the key.</returns>
-        public List<T> GetKeys<T>(string key) where T : IKey
+        public List<T> GetMemberKeysOfType<T>(string key) where T : IKey
         {
-            return GetKeys(key).OfType<T>()
+            return GetMemeberKeys(key).OfType<T>()
                 .Cast<T>()
                 .ToList();
         }
@@ -150,12 +120,11 @@ namespace CC.Grouping
         /// Get all objects of type T related to the keys.
         /// </summary>
         /// <typeparam name="T">Type that inherited IKey.</typeparam>
-        /// <param name="key"></param>
+        /// <param name="keys">A list of keys to get distinct member keys.</param>
         /// <returns>List of type T related to the keys.</returns>
-        public List<T> GetKeys<T>(IEnumerable<string> keys) where T : IKey
+        public List<T> GetMemberKeysOfType<T>(IEnumerable<string> keys) where T : IKey
         {
-            return GetKeys(keys).OfType<T>()
-                .Cast<T>()
+            return GetMemberKeys(keys).OfType<T>()
                 .ToList();
         }
         /// <summary>
@@ -163,32 +132,33 @@ namespace CC.Grouping
         /// </summary>
         /// <typeparam name="T">Type that inherited IKey.</typeparam>
         /// <returns>List of type T.</returns>
-        public List<T> GetAll<T>() where T : IKey
+        public List<T> GetAllKeysOfType<T>() where T : IKey
         {
-            return GetAll().OfType<T>()
-                .Cast<T>()
+            return GetAllKeys().OfType<T>()
                 .ToList();
         }
 
         /// <summary>
-        /// Check if key is of a certain group.
+        /// Check if key is/ is part of a certain groupKey.
         /// </summary>
-        /// <param name="key">The name og the key.</param>
-        /// <param name="group">The group name.</param>
-        /// <returns></returns>
+        /// <param name="key">The string name of the key.</param>
+        /// <param name="group">The groupKey/ key string.</param>
+        /// <returns>True is key is related to the groep.</returns>
         public bool IsKeyOfGroup(string key, string group)
         {
-            return GetKeys(group).Any(k => k.Key.CompareTo(key) == 0);
+            return GetMemeberKeys(group)
+                .Select(k => k.Key)
+                .Contains(key);
         }
         /// <summary>
-        /// Check if key is of a certain group.
+        /// Check if key is/ is part of a certain groupKey.
         /// </summary>
         /// <param name="key">The key Object.</param>
-        /// <param name="group">The group name.</param>
-        /// <returns></returns>
+        /// <param name="group">The groupKey/ key string.</param>
+        /// <returns>True is key is related to the groep.</returns>
         public bool IsKeyOfGroup(IKey key, string group)
         {
-            return GetKeys(group).Contains(key);
+            return GetMemeberKeys(group).Contains(key);
         }
     }
 }

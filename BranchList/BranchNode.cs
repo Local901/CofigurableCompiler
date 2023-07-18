@@ -15,7 +15,10 @@ namespace BranchList
         {
             Children = new List<T>();
         }
-
+        public BranchNode(List<T> children)
+        {
+            Children = children;
+        }
 
         public T this[int index] { get => Children[index]; protected set => Children[index] = value; }
 
@@ -37,6 +40,11 @@ namespace BranchList
             }
             Children.Add(node);
             node.Parent = (T)this;
+        }
+
+        public void AddRange(IEnumerable<T> nodes)
+        {
+            nodes.ForEach(node => Add(node));
         }
 
         public void Clear()

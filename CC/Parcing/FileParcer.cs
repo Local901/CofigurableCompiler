@@ -2,6 +2,7 @@
 using CC.Contract;
 using CC.Grouping;
 using CC.Lexing;
+using CC.Parcing.ComponentTypes;
 using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace CC.Parcing
         private FileLexer FileLexer;
         private KeyCollection KeyCollection;
         private IBlock ResultBlock;
-        private ValueBranchNode<IConstructParsingArgs> BranchList;
+        private ValueBranchNode<IConstructFactory> BranchList;
         
         public FileParcer(FileLexer filelexer, KeyCollection keyCollection)
         {
@@ -28,7 +29,7 @@ namespace CC.Parcing
             ResultBlock = new Block { Key = startConstruct };
 
             // start branch
-            BranchList = new ValueBranchNode<IConstructParsingArgs>(new ConstructParsingArgs(startConstruct));
+            BranchList = new ValueBranchNode<IConstructFactory>(new ConstructParsingArgs(startConstruct));
 
             IBlock nextBlock;
             while( TryGetNextBlock(out nextBlock) )
@@ -50,7 +51,7 @@ namespace CC.Parcing
             return FileLexer.TryNextBlock(out nextBlock);
         }
 
-        private void AddSubConstructs(ValueBranchNode<IConstructParsingArgs> tree)
+        private void AddSubConstructs(ValueBranchNode<IConstructFactory> tree)
         {
             tree.Ends()
                 .Where((arg) => !arg.Value.IsComplete && arg != tree)
@@ -66,7 +67,7 @@ namespace CC.Parcing
                 });
         }
 
-        private void UseBlock(ValueBranchNode<IConstructParsingArgs> branch, IBlock nextBlock)
+        private void UseBlock(ValueBranchNode<IConstructFactory> branch, IBlock nextBlock)
         {
             // Try use block on ends of branch.
 

@@ -13,6 +13,7 @@ namespace BranchList
         public T this[int index] { get; }
 
         public void Add(T node);
+        public void AddRange(IEnumerable<T> nodes);
         public void Clear();
         public bool Contains(T item);
         public void CopyTo(T[] array, int arrayIndex);

@@ -31,7 +31,7 @@ namespace CC.Lexing
         /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block)
         {
-            return TryNextBlock(out block, _tokenCollection.GetAll<Token>());
+            return TryNextBlock(out block, _tokenCollection.GetAllKeysOfType<Token>());
         }
         /// <summary>
         /// Find next block using tokens connected to the key.
@@ -41,7 +41,7 @@ namespace CC.Lexing
         /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, string key)
         {
-            return TryNextBlock(out block, _tokenCollection.GetKeys<Token>(key));
+            return TryNextBlock(out block, _tokenCollection.GetMemberKeysOfType<Token>(key));
         }
         /// <summary>
         /// Find next block using tokens connected to the keys.
@@ -51,7 +51,7 @@ namespace CC.Lexing
         /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, IEnumerable<string> keys)
         {
-            return TryNextBlock(out block, _tokenCollection.GetKeys<Token>(keys));
+            return TryNextBlock(out block, _tokenCollection.GetMemberKeysOfType<Token>(keys));
         }
         /// <summary>
         /// Find next block using provided tokens.
@@ -98,7 +98,7 @@ namespace CC.Lexing
         /// <returns>Returns true if block is created.</returns>
         public bool TryAllBlocks(out List<IBlock> blocks)
         {
-            return TryAllBlocks(out blocks, _tokenCollection.GetAll<Token>());
+            return TryAllBlocks(out blocks, _tokenCollection.GetAllKeysOfType<Token>());
         }
         /// <summary>
         /// Find next block using tokens connected to the key.<br/>
@@ -109,7 +109,7 @@ namespace CC.Lexing
         /// <returns>Returns true if block is created.</returns>
         public bool TryAllBlocks(out List<IBlock> blocks, string key)
         {
-            return TryAllBlocks(out blocks, _tokenCollection.GetKeys<Token>(key));
+            return TryAllBlocks(out blocks, _tokenCollection.GetMemberKeysOfType<Token>(key));
         }
         /// <summary>
         /// Find next block using tokens connected to the keys.<br/>
@@ -120,7 +120,7 @@ namespace CC.Lexing
         /// <returns>Returns true if block is created.</returns>
         public bool TryAllBlocks(out List<IBlock> blocks, IEnumerable<string> keys)
         {
-            return TryAllBlocks(out blocks, _tokenCollection.GetKeys<Token>(keys));
+            return TryAllBlocks(out blocks, _tokenCollection.GetMemberKeysOfType<Token>(keys));
         }
         /// <summary>
         /// Find all blocks using provided tokens.<br/>
