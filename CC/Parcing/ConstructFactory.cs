@@ -48,7 +48,7 @@ namespace CC.Parcing
             var ends = Content.Ends()
                 .Where(node => !node.Value.IsEnd);
 
-            var activeEnds = ends.Where(node =>
+            var activeEnds = ends.Where(node => // return true if node can continue else false
                 {
                     // ### Test if block is for component. ###
                     bool isRelated = Keys.IsKeyOfGroup(block.Key, node.Value.Component.Key);
@@ -88,7 +88,30 @@ namespace CC.Parcing
 
         public IBlock MakeBlock()
         {
-            throw new NotImplementedException();
+            if (!IsComplete) throw new Exception("The content is not complete.");
+
+            var contents = Content.AllFirst(arg => arg.Value.IsEnd)
+                .Select(arg => arg.Path().Skip(1).ToList())
+                .OrderByDescending(list => list.Count())
+                .ToList();
+
+            if (contents.Count() == 0) throw new Exception("Code didn't set (IsEnd in ComponentArgs)/(this.IsComplete in ConstructFactory) correctly");
+            if (contents.Count() == 1) return MakeBlock(contents[0]);
+            if (contents[0].Count() == contents[1].Count()) throw new Exception("Multiple options (This should be a special exeption that passes the options)");
+            return MakeBlock(contents[0]);
+        }
+
+        private IBlock MakeBlock(List<ValueBranchNode<ComponentArgs>> path)
+        {
+            var block = new Block
+            {
+                Key = Key,
+                Content = path.Select(arg => arg.Value.Block).ToList(),
+                Index = path.First().Value.Block.Index,
+                EndIndex = path.Last().Value.Block.EndIndex
+            };
+            path.ForEach(arg => arg.Value.Block.Parent = block);
+            return block;
         }
     }
 }

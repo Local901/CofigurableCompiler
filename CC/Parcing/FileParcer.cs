@@ -29,7 +29,7 @@ namespace CC.Parcing
             ResultBlock = new Block { Key = startConstruct };
 
             // start branch
-            BranchList = new ValueBranchNode<IConstructFactory>(new ConstructParsingArgs(startConstruct));
+            BranchList = new ValueBranchNode<IConstructFactory>(new ConstructFactory(startConstruct, KeyCollection));
 
             IBlock nextBlock;
             while( TryGetNextBlock(out nextBlock) )
@@ -57,12 +57,12 @@ namespace CC.Parcing
                 .Where((arg) => !arg.Value.IsComplete && arg != tree)
                 .ForEach((arg) =>
                 {
-                    List<IComponent> components = arg.Value.GetWantedComponents();
-                    components.SelectMany((comp) => KeyCollection.GetRelation(comp.Key).Keys)
+                    List<ValueComponent> components = arg.Value.GetWantedComponents();
+                    components.SelectMany((comp) => KeyCollection.GetRelationOfKey(comp.Key).Keys)
                         .Distinct()
                         .Where((key) => key is IConstruct)
                         .Cast<IConstruct>()
-                        .ForEach((construct) => arg.Add(new ConstructParsingArgs(construct)));
+                        .ForEach((construct) => arg.Add(new ConstructFactory(construct, KeyCollection)));
                     AddSubConstructs(arg);
                 });
         }
