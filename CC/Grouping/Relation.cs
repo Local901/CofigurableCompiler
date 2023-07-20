@@ -31,7 +31,7 @@ namespace CC.Grouping
         /// </summary>
         public List<Relation> Relations { get; set; }
         /// <summary>
-        /// Child keys of Key.
+        /// Keys related to Key.
         /// </summary>
         public List<IKey> Keys
         {

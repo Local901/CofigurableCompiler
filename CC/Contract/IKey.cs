@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 
 namespace CC.Contract
 {
-    public abstract class IKey : IComparable
+    public abstract class IKey : IComparable, IComparable<string>, IComparable<IKey>
     {
         public string Key { get; set; }
 
@@ -14,12 +15,12 @@ namespace CC.Contract
         /// </summary>
         /// <param name="value"></param>
         /// <returns>Found key</returns>
-        public abstract IKey GetKey(object value);
+        public abstract IKey GetKeyFor(string value);
 
         /// <summary>
-        /// Get all subkeys.
+        /// Get all child keys related to this key (this included).
         /// </summary>
-        /// <returns>List of subkeys</returns>
+        /// <returns>List of keys</returns>
         public abstract List<IKey> GetKeys();
 
         /// <summary>
@@ -34,7 +35,9 @@ namespace CC.Contract
 
         public override bool Equals(object obj)
         {
-            return CompareTo(obj) == 0;
+            if (obj is string) return Key == (string)obj;
+            if (obj is IKey) return Key == ((IKey)obj).Key;
+            return false;
         }
 
         public int CompareTo(object other)
@@ -43,6 +46,18 @@ namespace CC.Contract
             if (!(other is IKey)) return -1;
 
             return Key.CompareTo(((IKey)other).Key);
+        }
+
+        public int CompareTo([AllowNull] string other)
+        {
+            return GetKeys().Select(k => k.Key.CompareTo(other))
+                .OrderBy(o => Math.Abs(o))
+                .First();
+        }
+
+        public int CompareTo([AllowNull] IKey other)
+        {
+            return CompareTo(other?.Key);
         }
     }
 }

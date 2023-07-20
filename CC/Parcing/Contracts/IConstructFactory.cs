@@ -14,13 +14,13 @@ namespace CC.Parcing.Contracts
         /// </summary>
         public IConstruct Key { get; }
         /// <summary>
-        /// Indecates if the construct is complete.
+        /// Indecates the status of the construct factory.
         /// </summary>
-        public bool IsComplete { get; }
+        public ConstructFactoryStatus Status { get; }
         /// <summary>
-        /// Indicates if more blocks can be provided to expand the construct.
+        /// A list with all posible block contents.
         /// </summary>
-        public bool CanContinue { get; }
+        public List<List<ComponentArgs>> Contents { get; }
 
         /// <summary>
         /// This function returns a list of components that it can use next.
@@ -37,6 +37,12 @@ namespace CC.Parcing.Contracts
         /// Make a block from this construct.
         /// </summary>
         /// <returns></returns>
-        public IBlock MakeBlock();
+        public IConstructBlock MakeBlock();
+        /// <summary>
+        /// Make a block from this construct using the content that end at endIndex.
+        /// </summary>
+        /// <param name="endIndex">end index of last block</param>
+        /// <returns></returns>
+        public IConstructBlock MakeBlock(int endIndex);
     }
 }

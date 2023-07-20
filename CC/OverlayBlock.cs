@@ -11,8 +11,7 @@ namespace CC
 
         public IKey Key 
         { 
-            get => _block.Key; 
-            set => _block.Key = value; 
+            get => _block.Key;
         }
         public string Name 
         {
@@ -23,29 +22,15 @@ namespace CC
         public string Value
         {
             get => _block.Value;
-            set => _block.Value = value;
         }
         public int Index
         {
             get => _block.Index;
-            set => _block.Index = value;
         }
         public int EndIndex
         {
             get => _block.EndIndex;
-            set => _block.EndIndex = value;
         }
-        public List<IBlock> Content
-        {
-            get => _block.Content;
-            set => _block.Content = value;
-        }
-        public IBlock Parent
-        {
-            get => _parent;
-            set => _parent = value;
-        }
-        private IBlock _parent;
 
         public OverlayBlock(IBlock block)
         {

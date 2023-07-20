@@ -51,14 +51,18 @@ namespace CC.Parcing
             return FileLexer.TryNextBlock(out nextBlock);
         }
 
+        /// <summary>
+        /// Find all ends of the construct tree and find possible subconstruct and add these to the tree.
+        /// </summary>
+        /// <param name="tree">The tree of constructFactories</param>
         private void AddSubConstructs(ValueBranchNode<IConstructFactory> tree)
         {
             tree.Ends()
-                .Where((arg) => !arg.Value.IsComplete && arg != tree)
+                .Where((arg) => arg.Value.Status != ConstructFactoryStatus.Complete && arg != tree)
                 .ForEach((arg) =>
                 {
                     List<ValueComponent> components = arg.Value.GetWantedComponents();
-                    components.SelectMany((comp) => KeyCollection.GetRelationOfKey(comp.Key).Keys)
+                    components.SelectMany((comp) => KeyCollection.GetRelationOfKey(comp.Key).Members)
                         .Distinct()
                         .Where((key) => key is IConstruct)
                         .Cast<IConstruct>()
@@ -70,10 +74,21 @@ namespace CC.Parcing
         private void UseBlock(ValueBranchNode<IConstructFactory> branch, IBlock nextBlock)
         {
             // Try use block on ends of branch.
-
-            // When construct arg is complete make block and
-            // add to parent.
-            throw new NotImplementedException();
+            branch.Ends().AsEnumerable()
+                .ForEach(end => end.Value.TryUseBlock(nextBlock))
+                .Where(end => end.Value.Status == (ConstructFactoryStatus.Complete | ConstructFactoryStatus.Halted))
+                .Select(end => end.Parent)
+                .Distinct()
+                .ForEach(p =>
+                { // Check for multiple construct completions.
+                    if (p == null) return;
+                    var ends = p.Children.Where(end => end.Value.Status == (ConstructFactoryStatus.Complete | ConstructFactoryStatus.Halted));
+                    if (ends.Count() == 1)
+                    {
+                        p.Value.TryUseBlock(ends.First().Value.MakeBlock()); // Add to parent
+                        p.Children.Clear(); // Remove other branches
+                    }
+                });
         }
     }
 }

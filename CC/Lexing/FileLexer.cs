@@ -79,7 +79,7 @@ namespace CC.Lexing
             // make a block
             block = new Block
             {
-                Key = match.Token.GetKey(match.Match.Value),
+                Key = match.Token.GetKeyFor(match.Match.Value),
                 Index = match.Match.Index,
                 EndIndex = match.Match.Index + match.Match.Value.Length,
                 Value = match.Match.Value
@@ -141,7 +141,7 @@ namespace CC.Lexing
                 .Select(m =>
                     new Block
                     {
-                        Key = m.Token.GetKey(m.Match.Value),
+                        Key = m.Token.GetKeyFor(m.Match.Value),
                         Index = m.Match.Index,
                         EndIndex = m.Match.Index + m.Match.Value.Length,
                         Value = m.Match.Value
@@ -157,13 +157,13 @@ namespace CC.Lexing
         /// <param name="page"></param>
         /// <param name="tokens"></param>
         /// <returns>A block filled with lexed blocks</returns>
-        public static Block LexAll(string page, List<Token> tokens)
+        public static List<IBlock> LexAll(string page, List<Token> tokens)
         {
             var matches = tokens.Select(t => t.Regex.Matches(page).Where(m => !String.IsNullOrEmpty(m.Value))
             .Select(m => new { Token = t, Match = m }));
 
             int index = 0;
-            Block program = new Block {};
+            List<IBlock> program = new List<IBlock>();
             bool doLoop = true;
             while (doLoop)
             {
@@ -184,15 +184,12 @@ namespace CC.Lexing
                     Key = nextMatch.Token,
                     Index = nextMatch.Match.Index,
                     EndIndex = nextMatch.Match.Index + nextMatch.Match.Value.Length,
-                    Value = nextMatch.Match.Value,
-                    Parent = program
+                    Value = nextMatch.Match.Value
                 };
 
                 index = next.EndIndex;
-                program.Content.Add(next);
+                program.Add(next);
             }
-
-            program.EndIndex = index;
 
             return program;
         }

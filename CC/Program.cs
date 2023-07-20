@@ -22,7 +22,7 @@ namespace CC
             //var g = bc.GetGroups();
             //bc.IterationParcing(l, bc.Constructs, g);
 
-            foreach(var b in l.Content)
+            foreach(var b in l)
             {
                 Console.WriteLine(b.Index);
                 Console.WriteLine(b.Key + " : " + b.Value);

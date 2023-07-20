@@ -12,13 +12,5 @@ namespace CC
         public string Value { get; set; }
         public int Index { get; set; }
         public int EndIndex { get; set; }
-
-        public List<IBlock> Content { get; set; }
-        public IBlock Parent { get; set; }
-
-        public Block()
-        {
-            Content = new List<IBlock>();
-        }
     }
 }

@@ -37,7 +37,8 @@ namespace CC.Grouping
             // add relations
             if (key.IsGroup)
             {
-                r.Relations = r.Keys.Select(k => GetRelationOfKey(k.Key))
+                r.Relations = r.Keys.Where(k => k.Key != key.Key)
+                    .Select(k => GetRelationOfKey(k.Key))
                     .Where(r => r != null)
                     .ToList();
             }
@@ -59,7 +60,19 @@ namespace CC.Grouping
         /// <returns>The relation if key was found else null.</returns>
         public Relation GetRelationOfKey(string key)
         {
-            return Relations.FirstOrDefault(r => r.Key.Key.CompareTo(key) == 0);
+            return Relations.Where(r => r.Key.CompareTo(key) == 0)
+                .OrderBy(r => r.Key.GetKeys().Count())
+                .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Get all keys that have been added to the collection.
+        /// </summary>
+        /// <returns>List of distinct keys</returns>
+        public List<IKey> GetAllKeys()
+        {
+            return Relations.Select(r => r.Key)
+                .ToList();
         }
 
         /// <summary>
@@ -69,7 +82,7 @@ namespace CC.Grouping
         /// <returns>List of related member keys.</returns>
         public List<IKey> GetMemeberKeys(string key)
         {
-            var r = Relations.FirstOrDefault(r => r.Key.Key.CompareTo(key) == 0);
+            var r = GetRelationOfKey(key);
             if (r == null) throw new Exceptions.KeyNotFoundException(key);
             return r.Members;
         }
@@ -94,16 +107,6 @@ namespace CC.Grouping
                 .Distinct()
                 .ToList();
         }
-        /// <summary>
-        /// Get all keys that have been added to the collection.
-        /// </summary>
-        /// <returns>List of distinct keys</returns>
-        public List<IKey> GetAllKeys()
-        {
-            return Relations.Select(r => r.Key)
-                .ToList();
-        }
-
         /// <summary>
         /// Get all objects of type T related to the key.
         /// </summary>

@@ -6,13 +6,10 @@ namespace CC.Contract
 {
     public interface IBlock
     {
-        IKey Key { get; set; }
-        string Name { get; set; }
-        string Value { get; set; }
-        int Index { get; set; }
-        int EndIndex { get; set; }
-
-        List<IBlock> Content { get; set; }
-        IBlock Parent { get; set; }
+        IKey Key { get; }
+        string Name { get; }
+        string Value { get; }
+        int Index { get;}
+        int EndIndex { get;}
     }
 }

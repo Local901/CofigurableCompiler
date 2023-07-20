@@ -17,14 +17,14 @@ namespace CC.Grouping
             IsGroup = true;
         }
 
-        public override IKey GetKey(object value)
+        public override IKey GetKeyFor(string value)
         {
-            return this;
+            throw new NotImplementedException();
         }
 
         public override List<IKey> GetKeys()
         {
-            return Members.Cast<IKey>().ToList();
+            return Members.SelectMany(m => m.GetKeys()).Distinct().ToList();
         }
     }
 }

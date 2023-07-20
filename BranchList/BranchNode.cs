@@ -72,15 +72,18 @@ namespace BranchList
         public void Insert(int index, T item)
         {
             Children.Insert(index, item);
+            item.Parent = (T)this;
         }
 
         public bool Remove(T item)
         {
+            item.Parent = null;
             return Children.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
+            Children[index].Parent = null;
             Children.RemoveAt(index);
         }
 

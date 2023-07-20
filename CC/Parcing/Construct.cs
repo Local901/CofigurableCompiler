@@ -14,14 +14,14 @@ namespace CC.Parcing
         { }
 
 
-        public override IKey GetKey(object value)
+        public override IKey GetKeyFor(string value)
         {
-            return this;
+            throw new NotImplementedException();
         }
 
         public override List<IKey> GetKeys()
         {
-            return new List<IKey>();
+            return new List<IKey> { this };
         }
     }
 }

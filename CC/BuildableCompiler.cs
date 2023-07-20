@@ -42,18 +42,18 @@ namespace CC
             return "";
         }
 
-        public IBlock Lex(string code)
+        public List<IBlock> Lex(string code)
         {
             var keys = GetGroups();
             FileLexer fileLexer = new FileLexer(code, keys);
             return Lex(fileLexer, keys.GetAllKeysOfType<Token>());
         }
-        public static IBlock Lex(FileLexer fileLexer, List<Token> tokens)
+        public static List<IBlock> Lex(FileLexer fileLexer, List<Token> tokens)
         {
-            IBlock program = new Block {};
+            var program = new List<IBlock>();
             while(fileLexer.TryNextBlock(out IBlock block, tokens))
             {
-                program.Content.Add(block);
+                program.Add(block);
             }
             return program;
         }
@@ -120,21 +120,6 @@ namespace CC
             program.Content.ForEach(b => b.Parent = program);
         }
         */
-
-        public IBlock GetConstructs(string code)
-        {
-            // Lexing
-            var program = Lex(code);
-
-
-            // Make Groups
-            KeyCollection g = GetGroups();
-
-            // Parcing
-            //IterationParcing(program, Constructs, g);
-
-            return program;
-        }
 
         public KeyCollection GetGroups()
         {
