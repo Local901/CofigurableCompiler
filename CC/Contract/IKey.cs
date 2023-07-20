@@ -59,5 +59,10 @@ namespace CC.Contract
         {
             return CompareTo(other?.Key);
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Key);
+        }
     }
 }

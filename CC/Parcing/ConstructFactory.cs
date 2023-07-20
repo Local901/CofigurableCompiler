@@ -111,12 +111,12 @@ namespace CC.Parcing
                     } while (end.Children.Count() == 0);
                 });
 
-            return Status == ConstructFactoryStatus.Halted;
+            return !Status.HasFlag(ConstructFactoryStatus.Halted);
         }
 
         public IConstructBlock MakeBlock()
         {
-            if (Status != ConstructFactoryStatus.Complete) throw new Exception("The content is not complete.");
+            if (!Status.HasFlag(ConstructFactoryStatus.Complete)) throw new Exception("The content is not complete.");
 
             var contents = Contents;
 
@@ -126,12 +126,13 @@ namespace CC.Parcing
         }
         public IConstructBlock MakeBlock(int endIndex)
         {
-            if (Status != ConstructFactoryStatus.Complete) throw new Exception("The content is not complete.");
+            if (!Status.HasFlag(ConstructFactoryStatus.Complete)) throw new Exception("The content is not complete.");
 
             var content = Contents.Where(c => c.Last().Block.EndIndex == endIndex);
 
             if (content.Count() == 0) throw new Exception($"No content exists that en with index {endIndex}");
-            if (content.Count() > 1) throw new Exception("")
+            if (content.Count() > 1) throw new Exception("There are multiple blocks posible.");
+            return MakeBlock(content.First());
         }
 
         private IConstructBlock MakeBlock(List<ComponentArgs> path)

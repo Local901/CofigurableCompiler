@@ -58,7 +58,7 @@ namespace CC.Parcing
         private void AddSubConstructs(ValueBranchNode<IConstructFactory> tree)
         {
             tree.Ends()
-                .Where((arg) => arg.Value.Status != ConstructFactoryStatus.Complete && arg != tree)
+                .Where((arg) => (!arg.Value.Status.HasFlag(ConstructFactoryStatus.Complete)) && arg != tree)
                 .ForEach((arg) =>
                 {
                     List<ValueComponent> components = arg.Value.GetWantedComponents();
@@ -74,9 +74,11 @@ namespace CC.Parcing
         private void UseBlock(ValueBranchNode<IConstructFactory> branch, IBlock nextBlock)
         {
             // Try use block on ends of branch.
-            branch.Ends().AsEnumerable()
+            var ends = branch.Ends().AsEnumerable()
                 .ForEach(end => end.Value.TryUseBlock(nextBlock))
-                .Where(end => end.Value.Status == (ConstructFactoryStatus.Complete | ConstructFactoryStatus.Halted))
+                .ToList();
+
+            ends.Where(end => end.Value.Status == (ConstructFactoryStatus.Complete | ConstructFactoryStatus.Halted))
                 .Select(end => end.Parent)
                 .Distinct()
                 .ForEach(p =>
