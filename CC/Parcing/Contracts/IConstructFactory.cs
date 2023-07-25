@@ -32,7 +32,7 @@ namespace CC.Parcing.Contracts
         /// </summary>
         /// <param name="block">The block to check.</param>
         /// <returns>True if it is posible to use more blocks.</returns>
-        public bool TryUseBlock(IBlock block);
+        public ConstructFactoryStatus TryUseBlock(IBlock block);
         /// <summary>
         /// Make a block from this construct.
         /// </summary>

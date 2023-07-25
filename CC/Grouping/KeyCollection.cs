@@ -53,6 +53,11 @@ namespace CC.Grouping
                 });
         }
 
+        public IKey GetKey(string key)
+        {
+            return GetRelationOfKey(key)?.Key;
+        }
+
         /// <summary>
         /// Get the relation with provided key.
         /// </summary>

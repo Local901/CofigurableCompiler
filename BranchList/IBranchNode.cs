@@ -28,6 +28,11 @@ namespace BranchList
         /// <returns>A list starting with the root and ending with the node that this function was called on.</returns>
         public List<T> Path();
         /// <summary>
+        /// Get the path from the first parent that return true on the test to this node.
+        /// </summary>
+        /// <returns>A list starting with the root and ending with the node that this function was called on.</returns>
+        public List<T> Path(Func<T, bool> isBlockLike);
+        /// <summary>
         /// Get a list of all first incounters in a branch that return true to the test function.
         /// </summary>
         /// <param name="test">A function to check the nodes.</param>

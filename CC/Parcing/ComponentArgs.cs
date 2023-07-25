@@ -1,29 +1,53 @@
 ﻿using CC.Contract;
+using CC.Grouping;
 using CC.Parcing.ComponentTypes;
+using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 
 namespace CC.Parcing
 {
-    public class ComponentArgs
+    public class ComponentArgs : ParseArgs
     {
-        public ValueComponent Component { get; }
-        public IBlock Block { get; set; }
-        /// <summary>
-        /// IsEnd helps to indecate if this can be the end of the input blocks. Has to be set by hand. Default false.
-        /// </summary>
-        public bool IsEnd { get; set; }
+        public ComponentArgs(ValueComponent component, IParseArgs localRoot)
+            : base(component, localRoot)
+        { }
 
-        public ComponentArgs(ValueComponent component, IBlock block)
+        public override ParseStatus UseBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory)
         {
-            Component = component;
-            Block = block;
-        }
-        public ComponentArgs(ValueComponent component)
-        {
-            Component = component;
+            ParseStatus status = ParseStatus.None;
+
+            if (!keyCollection.IsKeyOfGroup(block.Key, Component.Key))
+            {
+                // make error block
+                status |= ParseStatus.Error;
+                block = new IssueBlock
+                {
+                    Type = IssueType.Error,
+                    Key = keyCollection.GetKey(Component.Key),
+                    Index = Parent == null ? 0 : Parent.Block.EndIndex,
+                    EndIndex = block.Index
+                };
+            }
+            Block = block.Copy(Component.Name);
+
+            var components = Component.GetNextComponents();
+            if (components.Any(comp => comp == null))
+            {
+                status |= ParseStatus.CanEnd;
+            }
+
+            components = components.Where(comp => comp != null).ToList();
+            if (components.Count() == 0)
+            {
+                status |= ParseStatus.ReachedEnd;
+            }
+            AddRange(components.Select(comp => factory.NewArg(comp, LocalRoot)));
+
+            return status;
         }
     }
 }

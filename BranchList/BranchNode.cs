@@ -95,6 +95,14 @@ namespace BranchList
             path.Add((T)this);
             return path;
         }
+        public List<T> Path(Func<T, bool> isBlockLike)
+        {
+            List<T> path = Parent == null || isBlockLike(Parent)
+                ? new List<T>()
+                : Parent.Path(isBlockLike);
+            path.Add((T)this);
+            return path;
+        }
         public List<T> AllFirst(Func<T, bool> test)
         {
             if (test((T)this))

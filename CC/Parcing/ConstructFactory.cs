@@ -61,10 +61,11 @@ namespace CC.Parcing
                 .ToList();
         }
 
-        public bool TryUseBlock(IBlock block)
+        public ConstructFactoryStatus TryUseBlock(IBlock block)
         {
             var ends = _content.Ends()
                 .Where(node => !node.Value.IsEnd);
+            ConstructFactoryStatus tryStatus = ConstructFactoryStatus.None;
 
             var activeEnds = ends.Where(node => // return true if node can continue else false
                 {
@@ -82,6 +83,7 @@ namespace CC.Parcing
                     {
                         node.Value.IsEnd = true;
                         Status |= ConstructFactoryStatus.Complete;
+                        tryStatus |= ConstructFactoryStatus.Complete;
                     }
 
                     // ### Add new layer of components. ###
@@ -96,6 +98,7 @@ namespace CC.Parcing
             if (activeEnds.Count() <= 0)
             {
                 Status |= ConstructFactoryStatus.Halted;
+                tryStatus |= ConstructFactoryStatus.Halted;
             }
 
             // Remove dead ends
@@ -111,7 +114,7 @@ namespace CC.Parcing
                     } while (end.Children.Count() == 0);
                 });
 
-            return !Status.HasFlag(ConstructFactoryStatus.Halted);
+            return tryStatus;
         }
 
         public IConstructBlock MakeBlock()

@@ -1,24 +1,24 @@
 ﻿using CC.Contract;
+using CC.Parcing.ComponentTypes;
+using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
-namespace CC
+namespace CC.Parcing
 {
-    public class Block : IBlock
+    public class IssueBlock : Block, IIssueBlock
     {
-        public IKey Key { get; set; }
-        public string Name { get; set; }
-        public string Value { get; set; }
-        public int Index { get; set; }
-        public int EndIndex { get; set; }
+        public IssueType Type { get; set; }
 
         public IBlock Copy(string name = null)
         {
-            return new Block
+            return new IssueBlock
             {
                 Key = Key,
                 Name = name == null ? Name : name,
+                Type = Type,
                 Value = Value,
                 Index = Index,
                 EndIndex = EndIndex
