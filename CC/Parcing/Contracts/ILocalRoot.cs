@@ -6,6 +6,8 @@ using System.Text;
 
 namespace CC.Parcing
 {
+    public delegate void ConstructCreated(ConstructBlock block);
+
     public interface ILocalRoot : IParseArgs
     {
         /// <summary>
@@ -29,5 +31,7 @@ namespace CC.Parcing
         /// </summary>
         /// <returns></returns>
         public IEnumerable<IParseArgs> LocalEnds();
+
+        public event ConstructCreated ConstructCreated;
     }
 }

@@ -31,7 +31,7 @@ namespace CC.Parcing
             }
         }
 
-        public IParseArgs CreateArg(IConstruct key)
+        public ILocalRoot CreateArg(IConstruct key)
         {
             return new ConstructArgs(key, new ValueComponent(key.Key, ""), null, this);
         }

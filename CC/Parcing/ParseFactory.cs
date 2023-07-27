@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BranchList;
+using CC.Contract;
 
 namespace CC.Parcing
 {
@@ -12,21 +13,24 @@ namespace CC.Parcing
     {
         private readonly KeyCollection Keys;
         private readonly IParseArgFactory ArgsFactory;
-        private readonly IParseArgs ParseTree;
+        private readonly ILocalRoot ParseTree;
 
         public ParseFactory(IConstruct startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
         {
             Keys = keys;
             ArgsFactory = argsFactory ?? new ParseArgFactory(keys);
             ParseTree = ArgsFactory.CreateArg(startConstruct);
+            ParseTree.ConstructCreated += (block) => LastCompletion = block;
         }
+
+        public ConstructBlock LastCompletion { get; private set; }
 
         public List<ValueComponent> GetNextKeys()
         {
             return ParseTree.Ends().Select(arg => arg.Component).ToList();
         }
 
-        public void UseBlock(Block block)
+        public void UseBlock(IBlock block)
         {
             var roots = ParseTree.Ends().AsEnumerable()
                 .ForEach(arg => arg.UseBlock(block, Keys, ArgsFactory))

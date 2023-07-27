@@ -21,6 +21,6 @@ namespace CC.Parcing.Contracts
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public IParseArgs CreateArg(IConstruct key);
+        public ILocalRoot CreateArg(IConstruct key);
     }
 }
