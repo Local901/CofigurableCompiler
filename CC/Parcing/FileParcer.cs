@@ -26,7 +26,7 @@ namespace CC.Parcing
 
         public void DoParse(out IBlock block, IConstruct startConstruct)
         {
-            ResultBlock = new Block { Key = startConstruct };
+            //ResultBlock = new Block { Key = startConstruct };
 
             // start branch
             BranchList = new ValueBranchNode<IConstructFactory>(new ConstructFactory(startConstruct, KeyCollection));
@@ -38,7 +38,7 @@ namespace CC.Parcing
                 UseBlock(BranchList, nextBlock);
             }
 
-            block = ResultBlock;
+            //block = ResultBlock;
         }
 
         /// <summary>

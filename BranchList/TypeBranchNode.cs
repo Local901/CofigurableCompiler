@@ -10,7 +10,7 @@ namespace BranchList
         where TActual : TypeBranchNode<TActual, TReturn>, TReturn
         where TReturn : class
     {
-        public TReturn Parent
+        public new TReturn Parent
         {
             get => base.Parent as TReturn;
             protected set
@@ -19,9 +19,9 @@ namespace BranchList
                 throw new Exception("Provided value for Parent was not not of correct type");
             }
         }
-        public List<TReturn> Children { get => base.Children.Cast<TReturn>().ToList(); }
+        public new List<TReturn> Children { get => base.Children.Cast<TReturn>().ToList(); }
 
-        public TReturn this[int index] { get => base[index] as TReturn; }
+        public new TReturn this[int index] => base[index] as TReturn;
 
         public void Add(TReturn node)
         {
@@ -49,7 +49,7 @@ namespace BranchList
             return base.Remove((TActual)item);
         }
 
-        public List<TReturn> Path()
+        public new List<TReturn> Path()
         {
             return base.Path().Cast<TReturn>().ToList();
         }
@@ -61,11 +61,11 @@ namespace BranchList
         {
             return base.AllFirst(block => test((TActual)block)).Cast<TReturn>().ToList();
         }
-        public List<TReturn> Ends()
+        public new List<TReturn> Ends()
         {
             return base.Ends().Cast<TReturn>().ToList();
         }
-        public List<TReturn> All()
+        public new List<TReturn> All()
         {
             return base.All().Cast<TReturn>().ToList();
         }

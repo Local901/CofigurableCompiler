@@ -85,7 +85,7 @@ namespace CC.Grouping
         /// </summary>
         /// <param name="key">A single key string.</param>
         /// <returns>List of related member keys.</returns>
-        public List<IKey> GetMemeberKeys(string key)
+        public List<IKey> GetMemberKeys(string key)
         {
             var r = GetRelationOfKey(key);
             if (r == null) throw new Exceptions.KeyNotFoundException(key);
@@ -102,7 +102,7 @@ namespace CC.Grouping
             {
                 try
                 {
-                    return GetMemeberKeys(k);
+                    return GetMemberKeys(k);
                 }
                 catch (Exceptions.KeyNotFoundException)
                 {
@@ -120,7 +120,7 @@ namespace CC.Grouping
         /// <returns>List of type T related to the key.</returns>
         public List<T> GetMemberKeysOfType<T>(string key) where T : IKey
         {
-            return GetMemeberKeys(key).OfType<T>()
+            return GetMemberKeys(key).OfType<T>()
                 .Cast<T>()
                 .ToList();
         }
@@ -154,7 +154,7 @@ namespace CC.Grouping
         /// <returns>True is key is related to the groep.</returns>
         public bool IsKeyOfGroup(string key, string group)
         {
-            return GetMemeberKeys(group)
+            return GetMemberKeys(group)
                 .Select(k => k.Key)
                 .Contains(key);
         }
@@ -166,7 +166,7 @@ namespace CC.Grouping
         /// <returns>True is key is related to the groep.</returns>
         public bool IsKeyOfGroup(IKey key, string group)
         {
-            return GetMemeberKeys(group).Contains(key);
+            return GetMemberKeys(group).Contains(key);
         }
     }
 }

@@ -77,13 +77,12 @@ namespace CC.Lexing
                 return false;
 
             // make a block
-            block = new Block
-            {
-                Key = match.Token.GetKeyFor(match.Match.Value),
-                Index = match.Match.Index,
-                EndIndex = match.Match.Index + match.Match.Value.Length,
-                Value = match.Match.Value
-            };
+            block = new Block(
+                match.Token.GetKeyFor(match.Match.Value),
+                match.Match.Value,
+                match.Match.Index,
+                match.Match.Index + match.Match.Value.Length
+            );
 
             // move last index
             Index = block.EndIndex;
@@ -139,13 +138,12 @@ namespace CC.Lexing
                 .Where(m => m.Match != null)
                 .Where(m => m.Match.Value.Length > 0)
                 .Select(m =>
-                    new Block
-                    {
-                        Key = m.Token.GetKeyFor(m.Match.Value),
-                        Index = m.Match.Index,
-                        EndIndex = m.Match.Index + m.Match.Value.Length,
-                        Value = m.Match.Value
-                    })
+                    new Block(
+                        m.Token.GetKeyFor(m.Match.Value),
+                        m.Match.Value,
+                        m.Match.Index,
+                        m.Match.Index + m.Match.Value.Length
+                    ))
                 .Cast<IBlock>()
                 .ToList();
             return blocks.Count > 0;
@@ -179,13 +177,12 @@ namespace CC.Lexing
                 }
 
                 // make block
-                Block next = new Block
-                {
-                    Key = nextMatch.Token,
-                    Index = nextMatch.Match.Index,
-                    EndIndex = nextMatch.Match.Index + nextMatch.Match.Value.Length,
-                    Value = nextMatch.Match.Value
-                };
+                Block next = new Block(
+                    nextMatch.Token,
+                    nextMatch.Match.Value,
+                    nextMatch.Match.Index,
+                    nextMatch.Match.Index + nextMatch.Match.Value.Length
+                );
 
                 index = next.EndIndex;
                 program.Add(next);

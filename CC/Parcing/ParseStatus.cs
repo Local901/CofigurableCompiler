@@ -11,6 +11,7 @@ namespace CC.Parcing
         CanEnd,
         ReachedEnd,
         IsComplete,
-        Error
+        Error,
+        ExpectedSomethingElse
     }
 }

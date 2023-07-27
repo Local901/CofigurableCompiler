@@ -1,4 +1,5 @@
-﻿using CC.Grouping;
+﻿using CC.Contract;
+using CC.Grouping;
 using CC.Parcing.ComponentTypes;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,12 @@ namespace CC.Parcing.Contracts
         /// <param name="component"></param>
         /// <param name="localRoot"></param>
         /// <returns></returns>
-        public IParseArgs NewArg(ValueComponent component, IParseArgs localRoot);
+        public IEnumerable<IParseArgs> CreateArg(ValueComponent component, ILocalRoot localRoot);
         /// <summary>
         /// Create a new ParseArg of the correct type based on the construct key.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public IParseArgs NewArg(IConstruct key);
+        public IParseArgs CreateArg(IConstruct key);
     }
 }

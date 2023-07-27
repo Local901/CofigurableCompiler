@@ -1,8 +1,10 @@
-﻿using CC.Grouping;
+﻿using CC.Contract;
+using CC.Grouping;
 using CC.Parcing.ComponentTypes;
 using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CC.Parcing
@@ -16,14 +18,22 @@ namespace CC.Parcing
             Keys = keys;
         }
 
-        public IParseArgs NewArg(ValueComponent component, IParseArgs localRoot)
+        public IEnumerable<IParseArgs> CreateArg(ValueComponent component, ILocalRoot localRoot)
         {
-            throw new NotImplementedException();
+            var keys = Keys.GetMemberKeys(component.Key);
+            var constructsKeys = keys.OfType<IConstruct>();
+
+            if (keys.Count() != constructsKeys.Count()) yield return new ComponentArgs(component, localRoot);
+
+            foreach(var construct in constructsKeys)
+            {
+                yield return new ConstructArgs(construct, component, localRoot, this);
+            }
         }
 
-        public IParseArgs NewArg(IConstruct key)
+        public IParseArgs CreateArg(IConstruct key)
         {
-            return new ConstructArgs(key, new ValueComponent(key.Key, ""), null);
+            return new ConstructArgs(key, new ValueComponent(key.Key, ""), null, this);
         }
     }
 }
