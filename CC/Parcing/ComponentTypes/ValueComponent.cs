@@ -10,6 +10,8 @@ namespace CC.Parcing.ComponentTypes
         public string Key { get; }
         public string Name { get; }
 
+        public ValueComponent(string key) 
+            : this(key, null) { }
         public ValueComponent(string key, string name)
         {
             Key = key;

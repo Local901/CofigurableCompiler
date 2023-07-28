@@ -148,47 +148,5 @@ namespace CC.Lexing
                 .ToList();
             return blocks.Count > 0;
         }
-
-        /// <summary>
-        /// Lex whole page with these tokens
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="tokens"></param>
-        /// <returns>A block filled with lexed blocks</returns>
-        public static List<IBlock> LexAll(string page, List<Token> tokens)
-        {
-            var matches = tokens.Select(t => t.Regex.Matches(page).Where(m => !String.IsNullOrEmpty(m.Value))
-            .Select(m => new { Token = t, Match = m }));
-
-            int index = 0;
-            List<IBlock> program = new List<IBlock>();
-            bool doLoop = true;
-            while (doLoop)
-            {
-                // select next match
-                var nextMatch = matches.Select(a => a.FirstOrDefault(m => m.Match.Index >= index))
-                    .OrderBy(m => m.Match.Index)
-                    .FirstOrDefault();
-
-                if (nextMatch == null)
-                {
-                    doLoop = false;
-                    continue;
-                }
-
-                // make block
-                Block next = new Block(
-                    nextMatch.Token,
-                    nextMatch.Match.Value,
-                    nextMatch.Match.Index,
-                    nextMatch.Match.Index + nextMatch.Match.Value.Length
-                );
-
-                index = next.EndIndex;
-                program.Add(next);
-            }
-
-            return program;
-        }
     }
 }

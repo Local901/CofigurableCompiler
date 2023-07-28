@@ -16,8 +16,9 @@ namespace BranchList
             Children = new List<T>();
         }
         public BranchNode(List<T> children)
+            :this()
         {
-            Children = children;
+            AddRange(children);
         }
 
         public T this[int index] { get => Children[index]; protected set => Children[index] = value; }
@@ -26,7 +27,7 @@ namespace BranchList
 
         public bool IsReadOnly => ((IList)Children).IsReadOnly;
 
-        public int Count => ((ICollection)Children).Count;
+        public int Count => Children.Count;
 
         public bool IsSynchronized => ((ICollection)Children).IsSynchronized;
 

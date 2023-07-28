@@ -9,8 +9,8 @@ namespace CC.Parcing
 {
     public class Construct : IConstruct
     {
-        public Construct(IComponent components)
-            : base(components)
+        public Construct(string name, IComponent components)
+            : base(name, components)
         { }
 
 

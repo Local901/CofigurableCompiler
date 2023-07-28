@@ -166,7 +166,7 @@ namespace CC.Grouping
         /// <returns>True is key is related to the groep.</returns>
         public bool IsKeyOfGroup(IKey key, string group)
         {
-            return GetMemberKeys(group).Contains(key);
+            return GetMemberKeys(group).Any(k => k.CompareTo(key) == 0);
         }
     }
 }

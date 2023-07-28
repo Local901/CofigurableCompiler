@@ -10,8 +10,9 @@ namespace CC.Parcing.Contracts
     {
         public IComponent Components { get; }
 
-        public IConstruct (IComponent components)
+        public IConstruct (string key, IComponent components)
         {
+            Key = key;
             Components = components;
         }
     }

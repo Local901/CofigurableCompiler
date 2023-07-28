@@ -22,7 +22,7 @@ namespace CC.Parcing
             KeyCollection = keyCollection;
         }
 
-        public void DoParse(out IBlock block, IConstruct startConstruct)
+        public void DoParse(out ConstructBlock block, IConstruct startConstruct)
         {
             IParseFactory factory = new ParseFactory(startConstruct, KeyCollection);
 

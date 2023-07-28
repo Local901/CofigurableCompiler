@@ -78,11 +78,11 @@ namespace CC.Parcing
 
         private IEnumerable<IParseArgs> LocalEnds(IParseArgs arg)
         {
-            if (Children.Count() == 0)
+            if (arg.Children.Count() == 0)
             {
                 return new IParseArgs[] { arg };
             }
-            return Children.Where(c => c.LocalRoot == this)
+            return arg.Children.Where(c => c.LocalRoot == this)
                 .SelectMany(c => LocalEnds(c));
         }
     }

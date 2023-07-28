@@ -19,6 +19,8 @@ namespace CC.Parcing.ComponentTypes
 
         public override IList<ValueComponent> GetValueComponents(IComponent startAfter = null)
         {
+            if (startAfter == null) return GetNextComponents();
+
             int index = Children.IndexOf(startAfter) + 1;
             if (index == Count || index == 0)
             {

@@ -13,7 +13,7 @@ namespace CC.Parcing
     {
         private readonly KeyCollection Keys;
         private readonly IParseArgFactory ArgsFactory;
-        private readonly ILocalRoot ParseTree;
+        public readonly ILocalRoot ParseTree;
 
         public ParseFactory(IConstruct startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
         {
@@ -32,9 +32,13 @@ namespace CC.Parcing
 
         public void UseBlock(IBlock block)
         {
-            var roots = ParseTree.Ends().AsEnumerable()
-                .ForEach(arg => arg.UseBlock(block, Keys, ArgsFactory))
-                .GroupBy(arg => arg.LocalRoot)
+            var endPoints = ParseTree.Ends()
+                .Where(arg => arg.Status == ParseStatus.None)
+                .ToList();
+
+            endPoints.ForEach(arg => arg.UseBlock(block, Keys, ArgsFactory));
+
+            var roots = endPoints.GroupBy(arg => arg.LocalRoot)
                 .OrderByDescending(group =>
                 {
                     int depth = 0;
