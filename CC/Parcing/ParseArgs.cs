@@ -27,7 +27,7 @@ namespace CC.Parcing
             LocalRoot = localRoot;
         }
 
-        public ParseStatus UseBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory)
+        public virtual ParseStatus UseBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory)
         {
             if (Block != null) throw new Exception($"This parse step already contains a block");
 
@@ -35,6 +35,7 @@ namespace CC.Parcing
             {
                 // Set Status to Error
                 Status |= ParseStatus.Error;
+                block = new ErrorBlock(block, keyCollection.GetKey(Component.Key));
             }
             Block = block.Copy(Component.Name);
 
@@ -49,6 +50,16 @@ namespace CC.Parcing
             {
                 Status |= ParseStatus.ReachedEnd;
             }
+
+            // When a error has been found check next components for a posible match to the block.
+            if (Status.HasFlag(ParseStatus.Error))
+            {
+                var nextComponents = components.Where(comp => keyCollection.IsKeyOfGroup(Block.Key, comp.Key)).ToList();
+                var args = nextComponents.SelectMany(comp => factory.CreateArg(comp, LocalRoot));
+                AddRange(args);
+                args.ForEach(arg => arg.UseBlock(block, keyCollection, factory));
+            }
+
             AddRange(components.SelectMany(comp => factory.CreateArg(comp, LocalRoot)));
 
             return Status;
@@ -61,7 +72,7 @@ namespace CC.Parcing
 
         public void RemoveBranch()
         {
-            if (Parent != null && Parent != LocalRoot)
+            if (Parent != null)
             {
                 if (Parent.Children.Count() > 1)
                 {

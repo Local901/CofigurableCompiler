@@ -69,8 +69,9 @@ namespace CC.Parcing
                     .Distinct()
                     .Where(arg => arg != null);
 
-                var completeArgs = ends.Where(arg => arg.Status.HasFlag(ParseStatus.CanEnd));
-                var activeArgs = ends.Where(arg => (arg.Status & ParseStatus.ReachedEnd) == 0);
+                var completeArgs = ends.Where(arg => arg.Status.HasFlag(ParseStatus.CanEnd)).ToList();
+                var activeArgs = ends.Where(arg => (arg.Status & ParseStatus.ReachedEnd) == 0).ToList();
+                var errorArgs = ends.Where(arg => arg.Status.HasFlag(ParseStatus.Error)).ToList();
 
                 if (completeArgs.Count() > 0)
                 {
@@ -88,7 +89,19 @@ namespace CC.Parcing
                 }
 
                 // Remove deadEnds
-                var deadEnds = ends.Where(arg => arg.Status.HasFlag(ParseStatus.ReachedEnd));
+                bool onlyErrors = errorArgs.Count() == ends.Count();
+                // Find dead end nodes.
+                var deadEnds = ends.Where(arg =>
+                {
+                    if (arg.Status.HasFlag(ParseStatus.ReachedEnd)) return true;
+
+                    // Only remove error when there is a path that doesn't have a error.
+                    if (!onlyErrors && arg.Status.HasFlag(ParseStatus.Error))
+                    {   // Only remove error nodes that don't have any children that already have a status.
+                        return arg.Children.Where(c => c.Status != ParseStatus.None).Count() == 0;
+                    }
+                    return false;
+                });
                 deadEnds.ForEach(arg => arg.RemoveBranch());
             }
         }

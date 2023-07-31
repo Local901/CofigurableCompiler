@@ -25,7 +25,7 @@ namespace CC.Parcing
         /// <param name="keyCollection"></param>
         /// <param name="factory"></param>
         /// <returns></returns>
-        public ParseStatus SplitCompleteFrom(IParseArgs argEnd, KeyCollection keyCollection, IParseArgFactory factory);
+        public ConstructArgs SplitCompleteFrom(IParseArgs argEnd, KeyCollection keyCollection, IParseArgFactory factory);
         /// <summary>
         /// Get all ends for this localRoot.
         /// </summary>

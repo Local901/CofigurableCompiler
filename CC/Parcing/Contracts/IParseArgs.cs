@@ -50,7 +50,7 @@ namespace CC.Parcing.Contracts
         public void AddRange(IEnumerable<IParseArgs> args);
         public bool Remove(IParseArgs arg);
         /// <summary>
-        /// Remove until a node has more than one child or has reached LocalRoot.
+        /// Remove until a node has more than one child.
         /// </summary>
         public void RemoveBranch();
     }

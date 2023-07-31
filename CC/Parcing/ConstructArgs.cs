@@ -6,6 +6,7 @@ using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace CC.Parcing
@@ -31,6 +32,43 @@ namespace CC.Parcing
             );
         }
 
+        public override ParseStatus UseBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory)
+        {
+            base.UseBlock(block, keyCollection, factory);
+
+            var lastBlock = LastBlock(Block);
+            if (lastBlock is ErrorBlock)
+            {   // try to use the last block if it was an errorblock.
+                ErrorBlock errorBlock = lastBlock as ErrorBlock;
+
+                Ends().Where(e =>
+                {
+                    if (e.LocalRoot == this || e == this) return false;
+                    return keyCollection.IsKeyOfGroup(errorBlock.Block.Key, e.Component.Key);
+                }).ForEach(e =>
+                {
+                    var next = factory.CreateArg(e.Component, e.LocalRoot)
+                        .Where(c => !c.UseBlock(errorBlock.Block, keyCollection, factory)
+                            .HasFlag(ParseStatus.Error)
+                        ).ToArray();
+                    e.Parent.AddRange(next);
+                });
+            }
+
+            return Status;
+        }
+
+        private IBlock LastBlock(IBlock block)
+        {
+            if (block is ConstructBlock)
+            {
+                return (block as ConstructBlock).Content.Count() == 0
+                    ? block
+                    : LastBlock((block as ConstructBlock).Content.Last());
+            }
+            return block;
+        }
+
         public event ConstructCreated ConstructCreated;
 
         public ParseStatus CompleteFrom(IParseArgs argEnd, KeyCollection keyCollection, IParseArgFactory factory)
@@ -48,18 +86,17 @@ namespace CC.Parcing
             return result;
         }
 
-        public ParseStatus SplitCompleteFrom(IParseArgs argEnd, KeyCollection keyCollection, IParseArgFactory factory)
+        public ConstructArgs SplitCompleteFrom(IParseArgs argEnd, KeyCollection keyCollection, IParseArgFactory factory)
         {
             var block = new ConstructBlock(Key, argEnd.LocalPath().Select(arg => arg.Block));
-            ParseStatus result = ParseStatus.None;
+            ConstructArgs arg = null;
             if (Parent != null)
             {
-                var arg = new ConstructArgs(block, Key, Component, LocalRoot, keyCollection, factory);
+                arg = new ConstructArgs(block, Key, Component, LocalRoot, keyCollection, factory);
                 Parent.Add(arg);
-                result = arg.Status;
             }
             TriggerCreateConstruct(block);
-            return result;
+            return arg;
         }
 
         private void TriggerCreateConstruct(ConstructBlock block)

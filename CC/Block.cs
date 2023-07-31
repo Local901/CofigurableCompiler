@@ -23,7 +23,7 @@ namespace CC
             EndIndex = endIndex;
         }
 
-        public IBlock Copy(string name = null)
+        public virtual IBlock Copy(string name = null)
         {
             return new Block
             {
