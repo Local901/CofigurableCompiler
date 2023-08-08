@@ -1,4 +1,5 @@
-﻿using CC.Contract;
+﻿using CC.Blocks;
+using CC.Key;
 using System;
 using System.Collections.Generic;
 using System.Text;

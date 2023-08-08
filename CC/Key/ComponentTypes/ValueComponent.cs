@@ -1,20 +1,21 @@
 ﻿using BranchList;
+using CC.Key;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC.Parcing.ComponentTypes
+namespace CC.Key.ComponentTypes
 {
     public class ValueComponent : IComponent
     {
-        public string Key { get; }
+        public KeyLangReference Reference { get; }
         public string Name { get; }
 
-        public ValueComponent(string key) 
+        public ValueComponent(KeyLangReference key) 
             : this(key, null) { }
-        public ValueComponent(string key, string name)
+        public ValueComponent(KeyLangReference key, string name)
         {
-            Key = key;
+            Reference = key;
             Name = name;
         }
 

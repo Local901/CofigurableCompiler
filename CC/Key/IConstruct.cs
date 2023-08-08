@@ -1,10 +1,7 @@
-﻿using CC.Contract;
-using CC.Parcing.ComponentTypes;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CC.Key.ComponentTypes;
 
-namespace CC.Parcing.Contracts
+namespace CC.Key
+
 {
     public abstract class IConstruct : IKey
     {
@@ -12,7 +9,7 @@ namespace CC.Parcing.Contracts
 
         public IConstruct (string key, IComponent components)
         {
-            Key = key;
+            Reference = new KeyLangReference { Key = key };
             Components = components;
         }
     }

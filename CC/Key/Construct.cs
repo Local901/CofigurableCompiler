@@ -1,11 +1,9 @@
-﻿using CC.Contract;
-using CC.Parcing.ComponentTypes;
-using CC.Parcing.Contracts;
+﻿using CC.Key.ComponentTypes;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC.Parcing
+namespace CC.Key
 {
     public class Construct : IConstruct
     {
@@ -14,14 +12,19 @@ namespace CC.Parcing
         { }
 
 
-        public override IKey GetKeyFor(string value)
+        public override IKey GetKeyFor(object value)
         {
             throw new NotImplementedException();
         }
 
-        public override List<IKey> GetKeys()
+        public override List<IKey> GetSubKeys()
         {
-            return new List<IKey> { this };
+            return new List<IKey>();
+        }
+
+        public override List<KeyLangReference> GetSubKeyRefs()
+        {
+            return new List<KeyLangReference>();
         }
     }
 }

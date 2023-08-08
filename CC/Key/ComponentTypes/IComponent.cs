@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC.Parcing.ComponentTypes
+namespace CC.Key.ComponentTypes
 {
     public abstract class IComponent : BranchNode<IComponent>
     {

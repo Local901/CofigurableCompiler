@@ -1,9 +1,9 @@
-﻿using CC.Contract;
+﻿using CC.Key;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC.Parcing
+namespace CC.Blocks
 {
     public class ErrorBlock : Block
     {

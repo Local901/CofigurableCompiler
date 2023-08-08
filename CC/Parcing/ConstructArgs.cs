@@ -1,7 +1,7 @@
 ﻿using BranchList;
-using CC.Contract;
-using CC.Grouping;
-using CC.Parcing.ComponentTypes;
+using CC.Blocks;
+using CC.Key;
+using CC.Key.ComponentTypes;
 using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
@@ -44,7 +44,7 @@ namespace CC.Parcing
                 Ends().Where(e =>
                 {
                     if (e.LocalRoot == this || e == this) return false;
-                    return keyCollection.IsKeyOfGroup(errorBlock.Block.Key, e.Component.Key);
+                    return keyCollection.IsKeyInGroup(errorBlock.Block.Key, e.Component.Reference);
                 }).ForEach(e =>
                 {
                     var next = factory.CreateArg(e.Component, e.LocalRoot)

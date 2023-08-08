@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CC.Parcing.ComponentTypes
+namespace CC.Key.ComponentTypes
 {
     public class AnyComponent : IComponent
     {

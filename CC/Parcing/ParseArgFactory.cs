@@ -1,6 +1,5 @@
-﻿using CC.Contract;
-using CC.Grouping;
-using CC.Parcing.ComponentTypes;
+﻿using CC.Key;
+using CC.Key.ComponentTypes;
 using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace CC.Parcing
 
         public IEnumerable<IParseArgs> CreateArg(ValueComponent component, ILocalRoot localRoot)
         {
-            var keys = Keys.GetMemberKeys(component.Key);
+            var keys = Keys.GetAllProminentSubKeys(component.Reference, true);
             var constructsKeys = keys.OfType<IConstruct>();
 
             if (keys.Count() != constructsKeys.Count()) yield return new ComponentArgs(component, localRoot);
@@ -33,7 +32,7 @@ namespace CC.Parcing
 
         public ILocalRoot CreateArg(IConstruct key)
         {
-            return new ConstructArgs(key, new ValueComponent(key.Key, ""), null, this);
+            return new ConstructArgs(key, new ValueComponent(key.Reference, ""), null, this);
         }
     }
 }

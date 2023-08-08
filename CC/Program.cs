@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using CC.Lexing;
-using CC.Parcing;
-using System.Linq;
 using BranchList;
-using CC.Grouping;
-using CC.Contract;
-using CC.Parcing.ComponentTypes;
-using CC.Parcing.Contracts;
+using CC.Key;
+using CC.Key.ComponentTypes;
+using CC.Blocks;
 
 namespace CC
 {
@@ -41,7 +37,7 @@ namespace CC
             }*/
 
             ConstructBlock block;
-            parser.DoParse(out block, keyCollection.GetKey("function") as IConstruct);
+            parser.DoParse(out block, keyCollection.GetLanguage("cLang").GetKey("function") as IConstruct);
             PrintConstruct(block);
         }
 
@@ -66,57 +62,43 @@ namespace CC
             Console.WriteLine($"{offSet}{block.EndIndex}");
         }
 
-        static void MakeTokens()
-        {
-            keyCollection.AddKey(new Token { Key = "lessThan", Pattern = "<" });
-            keyCollection.AddKey(new Token { Key = "gratherThan", Pattern = ">" });
-            keyCollection.AddKey(new Token { Key = "equals", Pattern = "=" });
-            keyCollection.AddKey(new Token { Key = "text", Pattern = "\".*?[^\\\\]\"" });
-            keyCollection.AddKey(new Token { Key = "dot", Pattern = @"\." });
-            keyCollection.AddKey(new Token { Key = "slash", Pattern = "/" });
-            Token temp = new Token { Key = "identifier", Pattern = @"[a-zA-Z]\w*" };
-            temp.SubTokens.Add(new Token { Key = "keyword_compiler", Pattern = "Compiler" });
-            temp.SubTokens.Add(new Token { Key = "keyword_token", Pattern = "Token" });
-            temp.SubTokens.Add(new Token { Key = "keyword_construct", Pattern = "Construct" });
-            temp.SubTokens.Add(new Token { Key = "keyword_condition", Pattern = "Condition" });
-            temp.SubTokens.Add(new Token { Key = "keyword_part", Pattern = "Part" });
-            temp.SubTokens.Add(new Token { Key = "keyword_content", Pattern = "Content" });
-            keyCollection.AddKey(temp);
-        }
-
         static void MakeCCompiler()
         {
-            keyCollection.AddKey(new Token { Key = "open_parentases", Pattern = @"\(" });
-            keyCollection.AddKey(new Token { Key = "close_parentases", Pattern = @"\)" });
-            keyCollection.AddKey(new Token { Key = "open_brace", Pattern = "{" });
-            keyCollection.AddKey(new Token { Key = "close_brace", Pattern = "}" });
+            var lang = new LangCollection("cLang");
+            keyCollection.AddLanguage(lang);
 
-            keyCollection.AddKey(new Token { Key = "semicolon", Pattern = ";" });
+            lang.Add(new Token ("open_parentases", @"\("));
+            lang.Add(new Token ("close_parentases", @"\)"));
+            lang.Add(new Token ("open_brace", "{"));
+            lang.Add(new Token ("close_brace", "}"));
 
-            Token temp = new Token { Key = "identifier", Pattern = @"[a-zA-Z]\w*" };
-            temp.SubTokens.Add(new Token { Key = "keyword_int", Pattern = "int" });
-            temp.SubTokens.Add(new Token { Key = "keyword_return", Pattern = "return" });
-            keyCollection.AddKey(temp);
+            lang.Add(new Token ("semicolon", ";"));
 
-            keyCollection.AddKey(new Token { Key = "integer_literal", Pattern = "[0-9]+" });
+            var identifier = lang.Add(new Token ("identifier", @"[a-zA-Z]\w*", new List<Token>
+            {
+                new Token ("keyword_int", "int"),
+                new Token ("keyword_return", "return")
+            }));
+
+            lang.Add(new Token ("integer_literal", "[0-9]+"));
 
             var c = new Construct("function",
                 new OrderComponent(new List<IComponent>{
-                    new ValueComponent("keyword_int", "return_type"),
-                    new ValueComponent("identifier", "function_name"),
-                    new ValueComponent("open_parentases"),
-                    new ValueComponent("close_parentases"),
-                    new ValueComponent("open_brace"),
+                    new ValueComponent(lang.CreateReference("keyword_int"), "return_type"),
+                    new ValueComponent(identifier, "function_name"),
+                    new ValueComponent(lang.CreateReference("open_parentases")),
+                    new ValueComponent(lang.CreateReference("close_parentases")),
+                    new ValueComponent(lang.CreateReference("open_brace")),
                     new OrderComponent(new List<IComponent>
                     {
-                        new ValueComponent("keyword_return"),
-                        new ValueComponent("integer_literal", "return_value"),
-                        new ValueComponent("semicolon")
+                        new ValueComponent(lang.CreateReference("keyword_return")),
+                        new ValueComponent(lang.CreateReference("integer_literal"), "return_value"),
+                        new ValueComponent(lang.CreateReference("semicolon"))
                     }),
-                    new ValueComponent("close_brace")
+                    new ValueComponent(lang.CreateReference("close_brace"))
                 }));
 
-            keyCollection.AddKey(c);
+            lang.Add(c);
 
             /*var c = bc.Constructs;
             var cont = new Construct { Key = "function" };

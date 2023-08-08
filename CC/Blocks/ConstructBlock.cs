@@ -1,12 +1,11 @@
 ﻿using BranchList;
-using CC.Contract;
-using CC.Parcing.Contracts;
+using CC.Key;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CC.Parcing
+namespace CC.Blocks
 {
     public class ConstructBlock : Block
     {

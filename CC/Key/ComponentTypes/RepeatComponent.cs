@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace CC.Parcing.ComponentTypes
+namespace CC.Key.ComponentTypes
 {
     /// <summary>
     /// Repeat child or continue with parent.

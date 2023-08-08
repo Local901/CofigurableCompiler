@@ -1,7 +1,7 @@
 ﻿using BranchList;
-using CC.Contract;
-using CC.Grouping;
-using CC.Parcing.ComponentTypes;
+using CC.Blocks;
+using CC.Key;
+using CC.Key.ComponentTypes;
 using CC.Parcing.Contracts;
 using System;
 using System.Collections.Generic;
@@ -31,11 +31,11 @@ namespace CC.Parcing
         {
             if (Block != null) throw new Exception($"This parse step already contains a block");
 
-            if (!keyCollection.IsKeyOfGroup(block.Key, Component.Key))
+            if (!keyCollection.GetLanguage(Component.Reference.Lang).IsKeyInGroup(block.Key.Reference, Component.Reference))
             {
                 // Set Status to Error
                 Status |= ParseStatus.Error;
-                block = new ErrorBlock(block, keyCollection.GetKey(Component.Key));
+                block = new ErrorBlock(block, keyCollection.GetKey(Component.Reference));
             }
             Block = block.Copy(Component.Name);
 
@@ -54,7 +54,7 @@ namespace CC.Parcing
             // When a error has been found check next components for a posible match to the block.
             if (Status.HasFlag(ParseStatus.Error))
             {
-                var nextComponents = components.Where(comp => keyCollection.IsKeyOfGroup(Block.Key, comp.Key)).ToList();
+                var nextComponents = components.Where(comp => keyCollection.GetLanguage(Component.Reference.Lang).IsKeyInGroup(Block.Key.Reference, comp.Reference)).ToList();
                 var args = nextComponents.SelectMany(comp => factory.CreateArg(comp, LocalRoot));
                 AddRange(args);
                 args.ForEach(arg => arg.UseBlock(block, keyCollection, factory));

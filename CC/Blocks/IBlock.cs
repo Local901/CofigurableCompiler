@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using CC.Key;
 
-namespace CC.Contract
+namespace CC.Blocks
 {
     public interface IBlock
     {
