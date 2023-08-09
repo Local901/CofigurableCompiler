@@ -25,6 +25,14 @@ namespace CC
         }
 
         /// <summary>
+        /// Restart lexing from the beginning.
+        /// </summary>
+        public void Reset()
+        {
+            Index = 0;
+        }
+
+        /// <summary>
         /// Find next block using tokens connected to the key.
         /// </summary>
         /// <param name="block">Block that gets created.</param>

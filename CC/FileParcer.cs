@@ -23,6 +23,7 @@ namespace CC
 
         public void DoParse(out ConstructBlock block, IConstruct startConstruct)
         {
+            FileLexer.Reset();
             IParseFactory factory = new ParseFactory(startConstruct, KeyCollection);
 
             IBlock nextBlock;
