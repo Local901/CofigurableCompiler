@@ -5,6 +5,7 @@ using BranchList;
 using CC.Key;
 using CC.Key.ComponentTypes;
 using CC.Blocks;
+using System.Linq;
 
 namespace CC
 {
@@ -24,7 +25,8 @@ namespace CC
 
             /*var blocks = new List<IBlock>();
             IBlock block;
-            while (lexer.TryNextBlock(out block))
+            var keys = keyCollection.GetLanguage("cLang").GetAllKeys().Select(k => k.Reference);
+            while (lexer.TryNextBlock(out block, keys))
             {
                 blocks.Add(block);
             }
@@ -35,7 +37,7 @@ namespace CC
                 Console.WriteLine(b.Key + " : " + b.Value);
                 Console.WriteLine(b.Index + b.Value.Length);
             }*/
-
+            
             ConstructBlock block;
             parser.DoParse(out block, keyCollection.GetLanguage("cLang").GetKey("function") as IConstruct);
             PrintConstruct(block);

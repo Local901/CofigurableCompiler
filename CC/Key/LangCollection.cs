@@ -179,7 +179,7 @@ namespace CC.Key
                 .ToList();
 
             if (keys == null) return new List<IKey>();
-            if (includeSelf) keys.Add(GetKey(key));
+            if (includeSelf) keys.Add(GetKey(key).ProminentKey);
 
             List<IKey> result = keys.Select(k => k.ProminentKey)
                 .Distinct()

@@ -32,7 +32,7 @@ namespace CC
         /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, KeyLangReference key)
         {
-            return TryNextBlock(out block, _tokenCollection.GetAllProminentSubKeysOfType<Token>(key));
+            return TryNextBlock(out block, _tokenCollection.GetAllProminentSubKeysOfType<Token>(key, true));
         }
         /// <summary>
         /// Find next block using tokens connected to the keys.
@@ -42,7 +42,7 @@ namespace CC
         /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, IEnumerable<KeyLangReference> keys)
         {
-            return TryNextBlock(out block, _tokenCollection.GetAllProminentSubKeysOfType<Token>(keys));
+            return TryNextBlock(out block, _tokenCollection.GetAllProminentSubKeysOfType<Token>(keys, true));
         }
         /// <summary>
         /// Find next block using provided tokens.
