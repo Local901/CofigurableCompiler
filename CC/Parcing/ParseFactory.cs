@@ -9,9 +9,10 @@ using CC.Blocks;
 
 namespace CC.Parcing
 {
-    public class ParseFactory : IParseFactory
+    public class ParseFactory : IParseFactory, IParseArgFactory
     {
         protected readonly KeyCollection Keys;
+        protected readonly IParseArgFactory ArgsFactory;
 
         public readonly ILocalRoot ParseTree;
         private IReadOnlyList<IParseArgs> Ends;
@@ -19,24 +20,28 @@ namespace CC.Parcing
 
         public ConstructBlock LastCompletion { get; private set; }
 
-        public ParseFactory(IConstruct startConstruct, KeyCollection keys)
+        public ParseFactory(IConstruct startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
         {
             Keys = keys;
-            ParseTree = CreateNextArgs(startConstruct);
+            ArgsFactory = argsFactory == null ? this : argsFactory;
+            ParseTree = argsFactory.CreateNextArgs(startConstruct);
             ParseTree.ConstructCreated += (block) => LastCompletion = block;
         }
 
         public List<KeyLangReference> GetNextKeys()
         {
-            return Ends.SelectMany(e => e.Data.GetNextComponents())
+            return Ends.SelectMany(e => GetNextDataOfArgs(e)
+                    .DataPaths
+                    .Select(p => p.Last()))
                 .Select(data => data.Component.Reference)
                 .Distinct()
+                .Where(data => data != null)
                 .ToList();
         }
 
         public void UseBlock(IBlock block)
         {
-            Ends = Ends.SelectMany(arg => ContinueArgs(arg, block)).ToList();
+            Ends = Ends.SelectMany(arg => NextArgs(arg, block)).ToList();
 
             var roots = Ends.GroupBy(arg => arg.LocalRoot)
                 .OrderByDescending(group => group.Key.Depth)
@@ -103,7 +108,7 @@ namespace CC.Parcing
         /// <param name="arg"></param>
         /// <param name="block"></param>
         /// <returns></returns>
-        protected virtual IReadOnlyList<IParseArgs> ContinueArgs(IParseArgs arg, IBlock block)
+        protected virtual IReadOnlyList<IParseArgs> NextArgs(IParseArgs arg, IBlock block)
         {
             if (block == null) throw new Exception("A block is required");
 
@@ -121,7 +126,7 @@ namespace CC.Parcing
                 return new List<IParseArgs>();
             }
 
-            return acceptable.SelectMany(data => CreateNextArgs(data, arg, block)).ToList();
+            return acceptable.Select(data => ArgsFactory.CreateNextArgs(data, arg, block)).ToList();
         }
 
         public ArgsData GetNextDataOfArgs(IParseArgs arg)
@@ -160,6 +165,7 @@ namespace CC.Parcing
         private void ExtendConstructNodes(ValueBranchNode<IValueComponentData> node)
         {
             node.Ends()
+                .Where(n => n.Value != null)
                 .Select(n => {
                     var reference = n.Value.Component.Reference;
                     return new
@@ -184,9 +190,27 @@ namespace CC.Parcing
 
         }
 
-        public IReadOnlyList<IParseArgs> CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
+        public IParseArgs CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
         {
-            throw new NotImplementedException();
+            if (componentPath == null || componentPath.Count == 0) throw new ArgumentException("ComponentPath should contain at leats one element.");
+
+            var p = parent;
+            foreach(var step in componentPath)
+            {
+                var localRoot = p is ILocalRoot ? (ILocalRoot)p : p.LocalRoot;
+                IKey key = Keys.GetKey(step.Component.Reference);
+                if (key is Token)
+                {
+                    // Should be last element in list.
+                    p = new ParseArgs(step, localRoot, block);
+                }
+                else if (key is IConstruct)
+                {
+                    p = new ConstructArgs((IConstruct)key, step, localRoot);
+                }
+            }
+
+            return p;
         }
     }
 }

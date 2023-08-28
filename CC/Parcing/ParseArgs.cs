@@ -11,7 +11,7 @@ namespace CC.Parcing
 {
     public class ParseArgs : TypeBranchNode<ParseArgs, IParseArgs>, IParseArgs
     {
-        public ParseStatus Status { get; protected set; }
+        public ParseStatus Status { get; set; }
 
         public IValueComponentData Data { get; }
 
@@ -19,6 +19,11 @@ namespace CC.Parcing
 
         public IBlock Block { get; protected set; }
 
+        public ParseArgs(IValueComponentData data, ILocalRoot localRoot, IBlock block)
+            : this(data, localRoot)
+        {
+            Block = block;
+        }
         public ParseArgs(IValueComponentData data, ILocalRoot localRoot)
             : base()
         {

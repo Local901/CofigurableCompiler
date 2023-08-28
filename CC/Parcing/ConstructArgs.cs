@@ -17,24 +17,14 @@ namespace CC.Parcing
 
         public int Depth { get; }
 
-        private ConstructArgs(IBlock block, IConstruct key, IValueComponentData component, ILocalRoot localRoot, KeyCollection keyCollection, IParseArgFactory factory)
-            : base(component, localRoot)
+        private ConstructArgs(IConstruct key, IValueComponentData component, ILocalRoot localRoot, IBlock block)
+            : base(component, localRoot, block)
         {
             Key = key;
-            SetBlock(block, keyCollection, factory);
             Depth = localRoot.Depth + 1;
         }
-        public ConstructArgs(IConstruct key, IValueComponentData component, ILocalRoot localRoot, IParseArgFactory factory)
-            : base(component, localRoot)
-        {
-            Key = key;
-            AddRange(
-                key.Component
-                    .GetNextComponents(null)
-                    .SelectMany(comp => factory.CreateArg(comp.Component, this))
-            );
-            Depth = localRoot.Depth + 1;
-        }
+        public ConstructArgs(IConstruct key, IValueComponentData component, ILocalRoot localRoot)
+            : this(key, component, localRoot, null) { }
 
         public override IList<IValueComponentData> GetNextComponents()
         {

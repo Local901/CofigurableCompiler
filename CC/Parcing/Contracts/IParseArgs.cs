@@ -12,7 +12,7 @@ namespace CC.Parcing.Contracts
         /// <summary>
         /// Indecate the status of this parse step. It is None when no block has been used for this step.
         /// </summary>
-        public ParseStatus Status { get; }
+        public ParseStatus Status { get; set; }
         /// <summary>
         /// The component related to this step in parsing.
         /// </summary>
