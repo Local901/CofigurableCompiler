@@ -6,6 +6,7 @@ using BranchList;
 using CC.Key;
 using CC.Key.ComponentTypes;
 using CC.Blocks;
+using System.Data;
 
 namespace CC.Parcing
 {
@@ -41,65 +42,27 @@ namespace CC.Parcing
 
         public void UseBlock(IBlock block)
         {
-            Ends = Ends.SelectMany(arg => NextArgs(arg, block)).ToList();
-
-            var roots = Ends.GroupBy(arg => arg.LocalRoot)
+            var groups = Ends.SelectMany(arg => NextArgs(arg, block))
+                .GroupBy(arg => arg.LocalRoot)
                 .OrderByDescending(group => group.Key.Depth)
-                .Select(group => group.Key);
+                .ToList();
 
-            foreach (var root in roots)
+            NextArgsData.Clear();
+
+            groups.ForEach(g => g.ForEach(arg => UpdateStatus(arg)));
+            Ends = groups.SelectMany(group =>
             {
-                if (root == null) continue;
-
-                // Get potentionaly new end points.
-                var ends = root.LocalEnds()
-                    .Select(arg => {
-                        // When a LocalRoot has already been used it should not be counted.
-                        if (arg is ILocalRoot && !arg.Children.All(c => c.Status == ParseStatus.None))
-                        {
-                            return null;
-                        }
-
-                        return arg.Status != ParseStatus.None ? arg : arg.Parent;
-                    })
-                    .Distinct()
-                    .Where(arg => arg != null);
-
-                var completeArgs = ends.Where(arg => arg.Status.HasFlag(ParseStatus.CanEnd)).ToList();
-                var activeArgs = ends.Where(arg => (arg.Status & ParseStatus.ReachedEnd) == 0).ToList();
-                var errorArgs = ends.Where(arg => arg.Status.HasFlag(ParseStatus.Error)).ToList();
-
-                if (completeArgs.Count() > 0)
+                var errors = group.Where(arg => arg.Status.HasFlag(ParseStatus.Error)).ToList();
+                if (group.Count() == errors.Count)
                 {
-                    bool isCompleted = activeArgs.Count() == 0;
-
-                    foreach(var arg in completeArgs.Skip(isCompleted ? 1 : 0))
-                    {
-                        root.SplitCompleteFrom(arg, Keys, ArgsFactory);
-                    }
-                    if (isCompleted)
-                    {
-                        root.CompleteFrom(completeArgs.First(), Keys, ArgsFactory);
-                        continue;
-                    }
+                    return group;
                 }
+                errors.ForEach(err => err.RemoveBranch());
+                return group.Where(arg => !arg.Status.HasFlag(ParseStatus.Error));
+            }).ToList();
 
-                // Remove deadEnds
-                bool onlyErrors = errorArgs.Count() == ends.Count();
-                // Find dead end nodes.
-                var deadEnds = ends.Where(arg =>
-                {
-                    if (arg.Status.HasFlag(ParseStatus.ReachedEnd)) return true;
-
-                    // Only remove error when there is a path that doesn't have a error.
-                    if (!onlyErrors && arg.Status.HasFlag(ParseStatus.Error))
-                    {   // Only remove error nodes that don't have any children that already have a status.
-                        return arg.Children.Where(c => c.Status != ParseStatus.None).Count() == 0;
-                    }
-                    return false;
-                });
-                deadEnds.ForEach(arg => arg.RemoveBranch());
-            }
+            Ends.OrderByDescending(arg => arg.LocalRoot.Depth)
+                .SelectMany(arg => UpdateEnd(arg));
         }
 
         /// <summary>
@@ -187,7 +150,29 @@ namespace CC.Parcing
 
                     ExtendConstructNodes(n.node);
                 });
+        }
 
+        /// <summary>
+        /// Set the status of the provided arg.
+        /// </summary>
+        /// <param name="arg"></param>
+        private void UpdateStatus(IParseArgs arg)
+        {
+            var data = GetNextDataOfArgs(arg);
+            var ends = data.DataPaths.Select(path => path.Last());
+            if (ends.Contains(null)) arg.Status |= ParseStatus.CanEnd;
+            if (ends.Where(v => v != null).Count() == 0) arg.Status |= ParseStatus.ReachedEnd;
+            if (arg.Block is ErrorBlock) arg.Status |= ParseStatus.Error;
+        }
+
+        /// <summary>
+        /// Update the provided argument as if it is an end of the tree and return a list of all the ends resulting from the arg arg included if it is still an end.
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns>List of all ends resulting from the arg (may include self)</returns>
+        public IReadOnlyList<IParseArgs> UpdateEnd(IParseArgs arg)
+        {
+            throw new NotImplementedException();
         }
 
         public IParseArgs CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
