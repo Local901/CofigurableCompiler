@@ -7,8 +7,8 @@ namespace CC.Key
 {
     public class Construct : IConstruct
     {
-        public Construct(string name, IComponent components)
-            : base(name, components)
+        public Construct(string name, IComponent component)
+            : base(name, component)
         { }
 
 

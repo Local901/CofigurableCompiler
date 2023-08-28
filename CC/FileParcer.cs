@@ -1,6 +1,7 @@
 ﻿using BranchList;
 using CC.Blocks;
 using CC.Key;
+using CC.Key.ComponentTypes;
 using CC.Parcing;
 using CC.Parcing.Contracts;
 using System;
@@ -24,6 +25,8 @@ namespace CC
         public void DoParse(out ConstructBlock block, IConstruct startConstruct)
         {
             FileLexer.Reset();
+            IReadOnlyList<IValueComponentData> Ends = null;
+
             IParseFactory factory = new ParseFactory(startConstruct, KeyCollection);
 
             IBlock nextBlock;
@@ -43,11 +46,19 @@ namespace CC
         private bool TryGetNextBlock(out IBlock nextBlock, IParseFactory factory)
         {
             var refs = factory.GetNextKeys()
-                .Select(vc => vc.Reference.Lang)
                 .Distinct()
-                .SelectMany(l => KeyCollection.GetLanguage(l).GetAllKeys())
+                .SelectMany(l => KeyCollection.GetLanguage(l.Lang).GetAllKeys())
                 .Select(k => k.Reference);
             return FileLexer.TryNextBlock(out nextBlock, refs);
+        }
+
+        private IReadOnlyList<IValueComponentData> UpdateEnds(IReadOnlyList<IValueComponentData> Ends, IBlock block, IConstruct startConstruct)
+        {
+            IReadOnlyList<IValueComponentData> nextEnds = Ends == null
+                ? nextEnds = startConstruct.Component.GetNextComponents(null).ToList()
+                : nextEnds = Ends.SelectMany(e => e.GetNextComponents()).ToList();
+
+            return nextEnds;
         }
     }
 }

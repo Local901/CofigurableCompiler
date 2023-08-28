@@ -12,6 +12,11 @@ namespace CC.Parcing
     public interface ILocalRoot : IParseArgs
     {
         /// <summary>
+        /// The number of localRoots deep that this arg is located.
+        /// </summary>
+        public int Depth { get; }
+
+        /// <summary>
         /// Complete the LocalRoot with the content gotten from argEnd and remove al chidren that have this as localRoot.
         /// </summary>
         /// <param name="argEnd">An endpoint of the arg branch with a localRoot equal to this object.</param>

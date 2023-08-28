@@ -16,7 +16,7 @@ namespace CC.Parcing.Contracts
         /// <summary>
         /// The component related to this step in parsing.
         /// </summary>
-        public ValueComponent Component { get; }
+        public IValueComponentData Data { get; }
         /// <summary>
         /// The reference to the root object that this step originates from. LocalRoot can be null to indecate the root of the entire tree.
         /// </summary>
@@ -34,11 +34,7 @@ namespace CC.Parcing.Contracts
         /// </summary>
         public List<IParseArgs> Children { get; }
 
-        /// <summary>
-        /// This function will use the block provided to it.
-        /// </summary>
-        /// <param name="block"></param>
-        public ParseStatus UseBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory);
+        public IList<IValueComponentData> GetNextComponents();
 
         public List<IParseArgs> Ends();
         /// <summary>

@@ -5,12 +5,12 @@ namespace CC.Key
 {
     public abstract class IConstruct : IKey
     {
-        public IComponent Components { get; }
+        public IComponent Component { get; }
 
-        public IConstruct (string key, IComponent components)
+        public IConstruct (string key, IComponent component)
         {
             Reference = new KeyLangReference { Key = key };
-            Components = components;
+            Component = component;
         }
     }
 }

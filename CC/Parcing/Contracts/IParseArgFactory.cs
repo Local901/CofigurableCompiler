@@ -1,4 +1,5 @@
-﻿using CC.Key;
+﻿using CC.Blocks;
+using CC.Key;
 using CC.Key.ComponentTypes;
 using System;
 using System.Collections.Generic;
@@ -9,17 +10,18 @@ namespace CC.Parcing.Contracts
     public interface IParseArgFactory
     {
         /// <summary>
-        /// Create a new ParseArg of the correct type based on the component.
+        /// Create the ParseArgs objects for the component using the given block. The created
+        /// Args will automaticaly be connected to the parent object. If the a part of the component
+        /// path already exists it will continue from the last overlaping component.
         /// </summary>
-        /// <param name="component"></param>
-        /// <param name="localRoot"></param>
+        /// <param name="componentPath">The path to the component.</param>
+        /// <param name="parent">The parent of the first component.</param>
+        /// <param name="block">The block content for the last component</param>
         /// <returns></returns>
-        public IEnumerable<IParseArgs> CreateArg(ValueComponent component, ILocalRoot localRoot);
-        /// <summary>
-        /// Create a new ParseArg of the correct type based on the construct key.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public ILocalRoot CreateArg(IConstruct key);
+        public IReadOnlyList<IParseArgs> CreateNextArgs(
+            IReadOnlyList<IValueComponentData> componentPath,
+            IParseArgs parent,
+            IBlock block
+        );
     }
 }

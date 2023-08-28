@@ -4,6 +4,32 @@ using System.Text;
 
 namespace CC.Key.ComponentTypes
 {
+    public class OrderComponentData : ComponentData<OrderComponent>
+    {
+        public readonly int Index;
+
+        public OrderComponentData(IComponentData parent, OrderComponent component)
+            : this(parent, component, 0) { }
+        public OrderComponentData(IComponentData parent, OrderComponent component, int index)
+            : base(parent, component)
+        {
+            Index = index;
+        }
+
+        public override IList<IValueComponentData> GetNextComponents()
+        {
+            if (Index + 1 == Component.Children.Count)
+            {
+                return Parent != null
+                    ? Parent.GetNextComponents()
+                    : IComponent.EMPTY_DATA_LIST;
+            }
+
+            var data = new OrderComponentData(Parent, Component, Index + 1);
+            return Component.Children[data.Index].GetNextComponents(data);
+        }
+    }
+
     public class OrderComponent : IComponent
     {
         public OrderComponent(List<IComponent> children)
@@ -12,23 +38,10 @@ namespace CC.Key.ComponentTypes
             if (children.Count == 0) throw new Exception("The list of children should contain components.");
         }
 
-        public override IList<ValueComponent> GetNextComponents()
+        public override IList<IValueComponentData> GetNextComponents(IComponentData parent)
         {
-            return Children[0].GetValueComponents();
-        }
-
-        public override IList<ValueComponent> GetValueComponents(IComponent startAfter = null)
-        {
-            if (startAfter == null) return GetNextComponents();
-
-            int index = Children.IndexOf(startAfter) + 1;
-            if (index == Count || index == 0)
-            {
-                return Parent == null
-                    ? new List<ValueComponent> { null }
-                    : Parent.GetValueComponents(this);
-            }
-            return Children[index].GetValueComponents();
+            var data = new OrderComponentData(parent, this);
+            return Children[0].GetNextComponents(data);
         }
     }
 }

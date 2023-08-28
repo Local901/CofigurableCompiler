@@ -17,16 +17,16 @@ namespace CC.Parcing
             Keys = keys;
         }
 
-        public IEnumerable<IParseArgs> CreateArg(ValueComponent component, ILocalRoot localRoot)
+        public IEnumerable<IParseArgs> CreateArg(IReadOnlyList<IValueComponentData> data, ILocalRoot localRoot)
         {
-            var keys = Keys.GetAllProminentSubKeys(component.Reference, true);
+            var keys = Keys.GetAllProminentSubKeys(data.Component.Reference, true);
             var constructsKeys = keys.OfType<IConstruct>();
 
-            if (keys.Count() != constructsKeys.Count()) yield return new ComponentArgs(component, localRoot);
+            if (keys.Count() != constructsKeys.Count()) yield return new ParseArgs(data, localRoot);
 
             foreach(var construct in constructsKeys)
             {
-                yield return new ConstructArgs(construct, component, localRoot, this);
+                yield return new ConstructArgs(construct, data, localRoot, this);
             }
         }
 

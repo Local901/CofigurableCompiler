@@ -11,45 +11,36 @@ namespace CC.Parcing
 {
     public class ParseFactory : IParseFactory
     {
-        private readonly KeyCollection Keys;
-        private readonly IParseArgFactory ArgsFactory;
-        public readonly ILocalRoot ParseTree;
+        protected readonly KeyCollection Keys;
 
-        public ParseFactory(IConstruct startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
-        {
-            Keys = keys;
-            ArgsFactory = argsFactory ?? new ParseArgFactory(keys);
-            ParseTree = ArgsFactory.CreateArg(startConstruct);
-            ParseTree.ConstructCreated += (block) => LastCompletion = block;
-        }
+        public readonly ILocalRoot ParseTree;
+        private IReadOnlyList<IParseArgs> Ends;
+        private Dictionary<IParseArgs, ArgsData> NextArgsData = new Dictionary<IParseArgs, ArgsData>();
 
         public ConstructBlock LastCompletion { get; private set; }
 
-        public List<ValueComponent> GetNextKeys()
+        public ParseFactory(IConstruct startConstruct, KeyCollection keys)
         {
-            return ParseTree.Ends().Select(arg => arg.Component).ToList();
+            Keys = keys;
+            ParseTree = CreateNextArgs(startConstruct);
+            ParseTree.ConstructCreated += (block) => LastCompletion = block;
+        }
+
+        public List<KeyLangReference> GetNextKeys()
+        {
+            return Ends.SelectMany(e => e.Data.GetNextComponents())
+                .Select(data => data.Component.Reference)
+                .Distinct()
+                .ToList();
         }
 
         public void UseBlock(IBlock block)
         {
-            var endPoints = ParseTree.Ends()
-                .Where(arg => arg.Status == ParseStatus.None)
-                .ToList();
+            Ends = Ends.SelectMany(arg => ContinueArgs(arg, block)).ToList();
 
-            endPoints.ForEach(arg => arg.UseBlock(block, Keys, ArgsFactory));
-
-            var roots = endPoints.GroupBy(arg => arg.LocalRoot)
-                .OrderByDescending(group =>
-                {
-                    int depth = 0;
-                    ILocalRoot root = group.Key;
-                    while(root != null)
-                    {
-                        depth++;
-                        root = root.LocalRoot;
-                    }
-                    return depth;
-                }).Select(group => group.Key);
+            var roots = Ends.GroupBy(arg => arg.LocalRoot)
+                .OrderByDescending(group => group.Key.Depth)
+                .Select(group => group.Key);
 
             foreach (var root in roots)
             {
@@ -104,6 +95,98 @@ namespace CC.Parcing
                 });
                 deadEnds.ForEach(arg => arg.RemoveBranch());
             }
+        }
+
+        /// <summary>
+        /// Create the next args that can use the provided block.
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        protected virtual IReadOnlyList<IParseArgs> ContinueArgs(IParseArgs arg, IBlock block)
+        {
+            if (block == null) throw new Exception("A block is required");
+
+            var nextData = GetNextDataOfArgs(arg);
+            var acceptable = nextData.DataPaths.Where(data =>
+            {
+                var reference = data.Last().Component.Reference;
+                return Keys.GetLanguage(reference.Lang)
+                    .IsKeyInGroup(block.Key.Reference, reference);
+            }).ToList();
+
+            if (acceptable.Count() == 0)
+            {
+                // TODO: make error args.
+                return new List<IParseArgs>();
+            }
+
+            return acceptable.SelectMany(data => CreateNextArgs(data, arg, block)).ToList();
+        }
+
+        public ArgsData GetNextDataOfArgs(IParseArgs arg)
+        {
+            if (NextArgsData.ContainsKey(arg))
+            {
+                return NextArgsData[arg];
+            }
+            var data = GenerateArgsData(arg);
+            NextArgsData[arg] = data;
+            return data;
+        }
+        /// <summary>
+        /// Generate the ArgsData with the dataPaths to next ValueComponents
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
+        protected virtual ArgsData GenerateArgsData(IParseArgs arg)
+        {
+            var node = new ValueBranchNode<IValueComponentData>(null);
+            node.AddRange(
+                arg.GetNextComponents()
+                    .AsEnumerable()
+                    .Select(data => new ValueBranchNode<IValueComponentData>(data))
+            );
+
+            ExtendConstructNodes(node);
+
+            return new ArgsData(
+                arg,
+                node.Ends()
+                    .Select(n => n.Path().Skip(1).Select(n => n.Value).ToList())
+                    .ToList()
+            );
+        }
+        private void ExtendConstructNodes(ValueBranchNode<IValueComponentData> node)
+        {
+            node.Ends()
+                .Select(n => {
+                    var reference = n.Value.Component.Reference;
+                    return new
+                    {
+                        node = n,
+                        constructs = Keys.GetLanguage(reference.Lang).GetAllProminentSubKeys<IConstruct>(reference.Key, true)
+                    };
+                })
+                .Where(n => n.constructs.Count > 0)
+                .ForEach(n =>
+                {
+                    n.constructs.ForEach(construct =>
+                    {
+                        var data = construct.Component.GetNextComponents(null).ToArray();
+                        // TODO: Check for loops.
+
+                        n.node.AddRange(data.Select(d => new ValueBranchNode<IValueComponentData>(d)));
+                    });
+
+                    ExtendConstructNodes(n.node);
+                });
+
+        }
+
+        public IReadOnlyList<IParseArgs> CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
+        {
+            throw new NotImplementedException();
         }
     }
 }

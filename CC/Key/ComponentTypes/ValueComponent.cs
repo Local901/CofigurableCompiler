@@ -6,6 +6,18 @@ using System.Text;
 
 namespace CC.Key.ComponentTypes
 {
+    public class ValueComponentData : ComponentData<ValueComponent>, IValueComponentData
+    {
+        public ValueComponentData(IComponentData parent, ValueComponent component)
+            : base(parent, component) { }
+
+        public override IList<IValueComponentData> GetNextComponents()
+        {
+            if (Parent == null) return IComponent.EMPTY_DATA_LIST;
+            return Parent.GetNextComponents();
+        }
+    }
+
     public class ValueComponent : IComponent
     {
         public KeyLangReference Reference { get; }
@@ -19,15 +31,9 @@ namespace CC.Key.ComponentTypes
             Name = name;
         }
 
-        public override IList<ValueComponent> GetNextComponents()
+        public override IList<IValueComponentData> GetNextComponents(IComponentData parent)
         {
-            if (Parent == null) return new List<ValueComponent> { null };
-            return Parent.GetValueComponents(this);
-        }
-
-        public override IList<ValueComponent> GetValueComponents(IComponent startAfter = null)
-        {
-            return new List<ValueComponent> { this };
+            return new List<IValueComponentData> { new ValueComponentData(parent, this) };
         }
     }
 }

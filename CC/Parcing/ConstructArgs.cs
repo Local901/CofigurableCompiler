@@ -15,26 +15,36 @@ namespace CC.Parcing
     {
         public IConstruct Key { get; }
 
-        private ConstructArgs(IBlock block, IConstruct key, ValueComponent component, ILocalRoot localRoot, KeyCollection keyCollection, IParseArgFactory factory)
+        public int Depth { get; }
+
+        private ConstructArgs(IBlock block, IConstruct key, IValueComponentData component, ILocalRoot localRoot, KeyCollection keyCollection, IParseArgFactory factory)
             : base(component, localRoot)
         {
             Key = key;
-            UseBlock(block, keyCollection, factory);
+            SetBlock(block, keyCollection, factory);
+            Depth = localRoot.Depth + 1;
         }
-        public ConstructArgs(IConstruct key, ValueComponent component, ILocalRoot localRoot, IParseArgFactory factory)
+        public ConstructArgs(IConstruct key, IValueComponentData component, ILocalRoot localRoot, IParseArgFactory factory)
             : base(component, localRoot)
         {
             Key = key;
             AddRange(
-                key.Components
-                    .GetNextComponents()
-                    .SelectMany(comp => factory.CreateArg(comp, this))
+                key.Component
+                    .GetNextComponents(null)
+                    .SelectMany(comp => factory.CreateArg(comp.Component, this))
             );
+            Depth = localRoot.Depth + 1;
         }
 
-        public override ParseStatus UseBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory)
+        public override IList<IValueComponentData> GetNextComponents()
         {
-            base.UseBlock(block, keyCollection, factory);
+            if (Block == null) return Key.Component.GetNextComponents(null);
+            return base.GetNextComponents();
+        }
+
+        public override ParseStatus SetBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory)
+        {
+            base.SetBlock(block, keyCollection, factory);
 
             var lastBlock = LastBlock(Block);
             if (lastBlock is ErrorBlock)
@@ -44,11 +54,11 @@ namespace CC.Parcing
                 Ends().Where(e =>
                 {
                     if (e.LocalRoot == this || e == this) return false;
-                    return keyCollection.IsKeyInGroup(errorBlock.Block.Key, e.Component.Reference);
+                    return keyCollection.IsKeyInGroup(errorBlock.Block.Key, e.Data.Component.Reference);
                 }).ForEach(e =>
                 {
-                    var next = factory.CreateArg(e.Component, e.LocalRoot)
-                        .Where(c => !c.UseBlock(errorBlock.Block, keyCollection, factory)
+                    var next = factory.CreateArg(e.Data.Component, e.LocalRoot)
+                        .Where(c => !c.SetBlock(errorBlock.Block, keyCollection, factory)
                             .HasFlag(ParseStatus.Error)
                         ).ToArray();
                     e.Parent.AddRange(next);
@@ -77,7 +87,7 @@ namespace CC.Parcing
             if (!argEnd.Status.HasFlag(ParseStatus.CanEnd)) throw new Exception("The argEnd should have the status of CanEnd at least");
 
             var block = new ConstructBlock(Key, argEnd.LocalPath().Select(arg => arg.Block));
-            ParseStatus result = UseBlock(block, keyCollection, factory);
+            ParseStatus result = SetBlock(block, keyCollection, factory);
             TriggerCreateConstruct(block);
 
             // remove children that were used to complete this construct.
@@ -92,7 +102,7 @@ namespace CC.Parcing
             ConstructArgs arg = null;
             if (Parent != null)
             {
-                arg = new ConstructArgs(block, Key, Component, LocalRoot, keyCollection, factory);
+                arg = new ConstructArgs(block, Key, Data, LocalRoot, keyCollection, factory);
                 Parent.Add(arg);
             }
             TriggerCreateConstruct(block);
