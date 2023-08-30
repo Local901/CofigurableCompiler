@@ -50,7 +50,7 @@ namespace CC.Parcing
             NextArgsData.Clear();
 
             groups.ForEach(g => g.ForEach(arg => UpdateStatus(arg)));
-            Ends = groups.SelectMany(group =>
+            var nextEnds = groups.SelectMany(group =>
             {
                 var errors = group.Where(arg => arg.Status.HasFlag(ParseStatus.Error)).ToList();
                 if (group.Count() == errors.Count)
@@ -61,8 +61,9 @@ namespace CC.Parcing
                 return group.Where(arg => !arg.Status.HasFlag(ParseStatus.Error));
             }).ToList();
 
-            Ends.OrderByDescending(arg => arg.LocalRoot.Depth)
-                .SelectMany(arg => UpdateEnd(arg));
+            Ends = nextEnds.OrderByDescending(arg => arg.LocalRoot.Depth)
+                .SelectMany(arg => UpdateEnd(arg))
+                .ToList();
         }
 
         /// <summary>
@@ -172,7 +173,30 @@ namespace CC.Parcing
         /// <returns>List of all ends resulting from the arg (may include self)</returns>
         public IReadOnlyList<IParseArgs> UpdateEnd(IParseArgs arg)
         {
-            throw new NotImplementedException();
+            List<IParseArgs> result = new List<IParseArgs>();
+
+            if (!(arg.Block is ErrorBlock))
+            {
+                if (!arg.Status.HasFlag(ParseStatus.ReachedEnd))
+                {
+                    result.Add(arg);
+                }
+                if (arg.Status.HasFlag(ParseStatus.CanEnd))
+                {
+                    var localRoot = arg.LocalRoot;
+                    if (localRoot == null) return result;
+
+                    var block = localRoot.CreateBlock(arg);
+                    if (localRoot.Parent != null)
+                    {
+                        var rootArg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
+                        UpdateStatus(rootArg);
+                        result.AddRange(UpdateEnd(rootArg));
+                    }
+                }
+                return result;
+            }
+            throw new NotImplementedException("Updating the end when the block is an error.");
         }
 
         public IParseArgs CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
@@ -180,19 +204,28 @@ namespace CC.Parcing
             if (componentPath == null || componentPath.Count == 0) throw new ArgumentException("ComponentPath should contain at leats one element.");
 
             var p = parent;
-            foreach(var step in componentPath)
+            for (int i = 0; i < componentPath.Count; i++)
             {
+                var step = componentPath[i];
                 var localRoot = p is ILocalRoot ? (ILocalRoot)p : p.LocalRoot;
                 IKey key = Keys.GetKey(step.Component.Reference);
+                IParseArgs np = null;
                 if (key is Token)
                 {
                     // Should be last element in list.
-                    p = new ParseArgs(step, localRoot, block);
+                    np = new ParseArgs(step, localRoot, block);
                 }
                 else if (key is IConstruct)
                 {
-                    p = new ConstructArgs((IConstruct)key, step, localRoot);
+                    np = i == componentPath.Count - 1
+                        ? new ConstructArgs((IConstruct)key, step, localRoot)
+                        : new ConstructArgs((IConstruct)key, step, localRoot, block);
                 }
+                if (p != null)
+                {
+                    p.Add(np);
+                }
+                p = np;
             }
 
             return p;

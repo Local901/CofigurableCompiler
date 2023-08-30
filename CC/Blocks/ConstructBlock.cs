@@ -7,10 +7,10 @@ using System.Text;
 
 namespace CC.Blocks
 {
-    public class ConstructBlock : Block
+    public class ConstructBlock : Block, IRelationBlock
     {
-        public ConstructBlock Parent { get; protected set; }
-        public IReadOnlyList<ConstructBlock> Content { get; protected set; }
+        public IRelationBlock Parent { get; set; }
+        public IReadOnlyList<IBlock> Content { get; protected set; }
 
         private ConstructBlock() { }
         public ConstructBlock(IConstruct key, IEnumerable<IBlock> content)
@@ -19,16 +19,10 @@ namespace CC.Blocks
 
             Content = content.Select(b =>
             {
-                if (b is ConstructBlock) return b as ConstructBlock;
-                return new ConstructBlock
-                {
-                    Key = b.Key,
-                    Name = b.Name,
-                    Value = b.Value,
-                    Parent = this,
-                    Index = b.Index,
-                    EndIndex = b.EndIndex
-                };
+                var relationBlock = b as IRelationBlock;
+                if (relationBlock == null) return b;
+                relationBlock.Parent = this;
+                return relationBlock;
             }).ToList();
 
             Key = key;
@@ -48,7 +42,12 @@ namespace CC.Blocks
                 Content = Content.Select(c => c.Copy()).ToList()
             };
             // set Parent to be the copy for all children.
-            copy.Content.ForEach(c => c.Parent = copy);
+            copy.Content.ForEach(c => 
+            {
+                if (c is IRelationBlock) {
+                    ((IRelationBlock)c).Parent = copy;
+                }
+            });
 
             return copy;
         }
