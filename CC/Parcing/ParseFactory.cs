@@ -21,12 +21,11 @@ namespace CC.Parcing
 
         public ConstructBlock LastCompletion { get; private set; }
 
-        public ParseFactory(IConstruct startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
+        public ParseFactory(KeyLangReference startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
         {
             Keys = keys;
             ArgsFactory = argsFactory == null ? this : argsFactory;
-            ParseTree = argsFactory.CreateNextArgs(startConstruct);
-            ParseTree.ConstructCreated += (block) => LastCompletion = block;
+            ParseTree = ArgsFactory.CreateRoot(startConstruct);
         }
 
         public List<KeyLangReference> GetNextKeys()
@@ -86,8 +85,15 @@ namespace CC.Parcing
 
             if (acceptable.Count() == 0)
             {
-                // TODO: make error args.
-                return new List<IParseArgs>();
+                return nextData.DataPaths.Select(path => 
+                    ArgsFactory.CreateNextArgs(
+                        path,
+                        arg,
+                        new ErrorBlock(
+                            block,
+                            Keys.GetKey(path.Last().Component.Reference)
+                        )
+                    )).ToList();
             }
 
             return acceptable.Select(data => ArgsFactory.CreateNextArgs(data, arg, block)).ToList();
@@ -187,15 +193,17 @@ namespace CC.Parcing
                     if (localRoot == null) return result;
 
                     var block = localRoot.CreateBlock(arg);
-                    if (localRoot.Parent != null)
-                    {
-                        var rootArg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
-                        UpdateStatus(rootArg);
-                        result.AddRange(UpdateEnd(rootArg));
-                    }
+                    var rootArg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
+                    UpdateStatus(rootArg);
+                    result.AddRange(UpdateEnd(rootArg));
                 }
                 return result;
             }
+            /* TODO:
+             *  * Forgot this arg
+             *     * create next arg if it is equal
+             *     * is closing parent construct. (might want to test until root)
+             */
             throw new NotImplementedException("Updating the end when the block is an error.");
         }
 
@@ -229,6 +237,16 @@ namespace CC.Parcing
             }
 
             return p;
+        }
+
+        public ILocalRoot CreateRoot(KeyLangReference key)
+        {
+            var component = new OrderComponent(new List<IComponent>
+            {
+                new ValueComponent(null),
+                new ValueComponent(key)
+            });
+            return new ConstructArgs(null, component.GetNextComponents(null)[0], null);
         }
     }
 }

@@ -23,5 +23,12 @@ namespace CC.Parcing.Contracts
             IParseArgs parent,
             IBlock block
         );
+
+        /// <summary>
+        /// Create the root for parsing.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public ILocalRoot CreateRoot(KeyLangReference key);
     }
 }

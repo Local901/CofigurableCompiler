@@ -5,23 +5,29 @@ using System.Text;
 
 namespace CC.Blocks
 {
-    public class ErrorBlock : Block
+    public class ErrorBlock : IBlock
     {
         public IBlock Block { get; }
 
+        public IKey Key { get; }
+
+        public string Name { get; }
+
+        public int Index => Block.Index;
+
+        public int EndIndex => Block.EndIndex;
+
         public ErrorBlock(IBlock block, IKey key, string name)
-            : base(key, null, block.Index, block.EndIndex, name)
         {
             Block = block;
+            Key = key;
+            Name = name;
         }
 
         public ErrorBlock(IBlock block, IKey key)
-            : base(key, null, block.Index, block.EndIndex, block.Name)
-        {
-            Block = block;
-        }
+            : this(block, key, null) { }
 
-        public new ErrorBlock Copy(string name = null)
+        public IBlock Copy(string name = null)
         {
             return name == null
                 ? new ErrorBlock(Block, Key)
