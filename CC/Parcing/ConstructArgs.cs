@@ -21,7 +21,7 @@ namespace CC.Parcing
             : base(component, localRoot, block)
         {
             Key = key;
-            Depth = localRoot.Depth + 1;
+            Depth = localRoot == null ? 0 : localRoot.Depth + 1;
         }
         public ConstructArgs(IConstruct key, IValueComponentData component, ILocalRoot localRoot)
             : this(key, component, localRoot, null) { }

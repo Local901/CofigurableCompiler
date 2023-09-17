@@ -25,7 +25,8 @@ namespace CC.Parcing.Contracts
         );
 
         /// <summary>
-        /// Create the root for parsing.
+        /// Create the root for parsing which has the Data property set so the nextComponents function returns
+        /// IValueComponentdata for the provided key.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>

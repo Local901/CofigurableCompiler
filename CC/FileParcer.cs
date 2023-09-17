@@ -22,7 +22,7 @@ namespace CC
             KeyCollection = keyCollection;
         }
 
-        public void DoParse(out ConstructBlock block, IConstruct startConstruct)
+        public void DoParse(out ConstructBlock block, KeyLangReference startConstruct)
         {
             FileLexer.Reset();
             IReadOnlyList<IValueComponentData> Ends = null;
@@ -45,9 +45,16 @@ namespace CC
         /// <returns>True if the block has been created.</returns>
         private bool TryGetNextBlock(out IBlock nextBlock, IParseFactory factory)
         {
-            var refs = factory.GetNextKeys()
+            var keys = factory.GetNextKeys();
+            if (keys.Count == 0)
+            {
+                nextBlock = null;
+                return false;
+            }
+            var refs = keys
+                .Select(k => k.Lang)
                 .Distinct()
-                .SelectMany(l => KeyCollection.GetLanguage(l.Lang).GetAllKeys())
+                .SelectMany(l => KeyCollection.GetLanguage(l).GetAllKeys())
                 .Select(k => k.Reference);
             return FileLexer.TryNextBlock(out nextBlock, refs);
         }

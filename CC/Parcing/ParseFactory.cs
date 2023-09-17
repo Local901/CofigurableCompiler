@@ -21,11 +21,14 @@ namespace CC.Parcing
 
         public ConstructBlock LastCompletion { get; private set; }
 
+        private readonly int MAX_ERROR_DEPTH = 3;
+
         public ParseFactory(KeyLangReference startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
         {
             Keys = keys;
             ArgsFactory = argsFactory == null ? this : argsFactory;
             ParseTree = ArgsFactory.CreateRoot(startConstruct);
+            Ends = new List<IParseArgs> { ParseTree };
         }
 
         public List<KeyLangReference> GetNextKeys()
@@ -183,28 +186,78 @@ namespace CC.Parcing
 
             if (!(arg.Block is ErrorBlock))
             {
-                if (!arg.Status.HasFlag(ParseStatus.ReachedEnd))
-                {
-                    result.Add(arg);
-                }
-                if (arg.Status.HasFlag(ParseStatus.CanEnd))
-                {
-                    var localRoot = arg.LocalRoot;
-                    if (localRoot == null) return result;
-
-                    var block = localRoot.CreateBlock(arg);
-                    var rootArg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
-                    UpdateStatus(rootArg);
-                    result.AddRange(UpdateEnd(rootArg));
-                }
+                AddArgToResult(arg, result);
                 return result;
             }
+
             /* TODO:
              *  * Forgot this arg
              *     * create next arg if it is equal
              *     * is closing parent construct. (might want to test until root)
              */
-            throw new NotImplementedException("Updating the end when the block is an error.");
+            // Find ErrorDepth
+            int depth = 1;
+            IParseArgs parent = arg.Parent;
+            for (int i = 0; i < MAX_ERROR_DEPTH - 1; i++)
+            {
+                if ( parent == null || parent == arg.LocalRoot || !(parent.Block is ErrorBlock) )
+                {
+                    break;
+                }
+                depth++;
+            }
+
+            // Stop when MAX_ERROR_DEPTH has been reached.
+            if (depth == MAX_ERROR_DEPTH) return result;
+
+            AddArgToResult(arg, result);
+
+            // Check next components
+            CheckAndAddNextComponent(arg, result);
+
+            // Check next components of parent (untill root)
+            IParseArgs localArg = arg;
+            ILocalRoot root = arg.LocalRoot;
+            while (root != null)
+            {
+                var b = root.CreateBlock(localArg);
+                localArg = CreateNextArgs(new List<IValueComponentData> { root.Data }, root.Parent, b);
+                UpdateStatus(localArg);
+                CheckAndAddNextComponent(localArg, result);
+
+                root = root.LocalRoot;
+            }
+
+            return result;
+        }
+
+        private void AddArgToResult(IParseArgs arg, List<IParseArgs> result)
+        {
+            if (!arg.Status.HasFlag(ParseStatus.ReachedEnd))
+            {
+                result.Add(arg);
+            }
+            if (arg.Status.HasFlag(ParseStatus.CanEnd))
+            {
+                var localRoot = arg.LocalRoot;
+                if (localRoot == null) return;
+
+                var block = localRoot.CreateBlock(arg);
+                var rootArg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
+                UpdateStatus(rootArg);
+                result.AddRange(UpdateEnd(rootArg));
+            }
+        }
+
+        private void CheckAndAddNextComponent(IParseArgs arg, List<IParseArgs> result)
+        {
+            var data = GetNextDataOfArgs(arg);
+            data.DataPaths.Where(d => Keys.IsKeyInGroup(arg.Block.Key, d.Last().Component.Reference))
+                .ForEach(d => {
+                    var a = ArgsFactory.CreateNextArgs(d, arg, arg.Block);
+                    UpdateStatus(a);
+                    AddArgToResult(a, result);
+                });
         }
 
         public IParseArgs CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
