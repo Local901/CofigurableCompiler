@@ -13,6 +13,6 @@ namespace CC.Parcing.Contracts
         /// </summary>
         /// <param name="block"></param>
         /// <param name="startConstruct"></param>
-        void DoParse(out ConstructBlock block, KeyLangReference startConstruct);
+        void DoParse(out IRelationBlock block, KeyLangReference startConstruct);
     }
 }

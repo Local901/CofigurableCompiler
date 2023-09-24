@@ -38,12 +38,12 @@ namespace CC
                 Console.WriteLine(b.Index + b.Value.Length);
             }*/
             
-            ConstructBlock block;
-            parser.DoParse(out block, keyCollection.GetLanguage("cLang").GetKey("function") as IConstruct);
+            IRelationBlock block;
+            parser.DoParse(out block, keyCollection.GetLanguage("cLang").GetKey("function").Reference);
             PrintConstruct(block);
         }
 
-        static void PrintConstruct(ConstructBlock block, string offSet = "")
+        static void PrintConstruct(IRelationBlock block, string offSet = "")
         {
             if (block == null)
             {
@@ -51,14 +51,15 @@ namespace CC
                 return;
             }
             Console.WriteLine($"{offSet}{block.Index}");
-            if (block.Value != null)
+            var vb = block as IValueBlock;
+            if (vb != null && vb.Value != null)
             {
-                Console.WriteLine($"{offSet}{block.Key} : {block.Name} : {block.Value}");
+                Console.WriteLine($"{offSet}{block.Key} : {block.Name} : {vb.Value}");
             }
             else
             {
                 Console.WriteLine($"{offSet}{block.Key} : {block.Name}[");
-                block.Content.ForEach(b => PrintConstruct(b, offSet + "  "));
+                block.Content.OfType<IRelationBlock>().ForEach(b => PrintConstruct(b, offSet + "  "));
                 Console.WriteLine($"{offSet}]");
             }
             Console.WriteLine($"{offSet}{block.EndIndex}");

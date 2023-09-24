@@ -19,12 +19,15 @@ namespace CC.Parcing
         private IReadOnlyList<IParseArgs> Ends;
         private Dictionary<IParseArgs, ArgsData> NextArgsData = new Dictionary<IParseArgs, ArgsData>();
 
-        public ConstructBlock LastCompletion { get; private set; }
+        public int NumberOfRounds { get; private set; }
+        private List<IParseCompletion> CompletedParsings = new List<IParseCompletion>();
+        public IReadOnlyList<IParseCompletion> Completed { get => CompletedParsings; }
 
         private readonly int MAX_ERROR_DEPTH = 3;
 
         public ParseFactory(KeyLangReference startConstruct, KeyCollection keys, IParseArgFactory argsFactory = null)
         {
+            NumberOfRounds = 0;
             Keys = keys;
             ArgsFactory = argsFactory == null ? this : argsFactory;
             ParseTree = ArgsFactory.CreateRoot(startConstruct);
@@ -44,6 +47,8 @@ namespace CC.Parcing
 
         public void UseBlock(IBlock block)
         {
+            NumberOfRounds++;
+
             var groups = Ends.SelectMany(arg => NextArgs(arg, block))
                 .GroupBy(arg => arg.LocalRoot)
                 .OrderByDescending(group => group.Key.Depth)
@@ -66,6 +71,8 @@ namespace CC.Parcing
             Ends = nextEnds.OrderByDescending(arg => arg.LocalRoot.Depth)
                 .SelectMany(arg => UpdateEnd(arg))
                 .ToList();
+
+            ProcessCompleted();
         }
 
         /// <summary>
@@ -190,11 +197,6 @@ namespace CC.Parcing
                 return result;
             }
 
-            /* TODO:
-             *  * Forgot this arg
-             *     * create next arg if it is equal
-             *     * is closing parent construct. (might want to test until root)
-             */
             // Find ErrorDepth
             int depth = 1;
             IParseArgs parent = arg.Parent;
@@ -300,6 +302,32 @@ namespace CC.Parcing
                 new ValueComponent(key)
             });
             return new ConstructArgs(null, component.GetNextComponents(null)[0], null);
+        }
+
+        public void ProcessCompleted()
+        {
+            ParseTree.Children.Where(arg => arg.Block != null)
+                .ForEach(arg =>
+                {
+                    CompletedParsings.Add(new ParseCompletion(NumberOfRounds, arg.Block));
+                    arg.RemoveBranch();
+                });
+        }
+
+        public void CompleteEnds()
+        {
+            Ends.ForEach(end =>
+            {
+                var arg = end;
+                while (arg.LocalRoot != null)
+                {
+                    var localRoot = arg.LocalRoot;
+                    var block = localRoot.CreateBlock(arg);
+                    arg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
+                    UpdateStatus(arg);
+                }
+            });
+            ProcessCompleted();
         }
     }
 }

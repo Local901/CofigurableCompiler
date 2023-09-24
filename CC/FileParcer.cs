@@ -22,10 +22,9 @@ namespace CC
             KeyCollection = keyCollection;
         }
 
-        public void DoParse(out ConstructBlock block, KeyLangReference startConstruct)
+        public void DoParse(out IRelationBlock block, KeyLangReference startConstruct)
         {
             FileLexer.Reset();
-            IReadOnlyList<IValueComponentData> Ends = null;
 
             IParseFactory factory = new ParseFactory(startConstruct, KeyCollection);
 
