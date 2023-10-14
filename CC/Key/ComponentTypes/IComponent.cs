@@ -7,6 +7,7 @@ namespace CC.Key.ComponentTypes
 {
     public abstract class IComponent : BranchNode<IComponent>
     {
+        public static readonly List<IValueComponentData> EMPTY_DATA_LIST = new List<IValueComponentData> { null };
         public IComponent()
             : base() { }
         public IComponent(List<IComponent> children)
@@ -17,13 +18,6 @@ namespace CC.Key.ComponentTypes
         /// A element in the list of components can be `null` when a posible end point was found.
         /// </summary>
         /// <returns>A list of components that can follow after this component or a element in the list is null when a endpoint is encounterd.</returns>
-        public abstract IList<ValueComponent> GetNextComponents();
-        /// <summary>
-        /// Get a list of ValueComponents that are found can be placed after the passed value.
-        /// A element in the list of components can be `null` when a posible end point was found.
-        /// </summary>
-        /// <param name="startFrom">The component that the search should start after.</param>
-        /// <returns></returns>
-        public abstract IList<ValueComponent> GetValueComponents(IComponent startAfter = null);
+        public abstract IList<IValueComponentData> GetNextComponents(IComponentData parent);
     }
 }

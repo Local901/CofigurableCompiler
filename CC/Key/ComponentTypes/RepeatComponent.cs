@@ -6,32 +6,81 @@ using System.Text;
 
 namespace CC.Key.ComponentTypes
 {
+    public class RepeatComponentData : ComponentData<RepeatComponent>
+    {
+        public readonly int Repeats;
+
+        public RepeatComponentData(IComponentData parent, RepeatComponent component)
+            : this(parent, component, 0) { }
+        public RepeatComponentData(IComponentData parent, RepeatComponent component, int repeats)
+            : base(parent, component)
+        {
+            Repeats = repeats;
+        }
+
+        public override IList<IValueComponentData> GetNextComponents()
+        {
+            var data = new RepeatComponentData(Parent, Component, Repeats + 1);
+            var result = new List<IValueComponentData>();
+            if (data.Repeats < Component.Maximum)
+            {
+                result.AddRange(Component.Children[0].GetNextComponents(data));
+            }
+            if (data.Repeats >= Component.Minimum)
+            {
+                result.AddRange(
+                    Parent != null
+                        ? Parent.GetNextComponents()
+                        : IComponent.EMPTY_DATA_LIST
+                );
+            }
+            return result;
+        }
+    }
+
     /// <summary>
     /// Repeat child or continue with parent.
     /// </summary>
     public class RepeatComponent : IComponent
     {
-        public RepeatComponent(IComponent child)
+        /// <summary>
+        /// The minimum number of repeats that should be done before the loop can be left.
+        /// </summary>
+        public readonly int Minimum;
+        /// <summary>
+        /// The maximum number of repeats that can be done before beeing forced to leave the repeat.
+        /// If maximum is less then 1 the limit will be unlimited.
+        /// </summary>
+        public readonly int Maximum;
+
+        public RepeatComponent(IComponent child, int minimum = 0, int maximum = 0)
             : base()
         {
+            if (maximum < 1) goto OK;
+            if (maximum < minimum) throw new Exception("Maximum should be larger that minimum or less than one.");
+
+        OK:
+            Minimum = minimum;
+            Maximum = maximum;
+
             if (child == null) throw new ArgumentNullException("Child should be a component.");
             if (child is RepeatComponent) throw new ArgumentException("The child of a repeatComponent can not be another repeatComponent");
             Add(child);
         }
 
-        public override IList<ValueComponent> GetNextComponents()
+        public override IList<IValueComponentData> GetNextComponents(IComponentData parent)
         {
-            var repeatResult = Children[0].GetValueComponents();
-            return repeatResult.Concat(
-                Parent == null
-                    ? new List<ValueComponent> { null }
-                    : Parent.GetValueComponents(this)
+            var data = new RepeatComponentData(parent, this);
+            var result = Children[0].GetNextComponents(data);
+            if (0 >= Minimum)
+            {
+                result = result.Concat(
+                    parent != null
+                        ? parent.GetNextComponents()
+                        : EMPTY_DATA_LIST
                 ).ToList();
-        }
-
-        public override IList<ValueComponent> GetValueComponents(IComponent startAfter = null)
-        {
-            return GetNextComponents();
+            }
+            return result;
         }
     }
 }

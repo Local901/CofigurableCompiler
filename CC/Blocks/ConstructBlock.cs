@@ -7,28 +7,29 @@ using System.Text;
 
 namespace CC.Blocks
 {
-    public class ConstructBlock : Block
+    public class ConstructBlock : IRelationBlock
     {
-        public ConstructBlock Parent { get; protected set; }
-        public IReadOnlyList<ConstructBlock> Content { get; protected set; }
+        public IKey Key { get; private set; }
+
+        public string Name { get; private set; }
+
+        public int Index { get; private set; }
+
+        public int EndIndex { get; private set; }
+        public IRelationBlock Parent { get; set; }
+        public IReadOnlyList<IBlock> Content { get; protected set; }
 
         private ConstructBlock() { }
-        public ConstructBlock(IConstruct key, IEnumerable<IBlock> content)
+        public ConstructBlock(Construct key, IEnumerable<IBlock> content)
         {
             if (content.Count() == 0) throw new ArgumentException("The content for a construct should at least contain one element.");
 
             Content = content.Select(b =>
             {
-                if (b is ConstructBlock) return b as ConstructBlock;
-                return new ConstructBlock
-                {
-                    Key = b.Key,
-                    Name = b.Name,
-                    Value = b.Value,
-                    Parent = this,
-                    Index = b.Index,
-                    EndIndex = b.EndIndex
-                };
+                var relationBlock = b as IRelationBlock;
+                if (relationBlock == null) return b;
+                relationBlock.Parent = this;
+                return relationBlock;
             }).ToList();
 
             Key = key;
@@ -36,21 +37,30 @@ namespace CC.Blocks
             EndIndex = Content.Last().EndIndex;
         }
 
-        public new ConstructBlock Copy(string name = null)
+        public ConstructBlock Copy(string name = null)
         {
             ConstructBlock copy = new ConstructBlock
             {
                 Key = Key,
                 Name = name == null ? Name : name,
-                Value = Value,
                 Index = Index,
                 EndIndex = EndIndex,
                 Content = Content.Select(c => c.Copy()).ToList()
             };
             // set Parent to be the copy for all children.
-            copy.Content.ForEach(c => c.Parent = copy);
+            copy.Content.ForEach(c => 
+            {
+                if (c is IRelationBlock) {
+                    ((IRelationBlock)c).Parent = copy;
+                }
+            });
 
             return copy;
+        }
+
+        IBlock IBlock.Copy(string name)
+        {
+            return Copy(name);
         }
     }
 }

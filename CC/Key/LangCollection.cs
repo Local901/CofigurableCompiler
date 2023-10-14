@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BranchList;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,6 @@ namespace CC.Key
             Language = language;
         }
 
-
-
         /// <summary>
         /// Add a key to the collection
         /// </summary>
@@ -28,16 +27,6 @@ namespace CC.Key
         {
             key.Reference.Lang = Language;
             Keys.Add(key.Reference.Key, key);
-
-            key.GetSubKeys().ForEach(subKey =>
-            {
-                if (ContainsKey(subKey.Reference.Key)) return;
-                try
-                {
-                    Add(subKey);
-                }
-                catch (Exception) { }
-            });
 
             return key.Reference;
         }
@@ -80,47 +69,6 @@ namespace CC.Key
         {
             return GetAllKeys().OfType<T>().ToList();
         }
-        /// <summary>
-        /// Get all prominent keys in the language.
-        /// </summary>
-        /// <returns></returns>
-        public IList<IKey> GetAllProminentKeys()
-        {
-            return Keys.Values.Select(k => k.ProminentKey)
-                .Distinct().ToList();
-        }
-        /// <summary>
-        /// Get all prominent keys in the language of type T.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public IList<T> GetAllProminentKeys<T>()
-            where T : IKey
-        {
-            return GetAllProminentKeys().OfType<T>().ToList();
-        }
-
-        /// <summary>
-        /// Get the prominent key of the key if possible. If no key was found result is null.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public IKey GetProminentKey(string key)
-        {
-            return GetKey(key)?.ProminentKey;
-        }
-        /// <summary>
-        /// Try to get the prominent key.
-        /// </summary>
-        /// <param name="keyString"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public bool TryGetProminentKey(string keyString, out IKey key)
-        {
-            bool result = TryGetKey(keyString, out key);
-            key = key?.ProminentKey;
-            return result;
-        }
 
         /// <summary>
         /// Get A list of all the sub keys of type T (recursive).
@@ -129,7 +77,7 @@ namespace CC.Key
         /// <param name="key"></param>
         /// <param name="includeSelf"></param>
         /// <returns></returns>
-        public IList<T> GetAllSubKeys<T>(string key, bool includeSelf = false)
+        public IList<T> GetAllSubKeysOfType<T>(string key, bool includeSelf = false)
         {
             return GetAllSubKeys(key, includeSelf).OfType<T>().ToList();
         }
@@ -141,7 +89,10 @@ namespace CC.Key
         /// <returns></returns>
         public IList<IKey> GetAllSubKeys(string key, bool includeSelf = false)
         {
-            List<IKey> keys = GetKey(key).GetSubKeyRefs()
+            var keyObject = GetKey(key);
+            List<IKey> keys = !(keyObject is KeyGroup)
+                ? new List<IKey>()
+                : (GetKey(key) as KeyGroup)?.GetSubKeyRefs()
                 .Select(k => GetKey(k.Key))
                 .Where(k => k != null)
                 .ToList();
@@ -155,7 +106,8 @@ namespace CC.Key
         }
         private void GetAllSubKeys(IList<IKey> previousKeys, List<IKey> result)
         {
-            List<IKey> keys = previousKeys.SelectMany(k => k.GetSubKeyRefs())
+            List<IKey> keys = previousKeys.OfType<KeyGroup>()
+                .SelectMany(k => k.GetSubKeyRefs())
                 .Select(k => GetKey(k.Key))
                 .Where(k => k != null && !result.Contains(k))
                 .ToList();
@@ -164,41 +116,6 @@ namespace CC.Key
             {
                 result.AddRange(keys);
                 GetAllSubKeys(keys, result);
-            }
-        }
-
-        public IList<T> GetAllProminentSubKeys<T>(string key, bool includeSelf = false) where T : IKey
-        {
-            return GetAllProminentSubKeys(key, includeSelf).OfType<T>().ToList();
-        }
-        public IList<IKey> GetAllProminentSubKeys(string key, bool includeSelf = false)
-        {
-            List<IKey> keys = GetKey(key)?.GetSubKeyRefs()
-                .Select(k => GetKey(k.Key))
-                .Where(k => k != null)
-                .ToList();
-
-            if (keys == null) return new List<IKey>();
-            if (includeSelf) keys.Add(GetKey(key).ProminentKey);
-
-            List<IKey> result = keys.Select(k => k.ProminentKey)
-                .Distinct()
-                .ToList();
-
-            GetAllProminentSubKeys(keys, result);
-            return result;
-        }
-        private void GetAllProminentSubKeys(IList<IKey> previousKeys, List<IKey> result)
-        {
-            List<IKey> keys = previousKeys.SelectMany(k => k.GetSubKeyRefs())
-                .Select(k => GetKey(k.Key)?.ProminentKey)
-                .Where(k => k != null && !result.Contains(k))
-                .ToList();
-
-            if (keys.Count() > 0)
-            {
-                result.AddRange(keys);
-                GetAllProminentSubKeys(keys, result);
             }
         }
 

@@ -10,15 +10,9 @@ namespace CC.Key.ComponentTypes
         public AnyComponent(List<IComponent> options)
             : base(options) { }
 
-        public override IList<ValueComponent> GetNextComponents()
+        public override IList<IValueComponentData> GetNextComponents(IComponentData parent)
         {
-            return Children.SelectMany(child => child.GetValueComponents()).ToList();
-        }
-
-        public override IList<ValueComponent> GetValueComponents(IComponent startAfter = null)
-        {
-            if (Parent == null) return new List<ValueComponent> { null };
-            return Parent.GetValueComponents(this);
+            return Children.SelectMany(child => child.GetNextComponents(parent)).ToList();
         }
     }
 }

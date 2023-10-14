@@ -38,17 +38,6 @@ namespace CC.Key
             Pattern = pattern;
             SubTokens = new List<Token>();
         }
-        public Token(string key, string pattern, List<Token> subTokens)
-            : this(key, pattern)
-        {
-            SubTokens = subTokens != null ? subTokens : new List<Token>();
-            SubTokens.ForEach(t => t.Leader = this);
-        }
-
-        public override IKey ProminentKey
-        {
-            get => Leader == null ? this : Leader.ProminentKey;
-        }
 
         /// <summary>
         /// Find a macth after index in page.
@@ -71,27 +60,6 @@ namespace CC.Key
             {
                 Regex = new Regex(Pattern, RegexOptions);
             }
-        }
-        public override IKey GetKeyFor(object value)
-        {
-            if (value == null) return null;
-            if (!(value is string)) return null;
-            if (Regex.Match((string)value).Value.CompareTo(value) != 0) return null;
-
-            var t = SubTokens.Select(t => t.GetKeyFor(value))
-                .FirstOrDefault(input => input != null);
-            if (t != null) return t;
-            return this;
-        }
-
-        public override List<IKey> GetSubKeys()
-        {
-            return SubTokens.Cast<IKey>().ToList();
-        }
-
-        public override List<KeyLangReference> GetSubKeyRefs()
-        {
-            return SubTokens.Select(t => t.Reference).ToList();
         }
     }
 }

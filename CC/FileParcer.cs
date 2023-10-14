@@ -1,6 +1,7 @@
 ﻿using BranchList;
 using CC.Blocks;
 using CC.Key;
+using CC.Key.ComponentTypes;
 using CC.Parcing;
 using CC.Parcing.Contracts;
 using System;
@@ -21,9 +22,10 @@ namespace CC
             KeyCollection = keyCollection;
         }
 
-        public void DoParse(out ConstructBlock block, IConstruct startConstruct)
+        public void DoParse(out IBlock block, KeyLangReference startConstruct)
         {
             FileLexer.Reset();
+
             IParseFactory factory = new ParseFactory(startConstruct, KeyCollection);
 
             IBlock nextBlock;
@@ -32,7 +34,15 @@ namespace CC
                 factory.UseBlock(nextBlock);
             }
 
-            block = factory.LastCompletion;
+            var ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();
+            if (ends.Count() == 0)
+            {
+                factory.CompleteEnds();
+                ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();
+            }
+
+            // TODO: look for the errors.
+            block = ends.FirstOrDefault()?.Block;
         }
 
         /// <summary>
@@ -42,8 +52,14 @@ namespace CC
         /// <returns>True if the block has been created.</returns>
         private bool TryGetNextBlock(out IBlock nextBlock, IParseFactory factory)
         {
-            var refs = factory.GetNextKeys()
-                .Select(vc => vc.Reference.Lang)
+            var keys = factory.GetNextKeys();
+            if (keys.Count == 0)
+            {
+                nextBlock = null;
+                return false;
+            }
+            var refs = keys
+                .Select(k => k.Lang)
                 .Distinct()
                 .SelectMany(l => KeyCollection.GetLanguage(l).GetAllKeys())
                 .Select(k => k.Reference);

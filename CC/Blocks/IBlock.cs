@@ -9,7 +9,6 @@ namespace CC.Blocks
     {
         IKey Key { get; }
         string Name { get; }
-        string Value { get; }
         int Index { get; }
         int EndIndex { get; }
 

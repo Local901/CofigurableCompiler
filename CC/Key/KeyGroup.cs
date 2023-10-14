@@ -18,19 +18,13 @@ namespace CC.Key
             Members = members;
         }
 
-        public override IKey GetKeyFor(object value)
+        /// <summary>
+        /// Get all child keys related to this key (this included).
+        /// </summary>
+        /// <returns>List of keys</returns>
+        public List<KeyLangReference> GetSubKeyRefs()
         {
-            throw new NotImplementedException();
-        }
-
-        public override List<KeyLangReference> GetSubKeyRefs()
-        {
-            return Members as List<KeyLangReference>;
-        }
-
-        public override List<IKey> GetSubKeys()
-        {
-            return new List<IKey>();
+            return Members.ToList();
         }
     }
 }

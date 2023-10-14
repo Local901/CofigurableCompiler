@@ -25,7 +25,11 @@ namespace BranchList
 
         public void Add(TReturn node)
         {
-            if (node is TActual) base.Add(node as TActual);
+            if (node is TActual)
+            {
+                base.Add(node as TActual);
+                return;
+            }
             throw new ArgumentException($"Object to be added was not of type: {typeof(TActual).FullName}");
         }
         public void AddRange(IEnumerable<TReturn> nodes)

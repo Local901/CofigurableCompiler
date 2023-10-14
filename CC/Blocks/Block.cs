@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CC.Blocks
 {
-    public class Block : IBlock
+    public class Block : IValueBlock
     {
         public IKey Key { get; protected set; }
         public string Name { get; protected set; }

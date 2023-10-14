@@ -9,60 +9,32 @@ using System.Linq;
 
 namespace CC.Parcing
 {
-    public abstract class ParseArgs : TypeBranchNode<ParseArgs, IParseArgs>, IParseArgs
+    public class ParseArgs : TypeBranchNode<ParseArgs, IParseArgs>, IParseArgs
     {
-        public ParseStatus Status { get; protected set; }
+        public ParseStatus Status { get; set; }
 
-        public ValueComponent Component { get; }
+        public IValueComponentData Data { get; }
 
         public ILocalRoot LocalRoot { get; }
 
         public IBlock Block { get; protected set; }
 
-        public ParseArgs(ValueComponent component, ILocalRoot localRoot)
+        public ParseArgs(IValueComponentData data, ILocalRoot localRoot, IBlock block)
+            : this(data, localRoot)
+        {
+            Block = block;
+        }
+        public ParseArgs(IValueComponentData data, ILocalRoot localRoot)
             : base()
         {
             Status = ParseStatus.None;
-            Component = component;
+            Data = data;
             LocalRoot = localRoot;
         }
 
-        public virtual ParseStatus UseBlock(IBlock block, KeyCollection keyCollection, IParseArgFactory factory)
+        public virtual IList<IValueComponentData> GetNextComponents()
         {
-            if (Block != null) throw new Exception($"This parse step already contains a block");
-
-            if (!keyCollection.GetLanguage(Component.Reference.Lang).IsKeyInGroup(block.Key.Reference, Component.Reference))
-            {
-                // Set Status to Error
-                Status |= ParseStatus.Error;
-                block = new ErrorBlock(block, keyCollection.GetKey(Component.Reference));
-            }
-            Block = block.Copy(Component.Name);
-
-            var components = Component.GetNextComponents();
-            if (components.Any(comp => comp == null))
-            {
-                Status |= ParseStatus.CanEnd;
-            }
-
-            components = components.Where(comp => comp != null).ToList();
-            if (components.Count() == 0)
-            {
-                Status |= ParseStatus.ReachedEnd;
-            }
-
-            // When a error has been found check next components for a posible match to the block.
-            if (Status.HasFlag(ParseStatus.Error))
-            {
-                var nextComponents = components.Where(comp => keyCollection.GetLanguage(Component.Reference.Lang).IsKeyInGroup(Block.Key.Reference, comp.Reference)).ToList();
-                var args = nextComponents.SelectMany(comp => factory.CreateArg(comp, LocalRoot));
-                AddRange(args);
-                args.ForEach(arg => arg.UseBlock(block, keyCollection, factory));
-            }
-
-            AddRange(components.SelectMany(comp => factory.CreateArg(comp, LocalRoot)));
-
-            return Status;
+            return Data.GetNextComponents();
         }
 
         public List<IParseArgs> LocalPath()
