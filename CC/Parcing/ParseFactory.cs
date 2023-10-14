@@ -72,9 +72,10 @@ namespace CC.Parcing
                 .SelectMany(arg => UpdateEnd(arg))
                 .ToList();
 
-            nextEnds.Where(ne => !Ends.Contains(ne)).ForEach(ne => ne.RemoveBranch());
-
             ProcessCompleted();
+
+            // Remove disused ends.
+            nextEnds.Where(ne => !Ends.Contains(ne)).ForEach(ne => ne.RemoveBranch());
         }
 
         /// <summary>
