@@ -38,12 +38,12 @@ namespace CC
                 Console.WriteLine(b.Index + b.Value.Length);
             }*/
             
-            IRelationBlock block;
+            IBlock block;
             parser.DoParse(out block, keyCollection.GetLanguage("cLang").GetKey("function").Reference);
             PrintConstruct(block);
         }
 
-        static void PrintConstruct(IRelationBlock block, string offSet = "")
+        static void PrintConstruct(IBlock block, string offSet = "")
         {
             if (block == null)
             {
@@ -51,15 +51,16 @@ namespace CC
                 return;
             }
             Console.WriteLine($"{offSet}{block.Index}");
-            var vb = block as IValueBlock;
-            if (vb != null && vb.Value != null)
+            if (block is IValueBlock)
             {
+                var vb = block as IValueBlock;
                 Console.WriteLine($"{offSet}{block.Key} : {block.Name} : {vb.Value}");
             }
-            else
+            else if (block is IRelationBlock)
             {
+                var rb = block as IRelationBlock;
                 Console.WriteLine($"{offSet}{block.Key} : {block.Name}[");
-                block.Content.OfType<IRelationBlock>().ForEach(b => PrintConstruct(b, offSet + "  "));
+                rb.Content.ForEach(b => PrintConstruct(b, offSet + "  "));
                 Console.WriteLine($"{offSet}]");
             }
             Console.WriteLine($"{offSet}{block.EndIndex}");
@@ -77,24 +78,20 @@ namespace CC
 
             lang.Add(new Token ("semicolon", ";"));
 
-            var identifier = lang.Add(new Token ("identifier", @"[a-zA-Z]\w*", new List<Token>
-            {
-                new Token ("keyword_int", "int"),
-                new Token ("keyword_return", "return")
-            }));
+            var identifier = lang.Add(new Token ("identifier", @"[a-zA-Z]\w*"));
 
             lang.Add(new Token ("integer_literal", "[0-9]+"));
 
             var c = new Construct("function",
                 new OrderComponent(new List<IComponent>{
-                    new ValueComponent(lang.CreateReference("keyword_int"), "return_type"),
+                    new ValueComponent(identifier, "return_type"),
                     new ValueComponent(identifier, "function_name"),
                     new ValueComponent(lang.CreateReference("open_parentases")),
                     new ValueComponent(lang.CreateReference("close_parentases")),
                     new ValueComponent(lang.CreateReference("open_brace")),
                     new OrderComponent(new List<IComponent>
                     {
-                        new ValueComponent(lang.CreateReference("keyword_return")),
+                        new ValueComponent(identifier),
                         new ValueComponent(lang.CreateReference("integer_literal"), "return_value"),
                         new ValueComponent(lang.CreateReference("semicolon"))
                     }),

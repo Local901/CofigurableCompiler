@@ -72,6 +72,8 @@ namespace CC.Parcing
                 .SelectMany(arg => UpdateEnd(arg))
                 .ToList();
 
+            nextEnds.Where(ne => !Ends.Contains(ne)).ForEach(ne => ne.RemoveBranch());
+
             ProcessCompleted();
         }
 
@@ -142,6 +144,10 @@ namespace CC.Parcing
                     .ToList()
             );
         }
+        /// <summary>
+        /// Extend child nodes that are constructs.
+        /// </summary>
+        /// <param name="node">A node with children.</param>
         private void ExtendConstructNodes(ValueBranchNode<IValueComponentData> node)
         {
             node.Ends()
@@ -151,7 +157,7 @@ namespace CC.Parcing
                     return new
                     {
                         node = n,
-                        constructs = Keys.GetLanguage(reference.Lang).GetAllProminentSubKeys<IConstruct>(reference.Key, true)
+                        constructs = Keys.GetLanguage(reference.Lang).GetAllSubKeysOfType<Construct>(reference.Key, true)
                     };
                 })
                 .Where(n => n.constructs.Count > 0)
@@ -187,7 +193,7 @@ namespace CC.Parcing
         /// </summary>
         /// <param name="arg"></param>
         /// <returns>List of all ends resulting from the arg (may include self)</returns>
-        public IReadOnlyList<IParseArgs> UpdateEnd(IParseArgs arg)
+        private IReadOnlyList<IParseArgs> UpdateEnd(IParseArgs arg)
         {
             List<IParseArgs> result = new List<IParseArgs>();
 
@@ -233,6 +239,11 @@ namespace CC.Parcing
             return result;
         }
 
+        /// <summary>
+        /// Add the arg to the result list and update localRoot if arg is at the end.
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <param name="result"></param>
         private void AddArgToResult(IParseArgs arg, List<IParseArgs> result)
         {
             if (!arg.Status.HasFlag(ParseStatus.ReachedEnd))
@@ -245,18 +256,29 @@ namespace CC.Parcing
                 if (localRoot == null) return;
 
                 var block = localRoot.CreateBlock(arg);
-                var rootArg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
-                UpdateStatus(rootArg);
-                result.AddRange(UpdateEnd(rootArg));
+                if (localRoot.Parent != null)
+                {
+                    var rootArg = CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
+                    UpdateStatus(rootArg);
+                    result.AddRange(UpdateEnd(rootArg));
+                }
             }
         }
 
+        /// <summary>
+        /// Try to add the block to the next arg if it is a ErrorBlock.
+        /// </summary>
+        /// <param name="arg">A arg that has a ErrorBlock.</param>
+        /// <param name="result">Results list.</param>
         private void CheckAndAddNextComponent(IParseArgs arg, List<IParseArgs> result)
         {
+            if (!(arg.Block is ErrorBlock)) return;
+            var block = (arg.Block as ErrorBlock).Block;
+
             var data = GetNextDataOfArgs(arg);
-            data.DataPaths.Where(d => Keys.IsKeyInGroup(arg.Block.Key, d.Last().Component.Reference))
+            data.DataPaths.Where(d => Keys.IsKeyInGroup(block.Key, d.Last().Component.Reference))
                 .ForEach(d => {
-                    var a = ArgsFactory.CreateNextArgs(d, arg, arg.Block);
+                    var a = ArgsFactory.CreateNextArgs(d, arg, block);
                     UpdateStatus(a);
                     AddArgToResult(a, result);
                 });
@@ -265,6 +287,7 @@ namespace CC.Parcing
         public IParseArgs CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
         {
             if (componentPath == null || componentPath.Count == 0) throw new ArgumentException("ComponentPath should contain at leats one element.");
+            if (parent == null) throw new ArgumentException("The parent arg can't be null.");
 
             var p = parent;
             for (int i = 0; i < componentPath.Count; i++)
@@ -275,14 +298,13 @@ namespace CC.Parcing
                 IParseArgs np = null;
                 if (key is Token)
                 {
-                    // Should be last element in list.
                     np = new ParseArgs(step, localRoot, block);
                 }
-                else if (key is IConstruct)
+                else if (key is Construct)
                 {
                     np = i == componentPath.Count - 1
-                        ? new ConstructArgs((IConstruct)key, step, localRoot)
-                        : new ConstructArgs((IConstruct)key, step, localRoot, block);
+                        ? new ConstructArgs((Construct)key, step, localRoot, block)
+                        : new ConstructArgs((Construct)key, step, localRoot);
                 }
                 if (p != null)
                 {
@@ -304,7 +326,10 @@ namespace CC.Parcing
             return new ConstructArgs(null, component.GetNextComponents(null)[0], null);
         }
 
-        public void ProcessCompleted()
+        /// <summary>
+        /// Add compleded constructs to the ParseCollection.
+        /// </summary>
+        private void ProcessCompleted()
         {
             ParseTree.Children.Where(arg => arg.Block != null)
                 .ForEach(arg =>

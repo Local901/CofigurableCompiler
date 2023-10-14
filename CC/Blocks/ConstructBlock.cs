@@ -7,13 +7,20 @@ using System.Text;
 
 namespace CC.Blocks
 {
-    public class ConstructBlock : Block, IRelationBlock
+    public class ConstructBlock : IRelationBlock
     {
+        public IKey Key { get; private set; }
+
+        public string Name { get; private set; }
+
+        public int Index { get; private set; }
+
+        public int EndIndex { get; private set; }
         public IRelationBlock Parent { get; set; }
         public IReadOnlyList<IBlock> Content { get; protected set; }
 
         private ConstructBlock() { }
-        public ConstructBlock(IConstruct key, IEnumerable<IBlock> content)
+        public ConstructBlock(Construct key, IEnumerable<IBlock> content)
         {
             if (content.Count() == 0) throw new ArgumentException("The content for a construct should at least contain one element.");
 
@@ -30,13 +37,12 @@ namespace CC.Blocks
             EndIndex = Content.Last().EndIndex;
         }
 
-        public new ConstructBlock Copy(string name = null)
+        public ConstructBlock Copy(string name = null)
         {
             ConstructBlock copy = new ConstructBlock
             {
                 Key = Key,
                 Name = name == null ? Name : name,
-                Value = Value,
                 Index = Index,
                 EndIndex = EndIndex,
                 Content = Content.Select(c => c.Copy()).ToList()
@@ -50,6 +56,11 @@ namespace CC.Blocks
             });
 
             return copy;
+        }
+
+        IBlock IBlock.Copy(string name)
+        {
+            return Copy(name);
         }
     }
 }

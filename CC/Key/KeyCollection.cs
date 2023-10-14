@@ -64,74 +64,41 @@ namespace CC.Key
                 .ToList();
         }
         /// <summary>
-        /// Get all prominent keys of type T.
+        /// Get all the keys that are related to the refered key.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="key">Key reference.</param>
+        /// <param name="includeSeft">Should the list include the referenced key itself?</param>
         /// <returns></returns>
-        public List<T> GetAllProminentKeysOfType<T>()
-            where T : IKey
-        {
-            return GetAllKeys().Select(k => k.ProminentKey)
-                .Distinct()
-                .OfType<T>()
-                .ToList();
-        }
-
         public IList<IKey> GetAllSubKeys(KeyLangReference key, bool includeSeft = false)
         {
             var keys = GetLanguage(key.Lang)?.GetAllSubKeys(key.Key, includeSeft);
             if (keys == null) return new List<IKey>();
             return keys;
         }
-
         /// <summary>
-        /// Get all keys related to the key.
+        /// Get all the keys that are related to the refered key.
         /// </summary>
-        /// <param name="key">A key reference </param>
-        /// <param name="includeSelf">Should the resulting list include the provided key?</param>
-        /// <returns>List of related prominent keys.</returns>
-        public List<IKey> GetAllProminentSubKeys(KeyLangReference key, bool includeSelf = false)
-        {
-            var keys = GetLanguage(key.Lang)?.GetAllProminentSubKeys(key.Key, includeSelf)?.ToList();
-            if (keys == null) keys = new List<IKey>();
-            return keys;
-        }
-        /// <summary>
-        /// Get all keys related to the keys.
-        /// </summary>
-        /// <param name="keys">A list of keys</param>
-        /// <param name="includeSelf">Should the resulting list include the provided key?</param>
-        /// <returns>List of distinct related prominent keys.</returns>
-        public List<IKey> GetAllProminentSubKeys(IEnumerable<KeyLangReference> keys, bool includeSelf = false)
-        {
-            return keys.SelectMany(key => GetAllProminentSubKeys(key, includeSelf))
-                .ToList();
-        }
-        /// <summary>
-        /// Get all objects of type T related to the key.
-        /// </summary>
-        /// <typeparam name="T">Type that inherited IKey.</typeparam>
-        /// <param name="key">A key reference.</param>
-        /// <param name="includeSelf">Should the resulting list include the provided key?</param>
-        /// <returns>List of type T related to the key.</returns>
-        public List<T> GetAllProminentSubKeysOfType<T>(KeyLangReference key, bool includeSelf = false)
+        /// <typeparam name="T">Type of key.</typeparam>
+        /// <param name="key">Key reference.</param>
+        /// <param name="includeSelf">Should the list include the referenced key itself?</param>
+        /// <returns></returns>
+        public IList<T> GetAllSubKeysOfType<T>(KeyLangReference key, bool includeSelf = false)
             where T : IKey
         {
-            return GetAllProminentSubKeys(key, includeSelf).OfType<T>()
-                .ToList();
+            return GetAllSubKeys(key, includeSelf).OfType<T>().ToList();
         }
         /// <summary>
-        /// Get all objects of type T related to the keys.
+        /// Get all the keys that are related to the refered key.
         /// </summary>
-        /// <typeparam name="T">Type that inherited IKey.</typeparam>
-        /// <param name="keys">A list of keys.</param>
-        /// <param name="includeSelf">Should the resulting list include the provided key?</param>
-        /// <returns>List of type T related to the keys.</returns>
-        public List<T> GetAllProminentSubKeysOfType<T>(IEnumerable<KeyLangReference> keys, bool includeSelf = false)
+        /// <typeparam name="T">Type of key.</typeparam>
+        /// <param name="key">Key reference.</param>
+        /// <param name="includeSelf">Should the list include the referenced key itself?</param>
+        /// <returns></returns>
+        public IList<T> GetAllSubKeysOfType<T>(IEnumerable<KeyLangReference> keys, bool includeSelf = false)
             where T : IKey
         {
-            return GetAllProminentSubKeys(keys, includeSelf).OfType<T>()
-                .ToList();
+            return keys.SelectMany(key => GetAllSubKeys(key, includeSelf).OfType<T>().ToList())
+                .Distinct().ToList();
         }
 
         /// <summary>

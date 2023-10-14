@@ -22,7 +22,7 @@ namespace CC
             KeyCollection = keyCollection;
         }
 
-        public void DoParse(out IRelationBlock block, KeyLangReference startConstruct)
+        public void DoParse(out IBlock block, KeyLangReference startConstruct)
         {
             FileLexer.Reset();
 
@@ -34,7 +34,15 @@ namespace CC
                 factory.UseBlock(nextBlock);
             }
 
-            block = factory.LastCompletion;
+            var ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();
+            if (ends.Count() == 0)
+            {
+                factory.CompleteEnds();
+                ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();
+            }
+
+            // TODO: look for the errors.
+            block = ends.FirstOrDefault()?.Block;
         }
 
         /// <summary>
@@ -56,15 +64,6 @@ namespace CC
                 .SelectMany(l => KeyCollection.GetLanguage(l).GetAllKeys())
                 .Select(k => k.Reference);
             return FileLexer.TryNextBlock(out nextBlock, refs);
-        }
-
-        private IReadOnlyList<IValueComponentData> UpdateEnds(IReadOnlyList<IValueComponentData> Ends, IBlock block, IConstruct startConstruct)
-        {
-            IReadOnlyList<IValueComponentData> nextEnds = Ends == null
-                ? nextEnds = startConstruct.Component.GetNextComponents(null).ToList()
-                : nextEnds = Ends.SelectMany(e => e.GetNextComponents()).ToList();
-
-            return nextEnds;
         }
     }
 }

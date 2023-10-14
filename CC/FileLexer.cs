@@ -40,7 +40,7 @@ namespace CC
         /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, KeyLangReference key)
         {
-            return TryNextBlock(out block, _tokenCollection.GetAllProminentSubKeysOfType<Token>(key, true));
+            return TryNextBlock(out block, _tokenCollection.GetAllSubKeysOfType<Token>(key, true));
         }
         /// <summary>
         /// Find next block using tokens connected to the keys.
@@ -50,7 +50,7 @@ namespace CC
         /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, IEnumerable<KeyLangReference> keys)
         {
-            return TryNextBlock(out block, _tokenCollection.GetAllProminentSubKeysOfType<Token>(keys, true));
+            return TryNextBlock(out block, _tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
         }
         /// <summary>
         /// Find next block using provided tokens.
@@ -58,7 +58,7 @@ namespace CC
         /// <param name="block">Block that gets created.</param>
         /// <param name="tokens">List of tokens.</param>
         /// <returns>Returns true if block is created.</returns>
-        private bool TryNextBlock(out IBlock block, List<Token> tokens)
+        private bool TryNextBlock(out IBlock block, IEnumerable<Token> tokens)
         {
             // find the next match
             var match = tokens.Select(t => new
@@ -77,7 +77,7 @@ namespace CC
 
             // make a block
             block = new Block(
-                match.Token.GetKeyFor(match.Match.Value),
+                match.Token,
                 match.Match.Value,
                 match.Match.Index,
                 match.Match.Index + match.Match.Value.Length
@@ -97,7 +97,7 @@ namespace CC
         /// <returns>Returns true if block is created.</returns>
         public bool TryAllBlocks(out List<IBlock> blocks, KeyLangReference key)
         {
-            return TryAllBlocks(out blocks, _tokenCollection.GetAllProminentSubKeysOfType<Token>(key, true));
+            return TryAllBlocks(out blocks, _tokenCollection.GetAllSubKeysOfType<Token>(key, true));
         }
         /// <summary>
         /// Find next block using tokens connected to the keys.<br/>
@@ -108,7 +108,7 @@ namespace CC
         /// <returns>Returns true if block is created.</returns>
         public bool TryAllBlocks(out List<IBlock> blocks, IEnumerable<KeyLangReference> keys)
         {
-            return TryAllBlocks(out blocks, _tokenCollection.GetAllProminentSubKeysOfType<Token>(keys, true));
+            return TryAllBlocks(out blocks, _tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
         }
         /// <summary>
         /// Find all blocks using provided tokens.<br/>
@@ -117,7 +117,7 @@ namespace CC
         /// <param name="blocks">Blocks that get created.</param>
         /// <param name="tokens">List of tokens.</param>
         /// <returns>Returns true if block is created.</returns>
-        private bool TryAllBlocks(out List<IBlock> blocks, List<Token> tokens)
+        private bool TryAllBlocks(out List<IBlock> blocks, IEnumerable<Token> tokens)
         {
             blocks = tokens.Select(t => new
             {
@@ -128,7 +128,7 @@ namespace CC
                 .Where(m => m.Match.Value.Length > 0)
                 .Select(m =>
                     new Block(
-                        m.Token.GetKeyFor(m.Match.Value),
+                        m.Token,
                         m.Match.Value,
                         m.Match.Index,
                         m.Match.Index + m.Match.Value.Length
