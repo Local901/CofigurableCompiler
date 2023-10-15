@@ -73,9 +73,6 @@ namespace CC.Parcing
                 .ToList();
 
             ProcessCompleted();
-
-            // Remove disused ends.
-            nextEnds.Where(ne => !Ends.Contains(ne)).ForEach(ne => ne.RemoveBranch());
         }
 
         /// <summary>
@@ -247,10 +244,6 @@ namespace CC.Parcing
         /// <param name="result"></param>
         private void AddArgToResult(IParseArgs arg, List<IParseArgs> result)
         {
-            if (!arg.Status.HasFlag(ParseStatus.ReachedEnd))
-            {
-                result.Add(arg);
-            }
             if (arg.Status.HasFlag(ParseStatus.CanEnd))
             {
                 var localRoot = arg.LocalRoot;
@@ -263,6 +256,14 @@ namespace CC.Parcing
                     UpdateStatus(rootArg);
                     result.AddRange(UpdateEnd(rootArg));
                 }
+            }
+            if (!arg.Status.HasFlag(ParseStatus.ReachedEnd))
+            {
+                result.Add(arg);
+            }
+            else
+            {
+                arg.RemoveBranch();
             }
         }
 
