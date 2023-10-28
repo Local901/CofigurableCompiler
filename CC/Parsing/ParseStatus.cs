@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC.Parcing
+namespace CC.Parsing
 {
     [Flags]
     public enum ParseStatus

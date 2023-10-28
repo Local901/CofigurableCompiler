@@ -21,7 +21,7 @@ namespace CC
             var path = @"Resources\TextFile2.txt";
             var file = File.ReadAllText(path);
             var lexer = new FileLexer(file, keyCollection);
-            var parser = new FileParcer(lexer, keyCollection);
+            var parser = new FileParser(lexer, keyCollection);
 
             /*var blocks = new List<IBlock>();
             IBlock block;

@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC.Parcing.Contracts
+namespace CC
 {
-    public interface IFileParcer
+    public interface IParser
     {
         /// <summary>
         /// Parse using the FileLexer and output the a block with the created tree.

@@ -1,4 +1,4 @@
-﻿using CC.Parcing.Contracts;
+﻿using CC.Parsing.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using CC.Key.ComponentTypes;
 using CC.Blocks;
 using System.Data;
 
-namespace CC.Parcing
+namespace CC.Parsing
 {
     public class ParseFactory : IParseFactory, IParseArgFactory
     {

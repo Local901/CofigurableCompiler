@@ -2,8 +2,8 @@
 using CC.Blocks;
 using CC.Key;
 using CC.Key.ComponentTypes;
-using CC.Parcing;
-using CC.Parcing.Contracts;
+using CC.Parsing;
+using CC.Parsing.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +11,12 @@ using System.Text;
 
 namespace CC
 {
-    public class FileParcer : IFileParcer
+    public class FileParser : IParser
     {
-        private FileLexer FileLexer;
+        private ILexer FileLexer;
         private KeyCollection KeyCollection;
 
-        public FileParcer(FileLexer filelexer, KeyCollection keyCollection)
+        public FileParser(ILexer filelexer, KeyCollection keyCollection)
         {
             FileLexer = filelexer;
             KeyCollection = keyCollection;
