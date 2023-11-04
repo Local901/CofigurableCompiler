@@ -8,9 +8,18 @@ namespace CC
     public interface ILanguageLoader
     {
         /// <summary>
-        /// Load the language into the provided key collection
+        /// Get the first token for parsing the file.
         /// </summary>
-        /// <param name="keyCollection">The key collection to be populated with the language.</param>
-        public void LoadLanguage(KeyCollection keyCollection);
+        /// <param name="filePath">Information about the file.</param>
+        /// <param name="keyCollection">The collection to get the reference from or incase an extra language has to be loaded.</param>
+        /// <returns></returns>
+        public KeyLangReference GetStartingPoint(string filePath, KeyCollection keyCollection);
+
+        /// <summary>
+        /// Load a language configuration into the key collection.
+        /// </summary>
+        /// <param name="configPath">The path to the config file.</param>
+        /// <param name="keyCollection">The collection.</param>
+        public void LoadConfig(string configPath, KeyCollection keyCollection);
     }
 }
