@@ -1,4 +1,5 @@
-﻿using CC.Key;
+﻿using CC.FileInfo;
+using CC.Key;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,10 +17,10 @@ namespace CC
         public KeyLangReference GetStartingPoint(string filePath, KeyCollection keyCollection);
 
         /// <summary>
-        /// Load a language configuration into the key collection.
+        /// Load a language configuration into the key collection. And add an language starting point to the file.
         /// </summary>
-        /// <param name="configPath">The path to the config file.</param>
+        /// <param name="file">All information about a file.</param>
         /// <param name="keyCollection">The collection.</param>
-        public void LoadConfig(string configPath, KeyCollection keyCollection);
+        public void LoadConfig(FileData file, KeyCollection keyCollection);
     }
 }

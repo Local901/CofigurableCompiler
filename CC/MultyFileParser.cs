@@ -1,11 +1,11 @@
 ﻿using BranchList;
 using CC.Blocks;
+using CC.FileInfo;
 using CC.Key;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace CC
 {
@@ -18,25 +18,52 @@ namespace CC
             this.languageLoader = languageLoader;
         }
 
-        public IBlock[] Parse(string[] filePaths, string[] configPaths)
+        public FileData[] Parse(string filePath)
         {
             var keyCollection = new KeyCollection();
-            configPaths.ForEach(path => languageLoader.LoadConfig(path, keyCollection));
+            var index = 0;
+            var fileList = new List<FileData> {
+                new FileData(filePath)
+            };
 
-            var blockList = new List<IBlock>();
+            while (fileList.Count() > index) {
+                var file = fileList[index];
+                languageLoader.LoadConfig(file, keyCollection);
 
+                try {
+                    var lexer = CreateLexer(file, keyCollection);
+                    var parser = CreateParser(lexer, keyCollection);
 
-            throw new NotImplementedException();
+                    IBlock block;
+                    parser.DoParse(out block, file.LanguageStart);
+
+                    file.ParsedContent = block;
+
+                    // Find all file relations.
+                    GetAllFileReferences(file)
+                        .ForEach((path) => {
+                            fileList.Add(new FileData(path));
+                        });
+
+                } catch (Exception) {}
+            }
+
+            return fileList.ToArray();
         }
 
-        protected virtual ILexer CreateLexer(string fileContent, KeyCollection keyCollection)
+        protected virtual ILexer CreateLexer(FileData file, KeyCollection keyCollection)
         {
+            var fileContent = File.ReadAllText(file.AbsolutePath);
             return new FileLexer(fileContent, keyCollection);
         }
 
         protected virtual IParser CreateParser(ILexer lexer, KeyCollection keyCollection)
         {
             return new FileParser(lexer, keyCollection);
+        }
+
+        protected virtual string[] GetAllFileReferences(FileData file) {
+            throw new NotImplementedException();
         }
     }
 }
