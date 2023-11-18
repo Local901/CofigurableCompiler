@@ -41,8 +41,16 @@ namespace CC
 
                     // Find all file relations.
                     GetAllFileReferences(file)
-                        .ForEach((path) => {
-                            fileList.Add(new FileData(path));
+                        .ForEach((newFile) => {
+                            var sameFiles = fileList.FindAll((f) => f.AbsolutePath == newFile.AbsolutePath);
+                            if (sameFiles.Count == 0)
+                            {
+                                fileList.Add(newFile);
+                            }
+                            else
+                            {
+                                sameFiles.ForEach((f) => f.Parents.AddRange(newFile.Parents));
+                            }
                         });
 
                 } catch (Exception) {}
@@ -62,7 +70,12 @@ namespace CC
             return new FileParser(lexer, keyCollection);
         }
 
-        protected virtual string[] GetAllFileReferences(FileData file) {
+        /// <summary>
+        /// Get all files that are related to the file.
+        /// </summary>
+        /// <param name="file">The file that has already been parsed.</param>
+        /// <returns>A list of related files.</returns>
+        protected virtual FileData[] GetAllFileReferences(FileData file) {
             throw new NotImplementedException();
         }
     }

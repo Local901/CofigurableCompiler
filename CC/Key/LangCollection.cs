@@ -10,6 +10,7 @@ namespace CC.Key
     {
         public readonly string Language;
         private readonly Dictionary<string, IKey> Keys = new Dictionary<string, IKey>();
+        private readonly Dictionary<string, >
 
         public LangCollection(string language)
         {
@@ -71,17 +72,6 @@ namespace CC.Key
         }
 
         /// <summary>
-        /// Get A list of all the sub keys of type T (recursive).
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="includeSelf"></param>
-        /// <returns></returns>
-        public IList<T> GetAllSubKeysOfType<T>(string key, bool includeSelf = false)
-        {
-            return GetAllSubKeys(key, includeSelf).OfType<T>().ToList();
-        }
-        /// <summary>
         /// Get A list of all the sub keys (recursive).
         /// </summary>
         /// <param name="key"></param>
@@ -117,6 +107,17 @@ namespace CC.Key
                 result.AddRange(keys);
                 GetAllSubKeys(keys, result);
             }
+        }
+        /// <summary>
+        /// Get A list of all the sub keys of type T (recursive).
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="includeSelf"></param>
+        /// <returns></returns>
+        public IList<T> GetAllSubKeysOfType<T>(string key, bool includeSelf = false)
+        {
+            return GetAllSubKeys(key, includeSelf).OfType<T>().ToList();
         }
 
         /// <summary>
