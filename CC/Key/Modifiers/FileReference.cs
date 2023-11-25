@@ -19,7 +19,7 @@ namespace CC.Key.Modifiers
         FileReferenceType ReferenceType { get; set; }
     }
 
-    public class FileReference : IModifier
+    public class FileReference : IParseTreeFilter
     {
         public readonly FileReferenceArgs Args;
 
@@ -31,7 +31,7 @@ namespace CC.Key.Modifiers
 
         public override IBlock[] FindBlocks(IBlock block)
         {
-            throw new NotImplementedException();
+            return BlockReader.SelectAll(block, (c) => c.Key.Reference == Args.KeyReference);
         }
     }
 }

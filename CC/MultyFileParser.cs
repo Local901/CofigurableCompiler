@@ -2,6 +2,7 @@
 using CC.Blocks;
 using CC.FileInfo;
 using CC.Key;
+using CC.Key.Modifiers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,12 +31,14 @@ namespace CC
                 var file = fileList[index];
                 languageLoader.LoadConfig(file, keyCollection);
 
+                var languageStartKey = file.Language.FindFilter<LanguageStart>().FindKey(file.Language);
+
                 try {
                     var lexer = CreateLexer(file, keyCollection);
                     var parser = CreateParser(lexer, keyCollection);
 
                     IBlock block;
-                    parser.DoParse(out block, file.LanguageStart);
+                    parser.DoParse(out block, languageStartKey.Reference);
 
                     file.ParsedContent = block;
 

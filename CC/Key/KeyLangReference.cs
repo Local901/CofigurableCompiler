@@ -7,8 +7,9 @@ namespace CC.Key
 {
     public class KeyLangReference : IComparable<KeyLangReference>
     {
+        public LangCollection Language { get; internal set; }
         public string Key { get; internal set; }
-        public string Lang { get; internal set; }
+        public string Lang { get => Language.Language; }
 
         public override bool Equals(object obj)
         {

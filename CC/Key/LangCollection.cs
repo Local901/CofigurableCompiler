@@ -1,4 +1,5 @@
 ﻿using BranchList;
+using CC.Key.Modifiers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace CC.Key
     {
         public readonly string Language;
         private readonly Dictionary<string, IKey> Keys = new Dictionary<string, IKey>();
-        private readonly Dictionary<string, >
+        private readonly List<IFilter> Filters = new List<IFilter>();
 
         public LangCollection(string language)
         {
@@ -26,7 +27,7 @@ namespace CC.Key
         /// <exception cref="ArgumentException"></exception>
         public KeyLangReference Add(IKey key)
         {
-            key.Reference.Lang = Language;
+            key.Reference.Language = this;
             Keys.Add(key.Reference.Key, key);
 
             return key.Reference;
@@ -150,7 +151,38 @@ namespace CC.Key
         /// <returns></returns>
         public KeyLangReference CreateReference(string key)
         {
-            return new KeyLangReference { Key = key, Lang = Language };
+            return new KeyLangReference { Key = key, Language = this };
+        }
+
+
+        /// <summary>
+        /// Add a filter for this language.
+        /// </summary>
+        /// <param name="filter">A filter that can be used for this language.</param>
+        public void AddFilter(IFilter filter)
+        {
+            filter.SetLanguage(this);
+            Filters.Add(filter);
+        }
+        /// <summary>
+        /// Find a filter of type.
+        /// </summary>
+        /// <typeparam name="TFilter">A type of filter</typeparam>
+        /// <returns>The filter if found.</returns>
+        public TFilter FindFilter<TFilter>()
+            where TFilter : IFilter
+        {
+            return Filters.OfType<TFilter>().FirstOrDefault();
+        }
+        /// <summary>
+        /// Find all filters of type.
+        /// </summary>
+        /// <typeparam name="TFilter">A type of filter.</typeparam>
+        /// <returns>A array of all the filters.</returns>
+        public TFilter[] FindFilters<TFilter>()
+            where TFilter : IFilter
+        {
+            return Filters.OfType<TFilter>().ToArray();
         }
     }
 }

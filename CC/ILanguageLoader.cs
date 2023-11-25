@@ -9,7 +9,7 @@ namespace CC
     public interface ILanguageLoader
     {
         /// <summary>
-        /// Load a language configuration into the key collection. And add an language starting point to the file.
+        /// Load a language configuration into the key collection. And set the language of the file.
         /// </summary>
         /// <param name="file">All information about a file.</param>
         /// <param name="keyCollection">The collection.</param>

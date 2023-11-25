@@ -13,7 +13,7 @@ namespace CC.FileInfo
 
         public List<FileData> Parents { get; }
 
-        public KeyLangReference LanguageStart { get; set; }
+        public LangCollection Language { get; set; }
         public IBlock ParsedContent { get; set; }
 
         public FileData(string path) {
