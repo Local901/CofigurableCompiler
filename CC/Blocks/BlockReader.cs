@@ -36,5 +36,36 @@ namespace CC.Blocks
 
             return result.ToArray();
         }
+
+        public IBlock TraverseBlock(IBlock block, string[] path)
+        {
+            var result = block;
+
+            for (int i = 0; i < path.Count() && result != null; i++) {
+                var step = path[i];
+
+                switch(step) {
+                    case ".":
+                        break;
+                    case "..":
+                        if (result is IRelationBlock) {
+                            result = (result as IRelationBlock).Parent;
+                        } else {
+                            result = null;
+                        }
+                        break;
+                    default:
+                        if (result is IRelationBlock) {
+                            result = (result as IRelationBlock)
+                                .Content.FirstOrDefault((b) => b.Name == step);
+                            break; // TODO: Add support for multiple hits.
+                        }
+                        result = null;
+                        break;
+                }
+            }
+
+            return result;
+        }
     }
 }

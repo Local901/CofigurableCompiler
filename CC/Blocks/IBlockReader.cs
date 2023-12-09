@@ -21,5 +21,13 @@ namespace CC.Blocks
         /// <param name="predicate">The predicate.</param>
         /// <returns>An array of blocks that match the predicate.</returns>
         TBlock[] SelectAll<TBlock>(IBlock block, Predicate<TBlock> predicate) where TBlock : IBlock;
+
+        /// <summary>
+        /// Try to traverse the tree of blocks.
+        /// </summary>
+        /// <param name="block">The root to search from.</param>
+        /// <param name="path">The pth to follow.</param>
+        /// <returns>The block that was found. Else it is null.</returns>
+        IBlock TraverseBlock(IBlock block, string[] path);
     }
 }

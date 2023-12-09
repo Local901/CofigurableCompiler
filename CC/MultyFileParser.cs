@@ -22,16 +22,20 @@ namespace CC
         public FileData[] Parse(string filePath)
         {
             var keyCollection = new KeyCollection();
-            var index = 0;
-            var fileList = new List<FileData> {
-                new FileData(filePath)
-            };
+            var parsedFileList = new List<FileData>();
+            var fileList = new Queue<FileData>();
 
-            while (fileList.Count() > index) {
-                var file = fileList[index];
+            fileList.Enqueue(new FileData(filePath));
+
+            while (fileList.Count() > 0) {
+                var file = fileList.Dequeue();
                 languageLoader.LoadConfig(file, keyCollection);
 
-                var languageStartKey = file.Language.FindFilter<LanguageStart>().FindKey(file.Language);
+                if (parsedFileList.Contains(file)) {
+                    continue;
+                }
+
+                var languageStartKey = file.Language.FindFilter<LanguageStart>().FindKey();
 
                 try {
                     var lexer = CreateLexer(file, keyCollection);
@@ -45,29 +49,35 @@ namespace CC
                     // Find all file relations.
                     GetAllFileReferences(file)
                         .ForEach((newFile) => {
-                            var sameFiles = fileList.FindAll((f) => f.AbsolutePath == newFile.AbsolutePath);
-                            if (sameFiles.Count == 0)
-                            {
-                                fileList.Add(newFile);
-                            }
-                            else
-                            {
-                                sameFiles.ForEach((f) => f.Parents.AddRange(newFile.Parents));
-                            }
+                            fileList.Enqueue(newFile);
                         });
 
                 } catch (Exception) {}
+
+                parsedFileList.Add(file);
             }
 
-            return fileList.ToArray();
+            return parsedFileList.ToArray();
         }
 
+        /// <summary>
+        /// Create a Lexer.
+        /// </summary>
+        /// <param name="file">The file that should be lexed.</param>
+        /// <param name="keyCollection">The keyCollection with all loaded keys.</param>
+        /// <returns>A Lexer.</returns>
         protected virtual ILexer CreateLexer(FileData file, KeyCollection keyCollection)
         {
             var fileContent = File.ReadAllText(file.AbsolutePath);
             return new FileLexer(fileContent, keyCollection);
         }
 
+        /// <summary>
+        /// Create a Parser.
+        /// </summary>
+        /// <param name="lexer">The lexer to use for parsing.</param>
+        /// <param name="keyCollection">The keyCollecction with all loaded keys.</param>
+        /// <returns>A Parser.</returns>
         protected virtual IParser CreateParser(ILexer lexer, KeyCollection keyCollection)
         {
             return new FileParser(lexer, keyCollection);
@@ -79,7 +89,12 @@ namespace CC
         /// <param name="file">The file that has already been parsed.</param>
         /// <returns>A list of related files.</returns>
         protected virtual FileData[] GetAllFileReferences(FileData file) {
-            throw new NotImplementedException();
+            return file.Language
+                .FindFilters<FileReference>()
+                .SelectMany((filter) => filter.FindFileReferences(file.ParsedContent))
+                .Where((path) => path != null)
+                .Select((path) => new FileData(path))
+                .ToArray();
         }
     }
 }
