@@ -4,12 +4,13 @@ using CC.Key;
 using CC.Key.ComponentTypes;
 using CC.Parsing;
 using CC.Parsing.Contracts;
+using CC.Tools.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CC
+namespace CC.Tools
 {
     public class FileParser : IParser
     {

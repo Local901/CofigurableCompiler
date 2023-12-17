@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC
+namespace CC.Tools.Contracts
 {
     public interface ILexer
     {

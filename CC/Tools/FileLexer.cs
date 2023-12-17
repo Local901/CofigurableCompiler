@@ -1,11 +1,12 @@
 ﻿using CC.Blocks;
 using CC.Key;
+using CC.Tools.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CC
+namespace CC.Tools
 {
     public class FileLexer: ILexer
     {

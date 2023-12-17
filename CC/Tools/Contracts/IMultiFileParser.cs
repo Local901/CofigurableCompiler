@@ -1,6 +1,6 @@
 ﻿using CC.FileInfo;
 
-namespace CC
+namespace CC.Tools.Contracts
 {
     public interface IMultiFileParser
     {

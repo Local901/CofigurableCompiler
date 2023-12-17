@@ -3,12 +3,13 @@ using CC.Blocks;
 using CC.FileInfo;
 using CC.Key;
 using CC.Key.Modifiers;
+using CC.Tools.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CC
+namespace CC.Tools
 {
     public class MultyFileParser : IMultiFileParser
     {
@@ -31,7 +32,11 @@ namespace CC
                 var file = fileList.Dequeue();
                 languageLoader.LoadConfig(file, keyCollection);
 
-                if (parsedFileList.Contains(file)) {
+                // skip files that have already been parsed
+                FileData simmilar;
+                if ((simmilar = parsedFileList.FirstOrDefault((f) => f.Equals(file))) != null) {
+                    // Link Parents to the similar file.
+                    simmilar.Parents.AddRange(file.Parents.Where((p) => simmilar.Parents.Contains(p)));
                     continue;
                 }
 
