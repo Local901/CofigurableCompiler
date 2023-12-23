@@ -30,7 +30,9 @@ namespace CC.Tools
 
             while (fileList.Count() > 0) {
                 var file = fileList.Dequeue();
-                languageLoader.LoadConfig(file, keyCollection);
+                var language = languageLoader.LoadConfig(file, keyCollection);
+
+                file.Language = language;
 
                 // skip files that have already been parsed
                 FileData simmilar;

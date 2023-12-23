@@ -5,9 +5,9 @@ using System.Text;
 
 namespace CC.Key.Modifiers
 {
-    public interface LanguageStartArgs
+    public struct LanguageStartArgs
     {
-        string KeyReference { get; set; }
+        public KeyLangReference KeyReference { get; set; }
     }
 
     public class LanguageStart : ILanguageFilter
@@ -21,7 +21,7 @@ namespace CC.Key.Modifiers
 
         public override IKey FindKey()
         {
-            return Language.GetKey(Args.KeyReference);
+            return Language.GetKey(Args.KeyReference.Key);
         }
     }
 }

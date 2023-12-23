@@ -13,11 +13,11 @@ namespace CC.Key.Modifiers
         Relative,
     }
 
-    public interface FileReferenceArgs
+    public struct FileReferenceArgs
     {
-        KeyLangReference KeyReference { get; set; }
-        string[] ValuePath { get; set; }
-        FileReferenceType ReferenceType { get; set; }
+        public KeyLangReference KeyReference { get; set; }
+        public string[] ValuePath { get; set; }
+        public FileReferenceType ReferenceType { get; set; }
     }
 
     public class FileReference : IParseTreeFilter
