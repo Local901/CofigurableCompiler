@@ -3,6 +3,7 @@ using CC.FileInfo;
 using CC.Key;
 using CC.Key.ComponentTypes;
 using CC.Key.Modifiers;
+using CC.Parsing;
 using CC.Test.Mock;
 using CC.Tools;
 using CC.Tools.Contracts;
@@ -45,7 +46,7 @@ namespace CC.Test
                         new ValueComponent(tIdentifier, "name"),
                     })));
 
-                    var gVariable = new KeyGroup("varibles", new List<KeyLangReference>
+                    var gVariable = new KeyGroup("variables", new List<KeyLangReference>
                     {
                         tIdentifier,
                         cVarDef,
@@ -138,11 +139,32 @@ namespace CC.Test
         }
 
         [Test]
+        public void ParseFile()
+        {
+            KeyCollection collection = new KeyCollection();
+            var language = languageLoaderMock.Object.LoadConfig(null, collection);
+
+            ILexer lexer = new FileLexer(CCode, collection);
+            IParser parser = new FileParser(lexer, new ParseArgFactory(collection), collection);
+
+            var languageStart = language.FindFilter<LanguageStart>();
+
+            Assert.That(language, Is.Not.Null);
+
+            IBlock result;
+            parser.DoParse(out result, languageStart.FindKey().Reference);
+
+            Assert.That(result, Is.Not.Null);
+        }
+
+        [Test]
         public void ParseSingleFile()
         {
             IMultiFileParser parser = new MultyFileParserPartialMock(languageLoaderMock.Object, (file) => CCode);
             var result = parser.Parse("test");
-            Assert.Pass();
+
+            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result[0].ParsedContent, Is.Not.Null);
         }
     }
 }

@@ -2,6 +2,7 @@
 using CC.Parsing.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CC.Parsing
@@ -15,6 +16,11 @@ namespace CC.Parsing
         {
             Args = args;
             DataPaths = dataPaths;
+        }
+
+        public IEnumerable<IReadOnlyList<IValueComponentData>> GetContinuingPaths()
+        {
+            return DataPaths.Where(path => path.Last() != null);
         }
     }
 }

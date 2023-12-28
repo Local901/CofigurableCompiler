@@ -3,6 +3,7 @@ using CC.Blocks;
 using CC.FileInfo;
 using CC.Key;
 using CC.Key.Modifiers;
+using CC.Parsing;
 using CC.Tools.Contracts;
 using System;
 using System.Collections.Generic;
@@ -87,7 +88,7 @@ namespace CC.Tools
         /// <returns>A Parser.</returns>
         protected virtual IParser CreateParser(ILexer lexer, KeyCollection keyCollection)
         {
-            return new FileParser(lexer, keyCollection);
+            return new FileParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
         }
 
         /// <summary>

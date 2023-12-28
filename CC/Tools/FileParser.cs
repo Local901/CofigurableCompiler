@@ -15,11 +15,13 @@ namespace CC.Tools
     public class FileParser : IParser
     {
         private ILexer FileLexer;
+        private IParseArgFactory ArgsFactory;
         private KeyCollection KeyCollection;
 
-        public FileParser(ILexer filelexer, KeyCollection keyCollection)
+        public FileParser(ILexer filelexer, IParseArgFactory argsFactory, KeyCollection keyCollection)
         {
             FileLexer = filelexer;
+            ArgsFactory = argsFactory;
             KeyCollection = keyCollection;
         }
 
@@ -27,7 +29,7 @@ namespace CC.Tools
         {
             FileLexer.Reset();
 
-            IParseFactory factory = new ParseFactory(startConstruct, KeyCollection);
+            IParseFactory factory = new ParseFactory(startConstruct, KeyCollection, ArgsFactory);
 
             IBlock nextBlock;
             while (TryGetNextBlock(out nextBlock, factory))

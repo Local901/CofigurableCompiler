@@ -39,6 +39,7 @@ namespace CC.Key
         /// <returns></returns>
         public IKey GetKey(KeyLangReference key)
         {
+            if (key == null) return null;
             return GetLanguage(key.Lang)?.GetKey(key.Key);
         }
 

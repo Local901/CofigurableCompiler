@@ -18,6 +18,11 @@ namespace CC.Key
             return Key == ((KeyLangReference)obj).Key && Lang == ((KeyLangReference)obj).Lang;
         }
 
+        public override string ToString()
+        {
+            return $"{Lang}:{Key}";
+        }
+
         public override int GetHashCode()
         {
             return HashCode.Combine(Key, Lang);

@@ -31,5 +31,7 @@ namespace CC.Parsing.Contracts
         /// <param name="key"></param>
         /// <returns></returns>
         public ILocalRoot CreateRoot(KeyLangReference key);
+
+        public ArgsData GenerateNextArgsData(IParseArgs arg);
     }
 }
