@@ -47,8 +47,6 @@ namespace CC.Parsing
                 .ToList();
         }
 
-        public List<List<List<string>>> structure = new List<List<List<string>>>();
-
         public void UseBlock(IBlock block)
         {
             NumberOfRounds++;
@@ -70,18 +68,6 @@ namespace CC.Parsing
                 .ForEach((arg) => arg.RemoveBranch());
 
             Ends = resovedArgs.Where((arg) => !arg.Status.HasFlag(ParseStatus.ReachedEnd)).ToList();
-
-            structure.Add(Ends.Select(end =>
-            {
-                var result = new List<string>();
-                var root = end;
-                while (root != null)
-                {
-                    result.Add(root.Data.Component?.Reference?.ToString());
-                    root = root.LocalRoot;
-                }
-                return result.AsEnumerable().Reverse().ToList();
-            }).ToList());
 
             // Add blocks that have propogated to the root to the result list.
             ProcessCompleted();
