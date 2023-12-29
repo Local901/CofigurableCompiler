@@ -58,6 +58,7 @@ namespace CC.Tools
             })
                 .Where(m => m.Match != null)
                 .Where(m => m.Match.Value.Length > 0)
+                .OrderByDescending(m => m.Match.Value.Length)
                 .OrderBy(m => m.Match.Index)
                 .FirstOrDefault();
 
