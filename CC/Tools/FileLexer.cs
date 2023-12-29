@@ -1,13 +1,14 @@
 ﻿using CC.Blocks;
 using CC.Key;
+using CC.Tools.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CC
+namespace CC.Tools
 {
-    public class FileLexer
+    public class FileLexer: ILexer
     {
         private string Page;
         private int Index;
@@ -24,30 +25,19 @@ namespace CC
             _tokenCollection = tokenCollection;
         }
 
-        /// <summary>
-        /// Restart lexing from the beginning.
-        /// </summary>
+        public void SetProgressIndex(int index)
+        {
+            Index = Math.Max(0, index);
+        }
         public void Reset()
         {
-            Index = 0;
+            SetProgressIndex(0);
         }
 
-        /// <summary>
-        /// Find next block using tokens connected to the key.
-        /// </summary>
-        /// <param name="block">Block that gets created.</param>
-        /// <param name="key">Key of group/token.</param>
-        /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, KeyLangReference key)
         {
             return TryNextBlock(out block, _tokenCollection.GetAllSubKeysOfType<Token>(key, true));
         }
-        /// <summary>
-        /// Find next block using tokens connected to the keys.
-        /// </summary>
-        /// <param name="block">Block that gets created.</param>
-        /// <param name="keys">Keys of group/token.</param>
-        /// <returns>Returns true if block is created.</returns>
         public bool TryNextBlock(out IBlock block, IEnumerable<KeyLangReference> keys)
         {
             return TryNextBlock(out block, _tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
@@ -68,6 +58,7 @@ namespace CC
             })
                 .Where(m => m.Match != null)
                 .Where(m => m.Match.Value.Length > 0)
+                .OrderByDescending(m => m.Match.Value.Length)
                 .OrderBy(m => m.Match.Index)
                 .FirstOrDefault();
 
@@ -88,24 +79,10 @@ namespace CC
             return true;
         }
 
-        /// <summary>
-        /// Find next block using tokens connected to the key.<br/>
-        /// <b>It doesn't update the index of the FileLexer.</b>
-        /// </summary>
-        /// <param name="blocks">Blocks that get created.</param>
-        /// <param name="key">Key of group/token.</param>
-        /// <returns>Returns true if block is created.</returns>
         public bool TryAllBlocks(out List<IBlock> blocks, KeyLangReference key)
         {
             return TryAllBlocks(out blocks, _tokenCollection.GetAllSubKeysOfType<Token>(key, true));
         }
-        /// <summary>
-        /// Find next block using tokens connected to the keys.<br/>
-        /// <b>It doesn't update the index of the FileLexer.</b>
-        /// </summary>
-        /// <param name="blocks">Blocks that get created.</param>
-        /// <param name="keys">Keys of group/token.</param>
-        /// <returns>Returns true if block is created.</returns>
         public bool TryAllBlocks(out List<IBlock> blocks, IEnumerable<KeyLangReference> keys)
         {
             return TryAllBlocks(out blocks, _tokenCollection.GetAllSubKeysOfType<Token>(keys, true));

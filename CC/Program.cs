@@ -6,6 +6,8 @@ using CC.Key;
 using CC.Key.ComponentTypes;
 using CC.Blocks;
 using System.Linq;
+using CC.Tools;
+using CC.Parsing;
 
 namespace CC
 {
@@ -21,7 +23,7 @@ namespace CC
             var path = @"Resources\TextFile2.txt";
             var file = File.ReadAllText(path);
             var lexer = new FileLexer(file, keyCollection);
-            var parser = new FileParcer(lexer, keyCollection);
+            var parser = new FileParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
 
             /*var blocks = new List<IBlock>();
             IBlock block;

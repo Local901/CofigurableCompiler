@@ -2,23 +2,26 @@
 using CC.Blocks;
 using CC.Key;
 using CC.Key.ComponentTypes;
-using CC.Parcing;
-using CC.Parcing.Contracts;
+using CC.Parsing;
+using CC.Parsing.Contracts;
+using CC.Tools.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CC
+namespace CC.Tools
 {
-    public class FileParcer : IFileParcer
+    public class FileParser : IParser
     {
-        private FileLexer FileLexer;
+        private ILexer FileLexer;
+        private IParseArgFactory ArgsFactory;
         private KeyCollection KeyCollection;
 
-        public FileParcer(FileLexer filelexer, KeyCollection keyCollection)
+        public FileParser(ILexer filelexer, IParseArgFactory argsFactory, KeyCollection keyCollection)
         {
             FileLexer = filelexer;
+            ArgsFactory = argsFactory;
             KeyCollection = keyCollection;
         }
 
@@ -26,7 +29,7 @@ namespace CC
         {
             FileLexer.Reset();
 
-            IParseFactory factory = new ParseFactory(startConstruct, KeyCollection);
+            IParseFactory factory = new ParseFactory(startConstruct, KeyCollection, ArgsFactory);
 
             IBlock nextBlock;
             while (TryGetNextBlock(out nextBlock, factory))

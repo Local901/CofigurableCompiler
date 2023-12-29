@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CC.Parcing.Contracts
+namespace CC.Parsing.Contracts
 {
     public interface IParseArgFactory
     {
@@ -31,5 +31,7 @@ namespace CC.Parcing.Contracts
         /// <param name="key"></param>
         /// <returns></returns>
         public ILocalRoot CreateRoot(KeyLangReference key);
+
+        public ArgsData GenerateNextArgsData(IParseArgs arg);
     }
 }

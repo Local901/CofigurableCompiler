@@ -2,12 +2,12 @@
 using CC.Blocks;
 using CC.Key;
 using CC.Key.ComponentTypes;
-using CC.Parcing.Contracts;
+using CC.Parsing.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CC.Parcing
+namespace CC.Parsing
 {
     public class ParseArgs : TypeBranchNode<ParseArgs, IParseArgs>, IParseArgs
     {

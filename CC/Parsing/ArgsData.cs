@@ -1,10 +1,11 @@
 ﻿using CC.Key.ComponentTypes;
-using CC.Parcing.Contracts;
+using CC.Parsing.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace CC.Parcing
+namespace CC.Parsing
 {
     public struct ArgsData
     {
@@ -15,6 +16,11 @@ namespace CC.Parcing
         {
             Args = args;
             DataPaths = dataPaths;
+        }
+
+        public IEnumerable<IReadOnlyList<IValueComponentData>> GetContinuingPaths()
+        {
+            return DataPaths.Where(path => path.Last() != null);
         }
     }
 }

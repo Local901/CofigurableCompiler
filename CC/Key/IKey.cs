@@ -8,7 +8,7 @@ namespace CC.Key
 {
     public abstract class IKey : IComparable, IComparable<KeyLangReference>, IComparable<IKey>
     {
-        public KeyLangReference Reference { get; set; }
+        public KeyLangReference Reference { get; protected set; }
 
         public override string ToString()
         {

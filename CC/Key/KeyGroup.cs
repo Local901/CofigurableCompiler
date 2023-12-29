@@ -7,14 +7,17 @@ namespace CC.Key
 {
     public class KeyGroup : IKey
     {
-        public IReadOnlyList<KeyLangReference> Members { get; }
+        public IList<KeyLangReference> Members { get; }
 
-        public KeyGroup()
+        public KeyGroup(string key)
+            : this(key, new List<KeyLangReference>())
+        { }
+        public KeyGroup(string key, IList<KeyLangReference> members)
         {
-            Members = new List<KeyLangReference>();
-        }
-        public KeyGroup(IReadOnlyList<KeyLangReference> members)
-        {
+            Reference = new KeyLangReference
+            {
+                Key = key,
+            };
             Members = members;
         }
 

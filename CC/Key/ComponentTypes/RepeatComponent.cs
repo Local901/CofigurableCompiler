@@ -22,7 +22,9 @@ namespace CC.Key.ComponentTypes
         {
             var data = new RepeatComponentData(Parent, Component, Repeats + 1);
             var result = new List<IValueComponentData>();
-            if (data.Repeats < Component.Maximum)
+
+            // Repeate while Maximum is larger than the number of repeates or repeat if Maximum is 0.
+            if (data.Repeats < Component.Maximum || Component.Maximum == 0)
             {
                 result.AddRange(Component.Children[0].GetNextComponents(data));
             }
@@ -56,10 +58,6 @@ namespace CC.Key.ComponentTypes
         public RepeatComponent(IComponent child, int minimum = 0, int maximum = 0)
             : base()
         {
-            if (maximum < 1) goto OK;
-            if (maximum < minimum) throw new Exception("Maximum should be larger that minimum or less than one.");
-
-        OK:
             Minimum = minimum;
             Maximum = maximum;
 
