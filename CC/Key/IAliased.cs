@@ -13,6 +13,11 @@ namespace CC.Key
         IReadOnlyList<IAliased<TKey, TValue>> Aliasses { get; }
 
         /// <summary>
+        /// List of parent aliasses.
+        /// </summary>
+        IReadOnlyList<IAliased<TKey, TValue>> AliasParents { get; }
+
+        /// <summary>
         /// Check the value if it corresponds with this key.
         /// </summary>
         /// <param name="value">The value to check.</param>
@@ -24,6 +29,12 @@ namespace CC.Key
         /// </summary>
         /// <param name="alias"></param>
         void AddAlias(IAliased<TKey, TValue> alias);
+
+        /// <summary>
+        /// Add a parent alias.
+        /// </summary>
+        /// <param name="alias"></param>
+        void AddParentAlias(IAliased<TKey, TValue> alias);
 
         /// <summary>
         /// Find all aliasses that correspond with the value.

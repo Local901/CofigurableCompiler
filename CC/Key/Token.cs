@@ -35,12 +35,16 @@ namespace CC.Key
         private readonly List<IAliased<Token, string>> _aliasses;
         public IReadOnlyList<IAliased<Token, string>> Aliasses => _aliasses.ToList();
 
+        private readonly List<IAliased<Token, string>> _aliasParents;
+        public IReadOnlyList<IAliased<Token, string>> AliasParents => _aliasParents.ToList();
+
         public Token(string key, string pattern)
         {
             Reference = new KeyLangReference { Key = key };
             Pattern = pattern;
             SubTokens = new List<Token>();
             _aliasses = new List<IAliased<Token, string>>();
+            _aliasParents = new List<IAliased<Token, string>>();
         }
 
         /// <summary>
@@ -75,6 +79,18 @@ namespace CC.Key
         public void AddAlias(IAliased<Token, string> alias)
         {
             _aliasses.Add(alias);
+            if (!alias.AliasParents.Contains(this)) {
+                alias.AddParentAlias(this);
+            }
+        }
+
+        public void AddParentAlias(IAliased<Token, string> alias)
+        {
+            _aliasParents.Add(alias);
+            if (!alias.Aliasses.Contains(this))
+            {
+                alias.AddAlias(this);
+            }
         }
 
         public IKey[] FindAliasses(string value, bool includeSelf = true)
