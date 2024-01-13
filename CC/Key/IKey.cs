@@ -12,7 +12,7 @@ namespace CC.Key
 
         public override string ToString()
         {
-            return $"{Reference.Lang}:{Reference.Key}";
+            return $"{Reference}";
         }
 
         public override bool Equals(object obj)
