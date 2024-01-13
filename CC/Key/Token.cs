@@ -1,4 +1,5 @@
 ﻿using BranchList;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -30,7 +31,7 @@ namespace CC.Key
         }
         public Regex Regex { get; private set; }
         public Token Leader { get; private set; }
-        public IReadOnlyList<Token> SubTokens { get; }
+
 
         private readonly List<IAliased<Token, string>> _aliasses;
         public IReadOnlyList<IAliased<Token, string>> Aliasses => _aliasses.ToList();
@@ -42,7 +43,6 @@ namespace CC.Key
         {
             Reference = new KeyLangReference { Key = key };
             Pattern = pattern;
-            SubTokens = new List<Token>();
             _aliasses = new List<IAliased<Token, string>>();
             _aliasParents = new List<IAliased<Token, string>>();
         }
@@ -78,6 +78,7 @@ namespace CC.Key
 
         public void AddAlias(IAliased<Token, string> alias)
         {
+            if (_aliasses.Contains(alias)) throw new Exception("Can't add the same alias twice.");
             _aliasses.Add(alias);
             if (!alias.AliasParents.Contains(this)) {
                 alias.AddParentAlias(this);
@@ -86,6 +87,7 @@ namespace CC.Key
 
         public void AddParentAlias(IAliased<Token, string> alias)
         {
+            if (_aliasParents.Contains(alias)) throw new Exception("Can't add the same parent alias twice.");
             _aliasParents.Add(alias);
             if (!alias.Aliasses.Contains(this))
             {
