@@ -23,9 +23,27 @@ namespace CC.Key
             Component = component;
         }
 
-        public bool Check(IReadOnlyList<IBlock> value)
+        public bool Check(IReadOnlyList<IBlock> values)
         {
-            throw new NotImplementedException();
+            var language = Reference.Language;
+            var data = Component.GetNextComponents(null);
+
+            foreach (var value in values)
+            {
+                // Only use data that corresponds with the possible data.
+                data = data.Where((d) => language.IsKeyInGroup(value.Key.Reference, d.Component.Reference)).ToList();
+
+                // If no data remains it is not of this type.
+                if (data.Count == 0)
+                {
+                    return false;
+                }
+
+                // Get next data.
+                data = data.SelectMany((d) => d.GetNextComponents()).ToList();
+            }
+
+            return true;
         }
 
         public void AddAlias(IAliased<Construct, IReadOnlyList<IBlock>> alias)
