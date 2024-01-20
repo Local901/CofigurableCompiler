@@ -7,15 +7,15 @@ using System.Linq;
 namespace CC.Key
 
 {
-    public class Construct : IKey, IAliased<Construct, IReadOnlyList<IBlock>>
+    public class Construct : IKey, IAlias<Construct, IReadOnlyList<IBlock>>
     {
         public IComponent Component { get; }
 
-        private readonly List<IAliased<Construct, IReadOnlyList<IBlock>>> _aliasses;
-        public IReadOnlyList<IAliased<Construct, IReadOnlyList<IBlock>>> Aliasses => _aliasses.ToList();
+        private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasses;
+        public IReadOnlyList<IAlias<Construct, IReadOnlyList<IBlock>>> Aliasses => _aliasses.ToList();
 
-        private readonly List<IAliased<Construct, IReadOnlyList<IBlock>>> _aliasParents;
-        public IReadOnlyList<IAliased<Construct, IReadOnlyList<IBlock>>> AliasParents => _aliasParents.ToList();
+        private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasParents;
+        public IReadOnlyList<IAlias<Construct, IReadOnlyList<IBlock>>> AliasParents => _aliasParents.ToList();
 
         public Construct (string key, IComponent component)
         {
@@ -46,7 +46,7 @@ namespace CC.Key
             return true;
         }
 
-        public void AddAlias(IAliased<Construct, IReadOnlyList<IBlock>> alias)
+        public void AddAlias(IAlias<Construct, IReadOnlyList<IBlock>> alias)
         {
             if (_aliasses.Contains(alias)) throw new Exception("Can't add the same alias twice.");
             _aliasses.Add(alias);
@@ -56,7 +56,7 @@ namespace CC.Key
             }
         }
 
-        public void AddParentAlias(IAliased<Construct, IReadOnlyList<IBlock>> alias)
+        public void AddParentAlias(IAlias<Construct, IReadOnlyList<IBlock>> alias)
         {
             if (_aliasParents.Contains(alias)) throw new Exception("Can't add the same parent alias twice.");
             _aliasParents.Add(alias);
@@ -81,6 +81,38 @@ namespace CC.Key
             }
 
             return validAliasses.ToArray();
+        }
+
+        public bool IsAlias(IAlias allias)
+        {
+            if (!(allias is IAlias<Construct, IReadOnlyList<IBlock>>))
+            {
+                return false;
+            }
+            return IsAlias(allias as IAlias<Construct, IReadOnlyList<IBlock>>);
+        }
+        public bool IsAlias(IAlias<Construct, IReadOnlyList<IBlock>> allias)
+        {
+            if (allias is Construct && Equals(allias as Construct))
+            {
+                return true;
+            }
+
+            return Aliasses.Any((a) => a.IsAlias(allias));
+        }
+
+        IList<IAlias> IAlias.RootAlliasses()
+        {
+            return RootAlliasses() as IList<IAlias>;
+        }
+        public IList<IAlias<Construct, IReadOnlyList<IBlock>>> RootAlliasses()
+        {
+            if (AliasParents.Count == 0)
+            {
+                return new List<IAlias<Construct, IReadOnlyList<IBlock>>> { this };
+            }
+
+            return AliasParents.SelectMany((parent) => parent.RootAlliasses()).ToList();
         }
     }
 }

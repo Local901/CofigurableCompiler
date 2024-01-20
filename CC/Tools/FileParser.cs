@@ -34,7 +34,7 @@ namespace CC.Tools
             IBlock nextBlock;
             while (TryGetNextBlock(out nextBlock, factory))
             {
-                factory.UseBlock(nextBlock);
+                factory.UseBlocks(new List<IBlock> { nextBlock });
             }
 
             var ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace CC.Key
 {
-    public class Token : IKey, IAliased<Token, string>
+    public class Token : IKey, IAlias<Token, string>
     {
         private string _pattern;
         private RegexOptions _regexOptions = RegexOptions.None;
@@ -33,18 +33,18 @@ namespace CC.Key
         public Token Leader { get; private set; }
 
 
-        private readonly List<IAliased<Token, string>> _aliasses;
-        public IReadOnlyList<IAliased<Token, string>> Aliasses => _aliasses.ToList();
+        private readonly List<IAlias<Token, string>> _aliasses;
+        public IReadOnlyList<IAlias<Token, string>> Aliasses => _aliasses.ToList();
 
-        private readonly List<IAliased<Token, string>> _aliasParents;
-        public IReadOnlyList<IAliased<Token, string>> AliasParents => _aliasParents.ToList();
+        private readonly List<IAlias<Token, string>> _aliasParents;
+        public IReadOnlyList<IAlias<Token, string>> AliasParents => _aliasParents.ToList();
 
         public Token(string key, string pattern)
         {
             Reference = new KeyLangReference { Key = key };
             Pattern = pattern;
-            _aliasses = new List<IAliased<Token, string>>();
-            _aliasParents = new List<IAliased<Token, string>>();
+            _aliasses = new List<IAlias<Token, string>>();
+            _aliasParents = new List<IAlias<Token, string>>();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace CC.Key
             return match.Value == value;
         }
 
-        public void AddAlias(IAliased<Token, string> alias)
+        public void AddAlias(IAlias<Token, string> alias)
         {
             if (_aliasses.Contains(alias)) throw new Exception("Can't add the same alias twice.");
             _aliasses.Add(alias);
@@ -85,7 +85,7 @@ namespace CC.Key
             }
         }
 
-        public void AddParentAlias(IAliased<Token, string> alias)
+        public void AddParentAlias(IAlias<Token, string> alias)
         {
             if (_aliasParents.Contains(alias)) throw new Exception("Can't add the same parent alias twice.");
             _aliasParents.Add(alias);
@@ -110,6 +110,38 @@ namespace CC.Key
             }
 
             return validAliasses.ToArray();
+        }
+
+        public bool IsAlias(IAlias allias)
+        {
+            if (!(allias is IAlias<Token, string>))
+            {
+                return false;
+            }
+            return IsAlias(allias as IAlias<Token, string>);
+        }
+        public bool IsAlias(IAlias<Token, string> allias)
+        {
+            if (allias is Token && Equals(allias as Token))
+            {
+                return true;
+            }
+
+            return Aliasses.Any((a) => a.IsAlias(allias));
+        }
+
+        IList<IAlias> IAlias.RootAlliasses()
+        {
+            return RootAlliasses() as IList<IAlias>;
+        }
+        public IList<IAlias<Token, string>> RootAlliasses()
+        {
+            if (AliasParents.Count == 0)
+            {
+                return new List<IAlias<Token, string>> { this };
+            }
+
+            return AliasParents.SelectMany((parent) => parent.RootAlliasses()).ToList();
         }
     }
 }

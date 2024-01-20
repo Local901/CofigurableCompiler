@@ -15,10 +15,10 @@ namespace CC.Parsing.Contracts
         /// <returns></returns>
         public List<KeyLangReference> GetNextKeys();
         /// <summary>
-        /// Use a block to progress the parsing.
+        /// Use blocks to progress the parsing.
         /// </summary>
-        /// <param name="block"></param>
-        public void UseBlock(IBlock block);
+        /// <param name="blocks"></param>
+        public void UseBlocks(IEnumerable<IBlock> blocks);
         /// <summary>
         /// Get the ArgsData for the provided arg. This contains the arg itself and all the paths to following valueComponents.
         /// </summary>

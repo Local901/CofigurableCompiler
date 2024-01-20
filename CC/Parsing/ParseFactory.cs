@@ -47,12 +47,12 @@ namespace CC.Parsing
                 .ToList();
         }
 
-        public void UseBlock(IBlock block)
+        public void UseBlocks(IEnumerable<IBlock> blocks)
         {
             NumberOfRounds++;
 
             // Find next accepted ParseArgs.
-            var acceptedNextArgs = PropogateBlock(Ends, block).ToArray();
+            var acceptedNextArgs = blocks.SelectMany((block) => PropogateBlock(Ends, block)).ToArray();
 
             // Update the status of the args.
             acceptedNextArgs.ForEach((arg) => UpdateStatus(arg));
