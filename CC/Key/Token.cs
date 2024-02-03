@@ -95,6 +95,14 @@ namespace CC.Key
             }
         }
 
+        public IKey[] FindAliasses(object value, bool includeSelf = true)
+        {
+            if (!(value is string))
+            {
+                return new IKey[0];
+            }
+            return FindAliasses(value as string, includeSelf);
+        }
         public IKey[] FindAliasses(string value, bool includeSelf = true)
         {
             List<IKey> validAliasses = new List<IKey>();

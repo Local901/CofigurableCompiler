@@ -18,6 +18,14 @@ namespace CC.Key
         /// </summary>
         /// <returns></returns>
         IList<IAlias> RootAlliasses();
+
+        /// <summary>
+        /// Find all aliasses that correspond with the value.
+        /// </summary>
+        /// <param name="value">The value to check with.</param>
+        /// <param name="includeSelf">Chould the search include this object.</param>
+        /// <returns>An array of keys. Returns an empty array when value not of correct type.</returns>
+        IKey[] FindAliasses(object value, bool includeSelf = true);
     }
 
     public interface IAlias<TKey, TValue> : IAlias
@@ -71,6 +79,6 @@ namespace CC.Key
         /// Get all root allias objects.
         /// </summary>
         /// <returns></returns>
-        IList<IAlias<TKey, TValue>> RootAlliasses();
+        new IList<IAlias<TKey, TValue>> RootAlliasses();
     }
 }

@@ -115,11 +115,13 @@ namespace CC.Test
             ILexer lexer = new FileLexer(CCode, collection);
 
             var result = new List<IBlock>();
-            IBlock block;
-            while(lexer.TryNextBlock(out block, refs))
+            IList<IValueBlock> blocks;
+            while((blocks = lexer.TryNextBlock(refs)) != null && blocks.Count > 0)
             {
-                result.Add(block);
+                Assert.That(blocks, Has.Count.EqualTo(1));
+                result.Add(blocks[0]);
             }
+            Assert.That(blocks, Is.Not.Null);
 
             Assert.That(result, Has.Count.EqualTo(14));
             Assert.That(result[0].Key.Reference.Key, Is.EqualTo("identifier"));
@@ -151,8 +153,7 @@ namespace CC.Test
 
             Assert.That(language, Is.Not.Null);
 
-            IBlock result;
-            parser.DoParse(out result, languageStart.FindKey().Reference);
+            IBlock result = parser.DoParse(languageStart.FindKey().Reference);
 
             Assert.That(result, Is.Not.Null);
         }

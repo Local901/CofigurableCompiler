@@ -34,58 +34,56 @@ namespace CC.Tools
             SetProgressIndex(0);
         }
 
-        public bool TryNextBlock(out IBlock block, KeyLangReference key)
+        public IList<IValueBlock> TryNextBlock(KeyLangReference key)
         {
-            return TryNextBlock(out block, _tokenCollection.GetAllSubKeysOfType<Token>(key, true));
+            return TryNextBlock(_tokenCollection.GetAllSubKeysOfType<Token>(key, true));
         }
-        public bool TryNextBlock(out IBlock block, IEnumerable<KeyLangReference> keys)
+        public IList<IValueBlock> TryNextBlock(IEnumerable<KeyLangReference> keys)
         {
-            return TryNextBlock(out block, _tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
+            return TryNextBlock(_tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
         }
         /// <summary>
-        /// Find next block using provided tokens.
+        /// Find next block using provided tokens. Will move the progress index to the one that is the higest of the returnd values.
         /// </summary>
         /// <param name="block">Block that gets created.</param>
         /// <param name="tokens">List of tokens.</param>
         /// <returns>Returns true if block is created.</returns>
-        private bool TryNextBlock(out IBlock block, IEnumerable<Token> tokens)
+        private IList<IValueBlock> TryNextBlock(IEnumerable<Token> tokens)
         {
+            // TODO: Make it optional to search using only the root aliases instead of the 
+
             // find the next match
-            var match = tokens.Select(t => new
+            var blocks = TryAllBlocks(tokens);
+
+            if (blocks.Count == 0)
             {
-                Match = t.NextMatch(Page, Index),
-                Token = t
-            })
-                .Where(m => m.Match != null)
-                .Where(m => m.Match.Value.Length > 0)
-                .OrderByDescending(m => m.Match.Value.Length)
-                .OrderBy(m => m.Match.Index)
-                .FirstOrDefault();
+                return blocks;
+            }
 
-            block = null;
-            if (match == null)
-                return false;
+            var minIndex = blocks.Select((b) => b.Index).Min();
 
-            // make a block
-            block = new Block(
-                match.Token,
-                match.Match.Value,
-                match.Match.Index,
-                match.Match.Index + match.Match.Value.Length
-            );
+            // Find all valid aliases
+            blocks = blocks.Where((b) => b.Index == minIndex)
+                .SelectMany((b) =>
+                {
+                    var alias = b.Key as IAlias;
+                    return alias?.FindAliasses(b.Value, false)
+                        ?.Select((key) => new Block(key, b.Value, b.Index, b.EndIndex))
+                        ?.Prepend(b) ?? new IValueBlock[] { b };
+                }).ToList();
 
-            // move last index
-            Index = block.EndIndex;
-            return true;
+            // move to last index
+            SetProgressIndex(blocks.Select((b) => b.EndIndex).Max());
+            return blocks;
         }
 
-        public bool TryAllBlocks(out List<IBlock> blocks, KeyLangReference key)
+        public List<IValueBlock> TryAllBlocks(KeyLangReference key)
         {
-            return TryAllBlocks(out blocks, _tokenCollection.GetAllSubKeysOfType<Token>(key, true));
+            return TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(key, true));
         }
-        public bool TryAllBlocks(out List<IBlock> blocks, IEnumerable<KeyLangReference> keys)
+        public List<IValueBlock> TryAllBlocks(IEnumerable<KeyLangReference> keys)
         {
-            return TryAllBlocks(out blocks, _tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
+            return TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
         }
         /// <summary>
         /// Find all blocks using provided tokens.<br/>
@@ -94,9 +92,9 @@ namespace CC.Tools
         /// <param name="blocks">Blocks that get created.</param>
         /// <param name="tokens">List of tokens.</param>
         /// <returns>Returns true if block is created.</returns>
-        private bool TryAllBlocks(out List<IBlock> blocks, IEnumerable<Token> tokens)
+        private List<IValueBlock> TryAllBlocks(IEnumerable<Token> tokens)
         {
-            blocks = tokens.Select(t => new
+            return tokens.Select(t => new
             {
                 Match = t.NextMatch(Page, Index),
                 Token = t
@@ -110,9 +108,8 @@ namespace CC.Tools
                         m.Match.Index,
                         m.Match.Index + m.Match.Value.Length
                     ))
-                .Cast<IBlock>()
+                .Cast<IValueBlock>()
                 .ToList();
-            return blocks.Count > 0;
         }
     }
 }

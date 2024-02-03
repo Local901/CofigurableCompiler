@@ -66,6 +66,14 @@ namespace CC.Key
             }
         }
 
+        public IKey[] FindAliasses(object value, bool includeSelf = true)
+        {
+            if (!(value is IReadOnlyList<IBlock>))
+            {
+                return new IKey[0];
+            }
+            return FindAliasses(value as IReadOnlyList<IBlock>, includeSelf);
+        }
         public IKey[] FindAliasses(IReadOnlyList<IBlock> value, bool includeSelf = true)
         {
             List<IKey> validAliasses = new List<IKey>();

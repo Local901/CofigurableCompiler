@@ -40,8 +40,7 @@ namespace CC
                 Console.WriteLine(b.Index + b.Value.Length);
             }*/
             
-            IBlock block;
-            parser.DoParse(out block, keyCollection.GetLanguage("cLang").GetKey("function").Reference);
+            IBlock block = parser.DoParse(keyCollection.GetLanguage("cLang").GetKey("function").Reference);
             PrintConstruct(block);
         }
 

@@ -22,34 +22,30 @@ namespace CC.Tools.Contracts
         /// Find next block using tokens connected to the key.
         /// Progress is updated.
         /// </summary>
-        /// <param name="block">Block that gets created.</param>
         /// <param name="key">Key of group/token.</param>
-        /// <returns>Returns true if block is created.</returns>
-        bool TryNextBlock(out IBlock block, KeyLangReference key);
+        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
+        IList<IValueBlock> TryNextBlock(KeyLangReference key);
         /// <summary>
         /// Find next block using tokens connected to the keys.
         /// Progress is updated.
         /// </summary>
-        /// <param name="block">Block that gets created.</param>
         /// <param name="keys">Keys of groups/tokens.</param>
-        /// <returns>Returns true if block is created.</returns>
-        bool TryNextBlock(out IBlock block, IEnumerable<KeyLangReference> keys);
+        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
+        IList<IValueBlock> TryNextBlock(IEnumerable<KeyLangReference> keys);
 
         /// <summary>
         /// Find next block using tokens connected to the key.<br/>
         /// <b>It doesn't update the progress of the lexer.</b>
         /// </summary>
-        /// <param name="blocks">Blocks that get created.</param>
         /// <param name="key">Key of group/token.</param>
-        /// <returns>Returns true if block is created.</returns>
-        bool TryAllBlocks(out List<IBlock> blocks, KeyLangReference key);
+        /// <returns>Returns Blocks that get created.</returns>
+        List<IValueBlock> TryAllBlocks(KeyLangReference key);
         /// <summary>
         /// Find next block using tokens connected to the keys.<br/>
         /// <b>It doesn't update the progress of the lexer.</b>
         /// </summary>
-        /// <param name="blocks">Blocks that get created.</param>
         /// <param name="keys">Keys of group/token.</param>
-        /// <returns>Returns true if block is created.</returns>
-        bool TryAllBlocks(out List<IBlock> blocks, IEnumerable<KeyLangReference> keys);
+        /// <returns>Returns Blocks that get created.</returns>
+        List<IValueBlock> TryAllBlocks(IEnumerable<KeyLangReference> keys);
     }
 }
