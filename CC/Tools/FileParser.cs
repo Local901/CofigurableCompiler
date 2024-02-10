@@ -25,16 +25,16 @@ namespace CC.Tools
             KeyCollection = keyCollection;
         }
 
-        public void DoParse(out IBlock block, KeyLangReference startConstruct)
+        public IBlock DoParse(KeyLangReference startConstruct)
         {
             FileLexer.Reset();
 
             IParseFactory factory = new ParseFactory(startConstruct, KeyCollection, ArgsFactory);
 
-            IBlock nextBlock;
-            while (TryGetNextBlock(out nextBlock, factory))
+            IList<IValueBlock> nextBlocks;
+            while (TryGetNextBlock(out nextBlocks, factory))
             {
-                factory.UseBlock(nextBlock);
+                factory.UseBlocks(nextBlocks);
             }
 
             var ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();
@@ -45,28 +45,25 @@ namespace CC.Tools
             }
 
             // TODO: look for the errors.
-            block = ends.FirstOrDefault()?.Block;
+            return ends.FirstOrDefault()?.Block;
         }
 
         /// <summary>
         /// Get the next block from the FileLexer.
         /// </summary>
-        /// <param name="nextBlock"></param>
+        /// <param name="nextBlocks"></param>
         /// <returns>True if the block has been created.</returns>
-        private bool TryGetNextBlock(out IBlock nextBlock, IParseFactory factory)
+        private bool TryGetNextBlock(out IList<IValueBlock> nextBlocks, IParseFactory factory)
         {
             var keys = factory.GetNextKeys();
             if (keys.Count == 0)
             {
-                nextBlock = null;
+                nextBlocks = null;
                 return false;
             }
-            var refs = keys
-                .Select(k => k.Lang)
-                .Distinct()
-                .SelectMany(l => KeyCollection.GetLanguage(l).GetAllKeys())
-                .Select(k => k.Reference);
-            return FileLexer.TryNextBlock(out nextBlock, refs);
+
+            nextBlocks = FileLexer.TryNextBlock(keys);
+            return nextBlocks != null && nextBlocks.Count != 0;
         }
     }
 }

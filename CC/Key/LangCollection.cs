@@ -137,7 +137,17 @@ namespace CC.Key
 
             if (key == null) return false;
 
-            return GetAllSubKeys(group, true).Any(gk => keyObject.Equals(gk));
+            var subKeys = GetAllSubKeys(group, true);
+            var result = subKeys.Any((gk) => keyObject.Equals(gk));
+
+            if (result || !(keyObject is IAlias))
+            {
+                return result;
+            }
+
+            // Is any of the keys an alias and is one of them the parent of the key;
+            return subKeys.OfType<IAlias>()
+                .Any((alias) => alias.IsAlias(keyObject as IAlias));
         }
         public bool IsKeyInGroup(KeyLangReference key, KeyLangReference group)
         {

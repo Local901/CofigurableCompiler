@@ -49,8 +49,7 @@ namespace CC.Tools
                     var lexer = CreateLexer(file, keyCollection);
                     var parser = CreateParser(lexer, keyCollection);
 
-                    IBlock block;
-                    parser.DoParse(out block, languageStartKey.Reference);
+                    IBlock block = parser.DoParse(languageStartKey.Reference);
 
                     file.ParsedContent = block;
 
