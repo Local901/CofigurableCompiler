@@ -40,9 +40,21 @@ This repository will contain a compiler that can be configured to read any sort 
 
   * Add file data and link related files and prevent recurive importing. It will make a relation to the parsed file.
 
-* [ ] Add aliases for tokens and constructs.
+* [X] Add aliases for tokens and constructs.
+
+  * Make Lexer hadle Token aliases.
 
 * [ ] Make the behaviour of the compiler configurable from outside.
+
+* [ ] Clean up Library.
+
+* [ ] Make library publicly available.
+
+* [ ] Create configurable pipeline.
+
+* [ ] Make my own regex resolver. To make sure it behaves the way that it should.
+
+* [ ] Decide how to use Contruct aliasses, if not remove behaviour.
 
 * [ ] Deside on a way to configure the compiler outside of code with a config file.
 
