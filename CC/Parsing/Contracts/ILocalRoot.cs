@@ -7,8 +7,6 @@ using System.Text;
 
 namespace CC.Parsing
 {
-    public delegate void ConstructCreated(ConstructBlock block);
-
     public interface ILocalRoot : IParseArgs
     {
         /// <summary>

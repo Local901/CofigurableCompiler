@@ -24,8 +24,14 @@ namespace CC.Parsing
             if (componentPath == null || componentPath.Count == 0) throw new ArgumentException("ComponentPath should contain at leats one element.");
             if (parent == null) throw new ArgumentException("The parent arg can't be null.");
 
+            // The inde from where the path loops.
+            // Is equal to componentPath.Count - 1 when there is no loop.
+            int loopIndex = componentPath.Select((c) => c.Component.Reference)
+                .ToList()
+                .IndexOf(componentPath[componentPath.Count - 1].Component.Reference);
+
             var currentParent = parent;
-            for (int i = 0; i < componentPath.Count; i++)
+            for (int i = 0; i <= loopIndex; i++)
             {
                 var step = componentPath[i];
 
@@ -63,6 +69,8 @@ namespace CC.Parsing
                 currentParent = newParent;
             }
 
+            // Create a loop object to handle loops.
+
             return currentParent;
         }
 
@@ -85,7 +93,7 @@ namespace CC.Parsing
                     .Select(data => new ValueBranchNode<IValueComponentData>(data))
             );
 
-            node.Children.ForEach(n => ResolveNode(n));
+            node.Children.ForEach(n => ResolveNode(n, new List<KeyLangReference> { n.Value.Component.Reference }));
 
             return new ArgsData(
                 arg,
@@ -98,9 +106,15 @@ namespace CC.Parsing
         /// Extend node as a construct with its own components and as group with its members.
         /// </summary>
         /// <param name="node">A node with children.</param>
-        private void ResolveNode(ValueBranchNode<IValueComponentData> node)
+        private void ResolveNode(ValueBranchNode<IValueComponentData> node, IList<KeyLangReference> path)
         {
             if (node == null || node.Value == null)
+            {
+                return;
+            }
+
+            // Stop when the path loops back.
+            if (path.IndexOf(node.Value.Component.Reference) < (path.Count - 1))
             {
                 return;
             }
@@ -120,7 +134,7 @@ namespace CC.Parsing
                 node.AddRange(childNodes);
 
                 // Resolve child nodes.
-                childNodes.ForEach(n => ResolveNode(n));
+                childNodes.ForEach(n => ResolveNode(n, path.Append(n.Value.Component.Reference).ToList()));
             } else if (key is KeyGroup)
             {
                 var group = key as KeyGroup;
@@ -134,7 +148,7 @@ namespace CC.Parsing
                 node.AddRange(childNodes);
 
                 // Resolve child nodes.
-                childNodes.ForEach(n => ResolveNode(n));
+                childNodes.ForEach(n => ResolveNode(n, path.Append(n.Value.Component.Reference).ToList()));
             }
         }
     }
