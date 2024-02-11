@@ -8,21 +8,32 @@ using System.Text;
 
 namespace CC.Tools
 {
+    [Flags]
+    public enum FileLexerOptions
+    {
+        None = 0,
+        CompleteLanguage = 1,
+        FromAliasRoot = 2,
+        ResolveAlias = 4,
+    }
+
     public class FileLexer: ILexer
     {
         private string Page;
         private int Index;
         private readonly KeyCollection _tokenCollection;
+        private readonly FileLexerOptions options;
 
         /// <summary>
         /// Make lexer for page text.
         /// </summary>
         /// <param name="page">text to lex</param>
-        public FileLexer(string page, KeyCollection tokenCollection)
+        public FileLexer(string page, KeyCollection tokenCollection, FileLexerOptions options = FileLexerOptions.None)
         {
             Page = page;
             Index = 0;
             _tokenCollection = tokenCollection;
+            this.options = options == FileLexerOptions.None ? FileLexerOptions.ResolveAlias : options;
         }
 
         public void SetProgressIndex(int index)
@@ -50,8 +61,6 @@ namespace CC.Tools
         /// <returns>Returns true if block is created.</returns>
         private IList<IValueBlock> TryNextBlock(IEnumerable<Token> tokens)
         {
-            // TODO: Make it optional to search using only the root aliases instead of the 
-
             // find the next match
             var blocks = TryAllBlocks(tokens);
 
@@ -62,15 +71,14 @@ namespace CC.Tools
 
             var minIndex = blocks.Select((b) => b.Index).Min();
 
-            // Find all valid aliases
-            blocks = blocks.Where((b) => b.Index == minIndex)
-                .SelectMany((b) =>
-                {
-                    var alias = b.Key as IAlias;
-                    return alias?.FindAliasses(b.Value, false)
-                        ?.Select((key) => new Block(key, b.Value, b.Index, b.EndIndex))
-                        ?.Prepend(b) ?? new IValueBlock[] { b };
-                }).ToList();
+            // Take all first blocks
+            blocks = blocks.Where((b) => b.Index == minIndex).ToList();
+
+            // Create all blocks of valid child aliases.
+            if (options.HasFlag(FileLexerOptions.ResolveAlias))
+            {
+                blocks = ResolveAliasses(blocks).ToList();
+            }
 
             // move to last index
             SetProgressIndex(blocks.Select((b) => b.EndIndex).Max());
@@ -79,11 +87,27 @@ namespace CC.Tools
 
         public List<IValueBlock> TryAllBlocks(KeyLangReference key)
         {
-            return TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(key, true));
+            var blocks = TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(key, true));
+
+            // Create all blocks of valid child aliases.
+            if (options.HasFlag(FileLexerOptions.ResolveAlias))
+            {
+                blocks = ResolveAliasses(blocks).ToList();
+            }
+
+            return blocks;
         }
         public List<IValueBlock> TryAllBlocks(IEnumerable<KeyLangReference> keys)
         {
-            return TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
+            var blocks = TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
+
+            // Create all blocks of valid child aliases.
+            if (options.HasFlag(FileLexerOptions.ResolveAlias))
+            {
+                blocks = ResolveAliasses(blocks).ToList();
+            }
+
+            return blocks;
         }
         /// <summary>
         /// Find all blocks using provided tokens.<br/>
@@ -94,7 +118,25 @@ namespace CC.Tools
         /// <returns>Returns true if block is created.</returns>
         private List<IValueBlock> TryAllBlocks(IEnumerable<Token> tokens)
         {
-            return tokens.Select(t => new
+            // Get all tokens of requested languages.
+            if (options.HasFlag(FileLexerOptions.CompleteLanguage))
+            {
+                tokens = tokens.GroupBy((t) => t.Reference.Language)
+                    .SelectMany((group) => group.Key.GetAllKeysOfType<Token>());
+            }
+            // Only use root level aliases.
+            if (options.HasFlag(FileLexerOptions.FromAliasRoot))
+            {
+                var roots = tokens.SelectMany((t) => t.RootAlliasses())
+                    .Distinct().Cast<Token>().ToList();
+
+                var tokenList = tokens.Where((t) => t.AliasParents.Count() == 0)
+                    .ToList();
+                tokenList.AddRange(roots.Where((r) => !tokens.Contains(r)));
+                tokens = tokenList;
+            }
+
+            var blocks = tokens.Select(t => new
             {
                 Match = t.NextMatch(Page, Index),
                 Token = t
@@ -110,6 +152,25 @@ namespace CC.Tools
                     ))
                 .Cast<IValueBlock>()
                 .ToList();
+
+            return blocks;
+        }
+
+        /// <summary>
+        /// Resolve all aliases and return a complete list of all valid blocks.
+        /// </summary>
+        /// <param name="blocks">list of blocks to resolve.</param>
+        /// <returns></returns>
+        private IEnumerable<IValueBlock> ResolveAliasses(IEnumerable<IValueBlock> blocks)
+        {
+            return blocks.SelectMany((block) =>
+            {
+                var token = block.Key as Token;
+
+                return token.FindAliasses(block.Value, false)
+                    .Select((t) => new Block(t, block.Value, block.Index, block.EndIndex, block.Name))
+                    .Prepend(block);
+            });
         }
     }
 }

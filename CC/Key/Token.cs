@@ -9,7 +9,7 @@ namespace CC.Key
     public class Token : IKey, IAlias<Token, string>
     {
         private string _pattern;
-        private RegexOptions _regexOptions = RegexOptions.None;
+        private RegexOptions _regexOptions = RegexOptions.Multiline | RegexOptions.Compiled;
         public string Pattern
         {
             get => _pattern;
