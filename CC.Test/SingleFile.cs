@@ -11,7 +11,7 @@ using Moq;
 
 namespace CC.Test
 {
-    public class Tests
+    public class SingleFile
     {
         private readonly string CCode = "void main() {int i = 5;return i;}";
 

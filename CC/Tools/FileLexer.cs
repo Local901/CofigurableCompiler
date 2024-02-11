@@ -170,7 +170,7 @@ namespace CC.Tools
                 var token = block.Key as Token;
 
                 return token.FindAliasses(block.Value, false)
-                    .Select((t) => new Block(token, block.Value, block.Index, block.EndIndex, block.Name))
+                    .Select((t) => new Block(t, block.Value, block.Index, block.EndIndex, block.Name))
                     .Prepend(block);
             });
         }
