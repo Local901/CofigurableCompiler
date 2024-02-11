@@ -61,8 +61,6 @@ namespace CC.Tools
         /// <returns>Returns true if block is created.</returns>
         private IList<IValueBlock> TryNextBlock(IEnumerable<Token> tokens)
         {
-            // TODO: Make it optional to search using only the root aliases instead of the 
-
             // find the next match
             var blocks = TryAllBlocks(tokens);
 

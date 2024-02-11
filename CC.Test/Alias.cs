@@ -88,7 +88,7 @@ namespace CC.Test
             languageLoaderMock.Object.LoadConfig(null, collection);
 
             var lexer = new FileLexer(
-                $"print hello world",
+                $"print hello world\nload file",
                 collection
                 );
             var language = collection.GetLanguage("test_lang");
