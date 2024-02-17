@@ -1,6 +1,6 @@
-﻿using CC.FileInfo;
+﻿using ConCore.FileInfo;
 
-namespace CC.Tools.Contracts
+namespace ConCore.Tools.Contracts
 {
     public interface IMultiFileParser
     {

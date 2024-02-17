@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ConCore.Key.Collections;
+using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
-namespace CC.Key
+namespace ConCore.Key
 {
     public class KeyLangReference : IComparable<KeyLangReference>
     {

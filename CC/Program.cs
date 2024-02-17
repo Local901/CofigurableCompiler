@@ -1,13 +1,14 @@
-﻿using System;
+﻿using BranchList;
+using ConCore.Blocks;
+using ConCore.Key;
+using ConCore.Key.Collections;
+using ConCore.Key.Components;
+using ConCore.Lexing;
+using ConCore.Parsing;
+using ConCore.Parsing.Simple;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using BranchList;
-using CC.Key;
-using CC.Key.ComponentTypes;
-using CC.Blocks;
-using System.Linq;
-using CC.Tools;
-using CC.Parsing;
 
 namespace CC
 {
@@ -22,8 +23,8 @@ namespace CC
 
             var path = @"Resources\TextFile2.txt";
             var file = File.ReadAllText(path);
-            var lexer = new FileLexer(file, keyCollection);
-            var parser = new FileParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
+            var lexer = new SimpleLexer(file, keyCollection);
+            var parser = new SimpleParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
 
             /*var blocks = new List<IBlock>();
             IBlock block;

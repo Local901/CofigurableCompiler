@@ -1,14 +1,10 @@
-﻿using CC.FileInfo;
-using CC.Key;
-using CC.Tools;
-using CC.Tools.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ConCore.FileInfo;
+using ConCore.Key.Collections;
+using ConCore.Lexing;
+using ConCore.Tools;
+using ConCore.Tools.Contracts;
 
-namespace CC.Test.Mock
+namespace ConCore.Test.Mock
 {
     internal class MultyFileParserPartialMock : MultyFileParser
     {
@@ -22,7 +18,7 @@ namespace CC.Test.Mock
 
         protected override ILexer CreateLexer(FileData file, KeyCollection keyCollection)
         {
-            return new FileLexer(FileReader(file), keyCollection);
+            return new SimpleLexer(FileReader(file), keyCollection);
         }
     }
 }

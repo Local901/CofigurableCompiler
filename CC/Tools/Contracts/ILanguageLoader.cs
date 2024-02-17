@@ -1,10 +1,7 @@
-﻿using CC.FileInfo;
-using CC.Key;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ConCore.FileInfo;
+using ConCore.Key.Collections;
 
-namespace CC.Tools.Contracts
+namespace ConCore.Tools.Contracts
 {
     public interface ILanguageLoader
     {

@@ -1,19 +1,14 @@
-﻿using CC.Blocks;
-using CC.FileInfo;
-using CC.Key;
-using CC.Key.ComponentTypes;
-using CC.Key.Modifiers;
-using CC.Test.Mock;
-using CC.Tools;
-using CC.Tools.Contracts;
+﻿using ConCore.Blocks.Helpers;
+using ConCore.FileInfo;
+using ConCore.Key;
+using ConCore.Key.Collections;
+using ConCore.Key.Components;
+using ConCore.Key.Modifiers;
+using ConCore.Test.Mock;
+using ConCore.Tools.Contracts;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CC.Test
+namespace ConCore.Test
 {
     public class MultyFile
     {

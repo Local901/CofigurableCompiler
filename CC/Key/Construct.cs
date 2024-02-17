@@ -1,10 +1,10 @@
-﻿using CC.Blocks;
-using CC.Key.ComponentTypes;
+﻿using ConCore.Blocks;
+using ConCore.Key.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CC.Key
+namespace ConCore.Key
 
 {
     public class Construct : IKey, IAlias<Construct, IReadOnlyList<IBlock>>

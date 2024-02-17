@@ -1,9 +1,7 @@
-﻿using CC.Blocks;
+﻿using ConCore.Key.Collections;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CC.Key.Modifiers
+namespace ConCore.Key.Modifiers
 {
     /// <summary>
     /// Objects to allow for custom interactions with the langauge.

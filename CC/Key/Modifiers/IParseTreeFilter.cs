@@ -1,9 +1,7 @@
-﻿using CC.Blocks;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ConCore.Blocks;
+using ConCore.Blocks.Helpers;
 
-namespace CC.Key.Modifiers
+namespace ConCore.Key.Modifiers
 {
     /// <summary>
     /// A filter to find blocks in the parsed block tree.

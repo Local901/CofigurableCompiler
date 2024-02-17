@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CC.Blocks
+﻿namespace ConCore.Blocks
 {
     public interface IValueBlock : IBlock
     {

@@ -1,16 +1,18 @@
 ﻿using BranchList;
-using CC.Blocks;
-using CC.FileInfo;
-using CC.Key;
-using CC.Key.Modifiers;
-using CC.Parsing;
-using CC.Tools.Contracts;
+using ConCore.Blocks;
+using ConCore.FileInfo;
+using ConCore.Key.Collections;
+using ConCore.Key.Modifiers;
+using ConCore.Lexing;
+using ConCore.Parsing;
+using ConCore.Parsing.Simple;
+using ConCore.Tools.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CC.Tools
+namespace ConCore.Tools
 {
     public class MultyFileParser : IMultiFileParser
     {
@@ -76,7 +78,7 @@ namespace CC.Tools
         protected virtual ILexer CreateLexer(FileData file, KeyCollection keyCollection)
         {
             var fileContent = File.ReadAllText(file.AbsolutePath);
-            return new FileLexer(fileContent, keyCollection);
+            return new SimpleLexer(fileContent, keyCollection);
         }
 
         /// <summary>
@@ -87,7 +89,7 @@ namespace CC.Tools
         /// <returns>A Parser.</returns>
         protected virtual IParser CreateParser(ILexer lexer, KeyCollection keyCollection)
         {
-            return new FileParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
+            return new SimpleParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
         }
 
         /// <summary>

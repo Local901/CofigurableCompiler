@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace CC.Key
+namespace ConCore.Key
 {
     public interface IAlias
     {

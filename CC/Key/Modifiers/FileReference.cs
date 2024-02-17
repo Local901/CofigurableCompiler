@@ -1,10 +1,8 @@
-﻿using CC.Blocks;
-using System;
-using System.Collections.Generic;
+﻿using ConCore.Blocks;
+using ConCore.Blocks.Helpers;
 using System.Linq;
-using System.Text;
 
-namespace CC.Key.Modifiers
+namespace ConCore.Key.Modifiers
 {
     public enum FileReferenceType
     {

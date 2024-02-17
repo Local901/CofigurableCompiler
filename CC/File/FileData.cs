@@ -1,11 +1,10 @@
-
+using ConCore.Blocks;
+using ConCore.Key.Collections;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CC.Blocks;
-using CC.Key;
 
-namespace CC.FileInfo
+namespace ConCore.FileInfo
 {
     public class FileData
     {

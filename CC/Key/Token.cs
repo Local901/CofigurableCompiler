@@ -1,10 +1,9 @@
-﻿using BranchList;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace CC.Key
+namespace ConCore.Key
 {
     public class Token : IKey, IAlias<Token, string>
     {

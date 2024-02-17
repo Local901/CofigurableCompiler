@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CC.Key;
+﻿using ConCore.Key;
 
-namespace CC.Blocks
+namespace ConCore.Blocks
 {
     public interface IBlock
     {

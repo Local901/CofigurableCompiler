@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CC", "CC\CC.csproj", "{548CCD19-8458-46D2-B162-7832486B554D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConCore", "CC\ConCore.csproj", "{548CCD19-8458-46D2-B162-7832486B554D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BranchList", "BranchList\BranchList.csproj", "{61668EC3-63A6-40BB-A49B-DD1ABDC98D7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CC.Test", "CC.Test\CC.Test.csproj", "{C1C166D9-0E7C-406F-B40F-5B14F5977A41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConCore.Test", "CC.Test\ConCore.Test.csproj", "{C1C166D9-0E7C-406F-B40F-5B14F5977A41}"
 	ProjectSection(ProjectDependencies) = postProject
 		{548CCD19-8458-46D2-B162-7832486B554D} = {548CCD19-8458-46D2-B162-7832486B554D}
 	EndProjectSection

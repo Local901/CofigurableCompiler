@@ -1,9 +1,6 @@
-﻿using CC.Key;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ConCore.Key;
 
-namespace CC.Blocks
+namespace ConCore.Blocks
 {
     public class Block : IValueBlock
     {

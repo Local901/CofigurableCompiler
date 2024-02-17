@@ -1,11 +1,10 @@
 ﻿using BranchList;
-using CC.Key;
+using ConCore.Key;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace CC.Blocks
+namespace ConCore.Blocks
 {
     public class ConstructBlock : IRelationBlock
     {

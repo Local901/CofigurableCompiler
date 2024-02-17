@@ -1,15 +1,17 @@
-using CC.Blocks;
-using CC.FileInfo;
-using CC.Key;
-using CC.Key.ComponentTypes;
-using CC.Key.Modifiers;
-using CC.Parsing;
-using CC.Test.Mock;
-using CC.Tools;
-using CC.Tools.Contracts;
+using ConCore.Blocks;
+using ConCore.FileInfo;
+using ConCore.Key;
+using ConCore.Key.Collections;
+using ConCore.Key.Components;
+using ConCore.Key.Modifiers;
+using ConCore.Lexing;
+using ConCore.Parsing;
+using ConCore.Parsing.Simple;
+using ConCore.Test.Mock;
+using ConCore.Tools.Contracts;
 using Moq;
 
-namespace CC.Test
+namespace ConCore.Test
 {
     public class SingleFile
     {
@@ -112,7 +114,7 @@ namespace CC.Test
             var language = languageLoaderMock.Object.LoadConfig(null, collection);
             var refs = language.GetAllKeysOfType<Token>().Select(k => k.Reference);
 
-            ILexer lexer = new FileLexer(CCode, collection);
+            ILexer lexer = new SimpleLexer(CCode, collection);
 
             var result = new List<IBlock>();
             IList<IValueBlock> blocks;
@@ -146,8 +148,8 @@ namespace CC.Test
             KeyCollection collection = new KeyCollection();
             var language = languageLoaderMock.Object.LoadConfig(null, collection);
 
-            ILexer lexer = new FileLexer(CCode, collection);
-            IParser parser = new FileParser(lexer, new ParseArgFactory(collection), collection);
+            ILexer lexer = new SimpleLexer(CCode, collection);
+            IParser parser = new SimpleParser(lexer, new ParseArgFactory(collection), collection);
 
             var languageStart = language.FindFilter<LanguageStart>();
 

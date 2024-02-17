@@ -1,9 +1,4 @@
-﻿using CC.Blocks;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CC.Key.Modifiers
+﻿namespace ConCore.Key.Modifiers
 {
     public struct LanguageStartArgs
     {

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace CC.Blocks
+namespace ConCore.Blocks
 {
     public interface IRelationBlock : IBlock
     {
