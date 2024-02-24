@@ -5,18 +5,24 @@ namespace ConCore.Key
 {
     public class KeyGroup : IKey
     {
-        public IList<KeyLangReference> Members { get; }
+        private List<KeyLangReference> _members;
+        public IReadOnlyList<KeyLangReference> Members { get => _members; }
 
         public KeyGroup(string key)
             : this(key, new List<KeyLangReference>())
         { }
-        public KeyGroup(string key, IList<KeyLangReference> members)
+        public KeyGroup(string key, List<KeyLangReference> members)
         {
             Reference = new KeyLangReference
             {
                 Key = key,
             };
-            Members = members;
+            _members = members;
+        }
+
+        public void Add(KeyLangReference keyReference)
+        {
+            _members.Add(keyReference);
         }
 
         /// <summary>

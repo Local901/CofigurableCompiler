@@ -18,11 +18,64 @@ The lexer returns `IValueBlock` objects that hold all related data to the lexed 
 
 ### SimpleParser
 
-The parser uses the lexer and constructs to combine tokens together.
+The parser uses the lexer and constructs to combine tokens together. The SimpleParser can't handle looping constructs at the start of the construct. It will not break but it will not have he desired result. There won't be any errors to tell you wat went wrong at the moment. And if it fails to parse it will return NULL.
 
-## Explanation of the library
+## Get started
 
-I can't be bauthered to explain right now because it prone to change. If you want to use it look at the tests.
+First a language has to be configured.
+
+### Add tokens
+
+Tokens need a unique name and a regular expression to function. Adding it to the language returns the reference used in most interaction with other keys (Token and Construct are Keys). The regex follows the c# regex standard for now.
+
+```cs
+using ConCore.Key;
+using ConCore.Key.Collections;
+
+var language = new LangCollection("example_lang");
+
+// Add tokens
+var tIdentifierRef = language.Add(new Token("identifier", "[a-zA-Z_][^\\s]"));
+.
+.
+.
+```
+
+### Add constructs
+
+Constructs are combinations of tokens, Constructs and/or groups. It uses components to know in what order to construct itself.
+
+```cs
+using ConCore.Key.Components;
+
+var cFunctionRef = language.Add(new Construct("example_function", new OrderComponent(new List<IComponent> {
+  new ValueComponent(tFunction),
+  new ValueComponent(tIdentifier, "function_name"),
+  new ValueComponent(tOpenBracket),
+  ...
+})));
+```
+
+Types of components:
+* ValueComponent
+* OrderComponent
+* AnyComponent
+* RepeatComponent (Repeats can't be directly nested in each other)
+
+### Add Groups
+
+Groups can be collections of tokens, constructs and groups to combine them together.
+
+```cs
+var groupTest = new KeyGroup("test", new List<KeyLangReference> {
+  tTrue,
+  cTestOperation,
+});
+
+groupTest.Add(tFalse); // References can be added afterwards as well.
+
+var gTest = language.Add(groupTest);
+```
 
 # Plans
 
