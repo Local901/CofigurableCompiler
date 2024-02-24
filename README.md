@@ -24,6 +24,7 @@ The parser uses the lexer and constructs to combine tokens together.
 
 I can't be bauthered to explain right now because it prone to change. If you want to use it look at the tests.
 
+# Plans
 
 * [x] Make a simple language representation to be used in the lexer and parser.
 
@@ -66,18 +67,20 @@ I can't be bauthered to explain right now because it prone to change. If you wan
 
   * Make Lexer hadle Token aliases.
 
-* [ ] Make the behaviour of the compiler configurable from outside.
+* [X] Clean up Library.
 
-* [ ] Clean up Library.
-
-* [ ] Make library publicly available.
+* [X] Make library publicly available.
 
 * [ ] Create configurable pipeline.
+
+* [ ] Make it able to transpile.
+
+* [ ] Make a language loader.
+
+* [ ] Make it able to compile.
 
 * [ ] Make my own regex resolver. To make sure it behaves the way that it should.
 
 * [ ] Decide how to use Contruct aliasses, if not remove behaviour.
 
 * [ ] Deside on a way to configure the compiler outside of code with a config file.
-
-* [ ] Make a language loader.
