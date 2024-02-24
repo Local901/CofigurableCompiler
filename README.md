@@ -1,11 +1,26 @@
-# CofigurableCompiler
+# ConfigurableCompiler (ConC)
 This repository will contain a compiler that can be configured to read any sort of code if provided the corresponding configuration file for the language used.
+
+## Current state
+
+At the moment the library contain's a lexer and a parser that use the configured tokens and constructs to know what to lex and parse. 
+
+
+### SimpleLexer
+
+The Lexer has a few options to define its behavior. The options are flags that can be OR'ed together.
+
+* `CompleteLanguage`: This flag makes sure that all the tokens in the language of the provided references are considered. This is done first.
+* `FromAliasRoot`: This flag insures that the root parent(s) of tokens are used for lexing. This has as advantage that it would require less tokens have to be checked, but a disadvantage is that the parser would have a harder time knowing if it should use the token. At the moment it is best to also have `ResolveAlias` enabled together with this flag.
+* `ResolveAlias`: This flag will try to add all valid child alias tokens in the result. If the value of the lexed block corresponds with the alias it will be added to the output.
+
+The lexer returns `IValueBlock` objects that hold all related data to the lexed token.
 
 
 
 * [x] Make a simple language representation to be used in the lexer and parser.
 
-  * Make a key to represent a sertain part of the lex/parsing process.
+  * Make a key to represent a certain part of the lex/parsing process.
 
     * `Token`: for representing string values from the input code.
 
