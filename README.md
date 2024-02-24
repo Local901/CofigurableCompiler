@@ -16,6 +16,13 @@ The Lexer has a few options to define its behavior. The options are flags that c
 
 The lexer returns `IValueBlock` objects that hold all related data to the lexed token.
 
+### SimpleParser
+
+The parser uses the lexer and constructs to combine tokens together.
+
+## Explanation of the library
+
+I can't be bauthered to explain right now because it prone to change. If you want to use it look at the tests.
 
 
 * [x] Make a simple language representation to be used in the lexer and parser.

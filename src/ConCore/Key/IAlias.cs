@@ -15,7 +15,7 @@ namespace ConCore.Key
         /// Get all root allias objects.
         /// </summary>
         /// <returns></returns>
-        IList<IAlias> RootAlliasses();
+        IList<IAlias> RootAliases();
 
         /// <summary>
         /// Find all aliasses that correspond with the value.
@@ -23,7 +23,7 @@ namespace ConCore.Key
         /// <param name="value">The value to check with.</param>
         /// <param name="includeSelf">Chould the search include this object.</param>
         /// <returns>An array of keys. Returns an empty array when value not of correct type.</returns>
-        IKey[] FindAliasses(object value, bool includeSelf = true);
+        IKey[] FindAliases(object value, bool includeSelf = true);
     }
 
     public interface IAlias<TKey, TValue> : IAlias

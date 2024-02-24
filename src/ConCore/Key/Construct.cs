@@ -66,7 +66,7 @@ namespace ConCore.Key
             }
         }
 
-        public IKey[] FindAliasses(object value, bool includeSelf = true)
+        public IKey[] FindAliases(object value, bool includeSelf = true)
         {
             if (!(value is IReadOnlyList<IBlock>))
             {
@@ -109,7 +109,7 @@ namespace ConCore.Key
             return Aliasses.Any((a) => a.IsAlias(allias));
         }
 
-        IList<IAlias> IAlias.RootAlliasses()
+        IList<IAlias> IAlias.RootAliases()
         {
             return RootAlliasses() as IList<IAlias>;
         }
