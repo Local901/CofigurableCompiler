@@ -15,6 +15,7 @@ namespace ConCore.Parsing.Simple.Contracts
         /// Use blocks to progress the parsing.
         /// </summary>
         /// <param name="blocks"></param>
+        /// <exception cref="ParseException"></exception>
         public void UseBlocks(IEnumerable<IBlock> blocks);
         /// <summary>
         /// Get the ArgsData for the provided arg. This contains the arg itself and all the paths to following valueComponents.

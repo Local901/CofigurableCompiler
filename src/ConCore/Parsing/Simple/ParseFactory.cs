@@ -3,6 +3,7 @@ using ConCore.Blocks;
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
+using ConCore.Parsing.Exceptions;
 using ConCore.Parsing.Simple.Contracts;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,19 @@ namespace ConCore.Parsing.Simple
 
             // Update the status of the args.
             acceptedNextArgs.ForEach((arg) => UpdateStatus(arg));
+
+            // Throw exception when there are no more ends and no parsings have finished.
+            if (acceptedNextArgs.Length == 0 && Completed.Where((p) => p.Round == NumberOfRounds).Count() == 0)
+            {
+                throw new ExpectedNextParseException(
+                    Ends.SelectMany((e) =>
+                        GetNextDataOfArgs(e).DataPaths
+                            .Select((p) => p.Last().Component.Reference)
+                            .Where((r) => r != null)
+                            .Distinct()
+                    )
+                );
+            }
 
             // Clear cache of next arg data.
             NextArgsData.Clear();

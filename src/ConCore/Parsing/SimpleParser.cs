@@ -2,6 +2,7 @@
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Lexing;
+using ConCore.Parsing.Exceptions;
 using ConCore.Parsing.Simple;
 using ConCore.Parsing.Simple.Contracts;
 using System.Collections.Generic;
