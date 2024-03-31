@@ -1,25 +1,23 @@
-﻿using ConDI.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ConDI
 {
     public class Scope : IScopeFactory, IDependencyFactory
     {
-        private IReadOnlyDictionary<Type, Dependency> _dependencies;
+        private IReadOnlyDictionary<Type, DependencyProperties> _dependencies;
         private Scope _parent;
-        private Dictionary<Type, object> _instances = new Dictionary<Type, object>();
+        private Dictionary<Type, Dependency> _instances = new Dictionary<Type, Dependency>();
 
-        public Scope(IReadOnlyDictionary<Type, Dependency> dependencies)
+        public Scope(IReadOnlyDictionary<Type, DependencyProperties> dependencies)
             : this(dependencies, null) { }
-        public Scope(IReadOnlyDictionary<Type, Dependency> dependencies, Scope parent)
+        public Scope(IReadOnlyDictionary<Type, DependencyProperties> dependencies, Scope parent)
         {
             _dependencies = dependencies;
             _parent = parent;
         }
 
-        public TClass CreateClass<TClass>()
-            where TClass : class
+        public TInstance CreateInstance<TInstance>()
         {
             throw new NotImplementedException();
         }
@@ -34,24 +32,36 @@ namespace ConDI
             return new Scope(_dependencies, parent);
         }
 
-        public TStruct CreateStruct<TStruct>()
-            where TStruct : struct
-        {
-            throw new NotImplementedException();
-        }
-
         public TInstance GetInstance<TInstance>()
         {
-            Dependency? dependency = _dependencies.GetValueOrDefault(typeof(TInstance));
+            DependencyProperties? dependency = _dependencies.GetValueOrDefault(typeof(TInstance));
 
             if (dependency == null)
             {
                 if (typeof(TInstance).IsClass)
                 {
-                    return CreateClass
+                    
                 }
             }
 
+            throw new NotImplementedException();
+        }
+
+        public bool IsKnownDependency<TDepenedency>()
+        {
+            if (_dependencies.ContainsKey(typeof(TDepenedency)))
+            {
+                return true;
+            }
+            else if (_parent != null)
+            {
+                return _parent.IsKnownDependency<TDepenedency>();
+            }
+            return false;
+        }
+
+        public Dependency GetDependency<TDependency>()
+        {
             throw new NotImplementedException();
         }
     }

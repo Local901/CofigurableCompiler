@@ -14,11 +14,25 @@ namespace ConDI
         public TInstance GetInstance<TInstance>();
 
         /// <summary>
-        /// Create a new instance of this type.
+        /// Create a new object of the requested type.
         /// </summary>
-        /// <typeparam name="TInstance">The type of the instance.</typeparam>
-        /// <exception cref="Exception">A exception</exception>
-        /// <returns>The created instance.</returns>
+        /// <typeparam name="TInstance">The type of the instance to be created.</typeparam>
+        /// <returns>The object of that instance type.</returns>
         public TInstance CreateInstance<TInstance>();
+
+        /// <summary>
+        /// Returns true when the dependency is known in the injector.
+        /// </summary>
+        /// <typeparam name="TDepenedency">The type of the dependency.</typeparam>
+        /// <returns></returns>
+        public bool IsKnownDependency<TDepenedency>();
+
+        /// <summary>
+        /// Get the dependency object that is storing the instance of the correct scope.
+        /// Priority of dependency types is Tansiant before Scoped before Singleton.
+        /// </summary>
+        /// <typeparam name="TDependency"></typeparam>
+        /// <returns></returns>
+        public Dependency GetDependency<TDependency>();
     }
 }

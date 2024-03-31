@@ -6,7 +6,7 @@ namespace ConDI
 {
     public class Injector : IInjectorSetup, IScopeFactory
     {
-        private Dictionary<Type, Dependency> Dependencies = new Dictionary<Type, Dependency>();
+        private Dictionary<Type, DependencyProperties> Dependencies = new Dictionary<Type, DependencyProperties>();
 
         public void AddScoped<TImplementation>()
         {
