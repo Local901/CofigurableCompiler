@@ -7,9 +7,9 @@ namespace ConCore.Key.Components
         public T Component { get; }
         IComponent IComponentData.Component => Component;
 
-        public IComponentData Parent { get; }
+        public IComponentData? Parent { get; }
 
-        public ComponentData(IComponentData parent, T component)
+        public ComponentData(IComponentData? parent, T component)
         {
             Component = component;
             Parent = parent;
@@ -19,6 +19,6 @@ namespace ConCore.Key.Components
         /// Get all next value component data.
         /// </summary>
         /// <returns></returns>
-        public abstract IList<IValueComponentData> GetNextComponents();
+        public abstract IList<IValueComponentData?> GetNextComponents();
     }
 }

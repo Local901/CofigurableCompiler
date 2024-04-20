@@ -164,7 +164,8 @@ namespace ConCore.Lexing
         {
             return blocks.SelectMany((block) =>
             {
-                var token = block.Key as Token;
+                // Keys of ValueBlocks are always tokens.
+                var token = (Token)block.Key;
 
                 return token.FindAliasses(block.Value, false)
                     .Select((t) => new Block(t, block.Value, block.Index, block.EndIndex, block.Name))

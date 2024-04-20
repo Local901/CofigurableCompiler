@@ -38,20 +38,23 @@ namespace ConCore.Tools
                 file.Language = language;
 
                 // skip files that have already been parsed
-                FileData simmilar;
+                FileData? simmilar;
                 if ((simmilar = parsedFileList.FirstOrDefault((f) => f.Equals(file))) != null) {
                     // Link Parents to the similar file.
                     simmilar.Parents.AddRange(file.Parents.Where((p) => simmilar.Parents.Contains(p)));
                     continue;
                 }
 
-                var languageStartKey = file.Language.FindFilter<LanguageStart>().FindKey();
+                var languageStartKey = file.Language.FindFilter<LanguageStart>()?.FindKey();
+                if (languageStartKey == null) {
+                    throw new Exception("Can't parse a language without a starting point.");
+                }
 
                 try {
                     var lexer = CreateLexer(file, keyCollection);
                     var parser = CreateParser(lexer, keyCollection);
 
-                    IBlock block = parser.DoParse(languageStartKey.Reference);
+                    IBlock? block = parser.DoParse(languageStartKey.Reference);
 
                     file.ParsedContent = block;
 
@@ -98,6 +101,10 @@ namespace ConCore.Tools
         /// <param name="file">The file that has already been parsed.</param>
         /// <returns>A list of related files.</returns>
         protected virtual FileData[] GetAllFileReferences(FileData file) {
+            if (file.Language == null || file.ParsedContent == null)
+            {
+                return new FileData[0];
+            }
             return file.Language
                 .FindFilters<FileReference>()
                 .SelectMany((filter) => filter.FindFileReferences(file.ParsedContent))

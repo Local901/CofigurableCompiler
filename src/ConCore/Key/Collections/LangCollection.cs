@@ -36,7 +36,7 @@ namespace ConCore.Key.Collections
         /// </summary>
         /// <param name="key"></param>
         /// <returns>The key if it is in the collection else it will return null.</returns>
-        public IKey GetKey(string key)
+        public IKey? GetKey(string key)
         {
             return Keys.GetValueOrDefault(key);
         }
@@ -46,7 +46,7 @@ namespace ConCore.Key.Collections
         /// <param name="keyString"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool TryGetKey(string keyString, out IKey key)
+        public bool TryGetKey(string keyString, out IKey? key)
         {
             return Keys.TryGetValue(keyString, out key);
         }
@@ -76,17 +76,19 @@ namespace ConCore.Key.Collections
         /// <param name="key"></param>
         /// <param name="includeSelf"></param>
         /// <returns></returns>
-        public IList<IKey> GetAllSubKeys(string key, bool includeSelf = false)
+        public IList<IKey> GetAllSubKeys(string? key, bool includeSelf = false)
         {
-            var keyObject = GetKey(key);
-            List<IKey> keys = !(keyObject is KeyGroup)
-                ? new List<IKey>()
-                : (GetKey(key) as KeyGroup)?.GetSubKeyRefs()
-                .Select(k => GetKey(k.Key))
-                .Where(k => k != null)
-                .ToList();
+            if (key == null) return new List<IKey>();
 
-            if (includeSelf) keys.Add(GetKey(key));
+            var keyObject = GetKey(key);
+            List<IKey> keys = keyObject is not KeyGroup
+                ? new List<IKey>()
+                : ((KeyGroup)keyObject).GetSubKeyRefs()
+                    .Select(k => GetKey(k.Key))
+                    .OfType<IKey>()
+                    .ToList();
+
+            if (includeSelf && keyObject != null) keys.Add(keyObject);
 
             List<IKey> result = keys.ToList();
 
@@ -98,7 +100,8 @@ namespace ConCore.Key.Collections
             List<IKey> keys = previousKeys.OfType<KeyGroup>()
                 .SelectMany(k => k.GetSubKeyRefs())
                 .Select(k => GetKey(k.Key))
-                .Where(k => k != null && !result.Contains(k))
+                .OfType<IKey>()
+                .Where(k => !result.Contains(k))
                 .ToList();
 
             if (keys.Count() > 0)
@@ -129,23 +132,25 @@ namespace ConCore.Key.Collections
             return Keys.ContainsKey(key);
         }
 
-        public bool IsKeyInGroup(string key, string group)
+        public bool IsKeyInGroup(string? key, string? group)
         {
+            if (key == null || group == null) return false;
+
             IKey keyObject = GetKey(key);
 
-            if (key == null) return false;
+            if (keyObject == null) return false;
 
             var subKeys = GetAllSubKeys(group, true);
             var result = subKeys.Any((gk) => keyObject.Equals(gk));
 
-            if (result || !(keyObject is IAlias))
+            if (result || keyObject is not IAlias)
             {
                 return result;
             }
 
             // Is any of the keys an alias and is one of them the parent of the key;
             return subKeys.OfType<IAlias>()
-                .Any((alias) => alias.IsAlias(keyObject as IAlias));
+                .Any((alias) => alias.IsAlias((IAlias)keyObject));
         }
         public bool IsKeyInGroup(KeyLangReference key, KeyLangReference group)
         {
@@ -177,7 +182,7 @@ namespace ConCore.Key.Collections
         /// </summary>
         /// <typeparam name="TFilter">A type of filter</typeparam>
         /// <returns>The filter if found.</returns>
-        public TFilter FindFilter<TFilter>()
+        public TFilter? FindFilter<TFilter>()
             where TFilter : IFilter
         {
             return Filters.OfType<TFilter>().FirstOrDefault();

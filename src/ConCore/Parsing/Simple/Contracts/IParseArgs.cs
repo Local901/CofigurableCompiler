@@ -17,21 +17,21 @@ namespace ConCore.Parsing.Simple.Contracts
         /// <summary>
         /// The reference to the root object that this step originates from. LocalRoot can be null to indecate the root of the entire tree.
         /// </summary>
-        public ILocalRoot LocalRoot { get; }
+        public ILocalRoot? LocalRoot { get; }
         /// <summary>
         /// The block that has been used for this step.
         /// </summary>
-        public IBlock Block { get; }
+        public IBlock? Block { get; }
         /// <summary>
         /// Parent is the parse step that came before this one.
         /// </summary>
-        public IParseArgs Parent { get; }
+        public IParseArgs? Parent { get; }
         /// <summary>
         /// Children are the parse steps that came after this step. The children only apear after this step has been completed.
         /// </summary>
         public List<IParseArgs> Children { get; }
 
-        public IList<IValueComponentData> GetNextComponents();
+        public IList<IValueComponentData?> GetNextComponents();
 
         public List<IParseArgs> Ends();
         /// <summary>

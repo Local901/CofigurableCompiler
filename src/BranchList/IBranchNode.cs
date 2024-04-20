@@ -7,7 +7,7 @@ namespace BranchList
 {
     public interface IBranchNode<T> where T : IBranchNode<T>
     {
-        public T Parent { get; }
+        public T? Parent { get; }
         public List<T> Children { get; }
 
         public T this[int index] { get; }

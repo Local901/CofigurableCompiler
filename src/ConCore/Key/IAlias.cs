@@ -77,6 +77,6 @@ namespace ConCore.Key
         /// Get all root allias objects.
         /// </summary>
         /// <returns></returns>
-        new IList<IAlias<TKey, TValue>> RootAlliasses();
+        IList<IAlias<TKey, TValue>> RootAlliasses();
     }
 }

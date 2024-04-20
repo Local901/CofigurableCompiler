@@ -26,6 +26,6 @@ namespace ConCore.Blocks.Helpers
         /// <param name="block">The root to search from.</param>
         /// <param name="path">The pth to follow.</param>
         /// <returns>The block that was found. Else it is null.</returns>
-        IBlock TraverseBlock(IBlock block, string[] path);
+        IBlock? TraverseBlock(IBlock block, string[] path);
     }
 }

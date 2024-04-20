@@ -25,9 +25,9 @@ namespace ConCore.Blocks.Helpers
 
                 newBlocks = newBlocks.SelectMany((b) =>
                 {
-                    if (b is IRelationBlock)
+                    if (b is IRelationBlock relationBlock)
                     {
-                        return (b as IRelationBlock).Content;
+                        return relationBlock.Content;
                     }
                     return Array.Empty<IBlock>();
                 }).ToList();
@@ -36,7 +36,7 @@ namespace ConCore.Blocks.Helpers
             return result.ToArray();
         }
 
-        public IBlock TraverseBlock(IBlock block, string[] path)
+        public IBlock? TraverseBlock(IBlock block, string[] path)
         {
             var result = block;
 
@@ -51,7 +51,7 @@ namespace ConCore.Blocks.Helpers
                     case "..":
                         if (result is IRelationBlock)
                         {
-                            result = (result as IRelationBlock).Parent;
+                            result = ((IRelationBlock)result).Parent;
                         }
                         else
                         {
@@ -61,7 +61,7 @@ namespace ConCore.Blocks.Helpers
                     default:
                         if (result is IRelationBlock)
                         {
-                            result = (result as IRelationBlock)
+                            result = ((IRelationBlock)result)
                                 .Content.FirstOrDefault((b) => b.Name == step);
                             break; // TODO: Add support for multiple hits.
                         }

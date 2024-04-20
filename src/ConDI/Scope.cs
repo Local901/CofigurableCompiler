@@ -6,12 +6,12 @@ namespace ConDI
     public class Scope : IScopeFactory, IDependencyFactory
     {
         private IReadOnlyDictionary<Type, DependencyProperties> _dependencies;
-        private Scope _parent;
+        private Scope? _parent;
         private Dictionary<Type, Dependency> _instances = new Dictionary<Type, Dependency>();
 
         public Scope(IReadOnlyDictionary<Type, DependencyProperties> dependencies)
             : this(dependencies, null) { }
-        public Scope(IReadOnlyDictionary<Type, DependencyProperties> dependencies, Scope parent)
+        public Scope(IReadOnlyDictionary<Type, DependencyProperties> dependencies, Scope? parent)
         {
             _dependencies = dependencies;
             _parent = parent;
