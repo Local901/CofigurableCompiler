@@ -5,45 +5,48 @@ using System.Text;
 
 namespace ConDI
 {
-    public abstract class Dependency : IDependency<object>
+    public abstract class Dependency : IDependency
     {
         public DependencyProperties Properties { get; }
+        protected readonly IDependencyFactory Factory;
 
-        public object Instance
+        public object? Instance
         {
             get {
-                return _instance ??= CreateInstance();
+                if (Properties.DependencyType == DependencyType.Transient) return ((IDependency)this).CreateInstance();
+                return _instance ??= ((IDependency)this).CreateInstance();
             }
         }
         private object? _instance;
 
-        protected Dependency(DependencyProperties properties)
+        protected Dependency(DependencyProperties properties, IDependencyFactory factory)
         {
             Properties = properties;
+            Factory = factory;
         }
 
-        abstract public object CreateInstance();
+        object? IDependency.CreateInstance()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class Dependency<T> : Dependency, IDependency<T>
     {
-        private readonly IDependencyFactory _factory;
-        T IDependency<T>.Instance => (T)Instance;
+        public T? Instance => (T)base.Instance;
 
         public Dependency(DependencyProperties properties, IDependencyFactory factory)
-            : base(properties)
+            : base(properties, factory)
+        { }
+
+        public T? CreateInstance()
         {
-            _factory = factory;
+            return Factory.CreateInstance<T>();
         }
 
-        T IDependency<T>.CreateInstance()
+        object? IDependency.CreateInstance()
         {
-            return _factory.CreateInstance<T>();
-        }
-
-        public override object CreateInstance()
-        {
-            return ((IDependency<T>)this).CreateInstance();
+            return CreateInstance();
         }
     }
 }

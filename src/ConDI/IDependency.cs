@@ -4,10 +4,15 @@ using System.Text;
 
 namespace ConDI
 {
-    public interface IDependency<T>
+    public interface IDependency
     {
         public DependencyProperties Properties { get; }
-        public T Instance { get; }
-        public T CreateInstance();
+        public object? Instance { get; }
+        public object? CreateInstance();
+    }
+    public interface IDependency<T> : IDependency
+    {
+        public new T? Instance { get; }
+        public new T? CreateInstance();
     }
 }
