@@ -15,7 +15,7 @@ namespace ConDI
         public void AddScoped<TReference, TImplementation>()
             where TImplementation : TReference
         {
-            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TReference), DependencyType.Scoped));
+            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TImplementation), DependencyType.Scoped));
         }
 
         public void AddSingleton<TImplementation>()
@@ -25,7 +25,7 @@ namespace ConDI
         public void AddSingleton<TReference, TImplementation>()
             where TImplementation : TReference
         {
-            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TReference), DependencyType.Singleton));
+            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TImplementation), DependencyType.Singleton));
         }
 
         public void AddTrancient<TImplementation>()
@@ -35,7 +35,7 @@ namespace ConDI
         public void AddTrancient<TReference, TImplementation>()
             where TImplementation : TReference
         {
-            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TReference), DependencyType.Transient));
+            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TImplementation), DependencyType.Transient));
         }
 
         /// <summary>
