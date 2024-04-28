@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
+using System.Linq;
 
 namespace ConDI
 {
-    public class Scope : IScopeFactory, IDependencyFactory
+    public class Scope : IScope, IScopeFactory, IDependencyFactory
     {
         private readonly IReadOnlyDictionary<Type, DependencyProperties> Dependencies;
         private readonly Scope? Parent;
@@ -20,7 +20,31 @@ namespace ConDI
 
         public TInstance? CreateInstance<TInstance>()
         {
-            throw new NotImplementedException();
+            var type = typeof(TInstance);
+            foreach(var constructor in type.GetConstructors())
+            {
+                var parameters = constructor.GetParameters();
+                try
+                {
+                    var parms = parameters.Select((parameter) =>
+                    {
+                        return typeof(Scope)
+                            .GetMethod("GetInstance")
+                            ?.MakeGenericMethod(parameter.ParameterType)
+                            .Invoke(this, null);
+                    }).ToArray();
+
+                    var instance = constructor.Invoke(parms);
+                    if (instance is TInstance instance1)
+                    {
+                        return instance1;
+                    }
+                } catch (Exception)
+                {
+                    continue;
+                }
+            }
+            return default(TInstance);
         }
 
         public Scope CreateScope()
@@ -35,10 +59,14 @@ namespace ConDI
 
         public TInstance? GetInstance<TInstance>()
         {
+            if (this is TInstance factory)
+            {
+                return factory;
+            }
             try
             {
                 Dependency<TInstance> dependency = GetDependency<TInstance>();
-                return dependency.CreateInstance();
+                return dependency.Instance;
             }
             catch (Exception)
             {
