@@ -15,10 +15,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConCli", "ConCli\ConCli.csproj", "{726537F9-0A15-4AE7-95D8-0832299F14AB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConLine", "ConLine\ConLine.csproj", "{59D8BE17-BC09-4864-917E-7C06620E9117}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E1D64B87-EF02-4968-8D27-076AD01424B1} = {E1D64B87-EF02-4968-8D27-076AD01424B1}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConDI", "ConDI\ConDI.csproj", "{E1D64B87-EF02-4968-8D27-076AD01424B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConDI.Test", "ConDI.Test\ConDI.Test.csproj", "{804AB38C-1E26-4285-B54F-EDC3B0A2E304}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConDI.Test", "ConDI.Test\ConDI.Test.csproj", "{804AB38C-1E26-4285-B54F-EDC3B0A2E304}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

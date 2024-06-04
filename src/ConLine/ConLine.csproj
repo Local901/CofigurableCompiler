@@ -5,4 +5,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="StatefulPipeline\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConDI\ConDI.csproj" />
+  </ItemGroup>
+
 </Project>
