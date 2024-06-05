@@ -170,22 +170,30 @@ namespace ConLine.ProcessPipeline
 
         private Action<string, object?> CreateCallback(IStep step, LinkedList<WaitingSteps> memories, Action<string, object?> callback)
         {
+            if (step is Output)
+            {
+                return callback;
+            }
             return (outputName, value) =>
             {
-                var waitingMemories = memories.Where((memory) => memory.Step.Name == step.Name);
+                // Find all connections connected to this step::outputname.
                 var connectedInputs = Connections[new Connection(step.Name, outputName)];
 
                 if (connectedInputs == null || connectedInputs.Count == 0)
                 {
-                    // Send value to outside the pipeline.
-                    callback(outputName, value);
+                    // Drop unused values.
                     return;
                 }
 
                 foreach (var connectedInput in connectedInputs)
                 {
-                    var memory = memories.LastOrDefault((mem) => mem.Step.Name == connectedInput.StepName);
-                    if (memory == null || memory.Values.Any((v) => v.Name == outputName))
+                    // Find first waiting memeory for the connected step without a value for the connected property.
+                    var memory = memories.FirstOrDefault((mem) => 
+                        mem.Step.Name == connectedInput.StepName &&
+                        mem.Values.All((item) => item.Name != connectedInput.PropertyName)
+                    );
+
+                    if (memory == null)
                     {
                         memory = new WaitingSteps(Steps[connectedInput.StepName]);
                         memories.AddLast(memory);
