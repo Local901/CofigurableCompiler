@@ -9,77 +9,10 @@ using System.Threading.Tasks;
 
 namespace ConLine.ProcessPipeline
 {
-    public class ProcessPipeLine : IPipeLine
+    public class ProcessPipeLine : Pipeline
     {
-        public string Name { get; }
-
-        private IReadOnlyList<IIOType>? _output;
-        public IReadOnlyList<IIOType> Outputs
-        {
-            get
-            {
-                if (_output != null) return _output;
-                CanBeEdited = false;
-                _output = Steps.Values.OfType<Output>()
-                    .SelectMany((step) => step.Outputs.ToArray())
-                    .ToList();
-                return _output;
-            }
-        }
-        private IReadOnlyList<IIOType>? _input;
-        public IReadOnlyList<IIOType> Inputs
-        {
-            get
-            {
-                if (_input != null) return _input;
-                CanBeEdited = false;
-                _input = Steps.Values.OfType<Input>()
-                    .SelectMany((step) => step.Inputs.ToArray())
-                    .ToList();
-                return _input;
-            }
-        }
-
-        public Dictionary<string, IStep> Steps { get; } = new Dictionary<string, IStep>();
-        public Dictionary<Connection, IList<Connection>> Connections { get; } = new Dictionary<Connection, IList<Connection>>();
-
-        public bool CanBeEdited { get; private set; } = true;
-
-        private Injector Injector = new();
-
-        public IInjectorSetup InjectorSetup => Injector;
-
         public ProcessPipeLine(string name)
-        {
-            Name = name;
-        }
-
-        public void AddConnection(Connection from, Connection to)
-        {
-            if (!CanBeEdited) throw new Exception($"Pipeline {Name}: The state of the pipe line is already fixed.");
-            IList<Connection>? toConnections;
-            if (!Connections.TryGetValue(from, out toConnections))
-            {
-                toConnections = new List<Connection>();
-                Connections.Add(from, toConnections);
-            }
-            toConnections.Add(to);
-        }
-
-        public void AddStep(IStep step)
-        {
-            if (!CanBeEdited) throw new Exception($"Pipeline {Name}: The state of the pipe line is already fixed.");
-            if (Steps.ContainsKey(step.Name))
-            {
-                throw new Exception($"PipeLine \"{Name}\": Already contains step with name \"{step.Name}\"");
-            }
-            Steps[step.Name] = step;
-        }
-
-        public IStep? GetStep(string name)
-        {
-            return Steps[name];
-        }
+            : base(name) { }
 
         private class WaitingSteps
         {
@@ -93,7 +26,7 @@ namespace ConLine.ProcessPipeline
             }
         }
 
-        public async Task Run(RunOptions options, IStepInput input)
+        public override async Task Run(RunOptions options, IStepInput input)
         {
             CanBeEdited = false;
             var stack = new LinkedList<Task>();

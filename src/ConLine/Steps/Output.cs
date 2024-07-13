@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace ConLine.Steps
 {
+    public class Output<TType> : Output
+    {
+        public Output(string name, bool isOptional = false)
+            : base(name, typeof(TType), isOptional)
+        { }
+    }
     public class Output : IStep
     {
         public string Name { get; }
@@ -14,6 +20,13 @@ namespace ConLine.Steps
 
         public IReadOnlyList<IIOType> Inputs { get; }
 
+        public Output(string name, Type type, bool isOptional = false)
+            : this(
+                  name,
+                  new IOType(name, type, isOptional, null),
+                  new IOType(name, type, isOptional, null)
+              )
+        { }
         public Output(string name, IIOType input, IIOType output)
         {
             Name = name;
@@ -21,7 +34,7 @@ namespace ConLine.Steps
             Outputs = new List<IIOType>() { output };
         }
 
-        public Task Run(RunOptions options, IStepInput input)
+        public Task<StepValue[]> Run(RunOptions options, IStepInput input)
         {
             return new Task(() =>
             {

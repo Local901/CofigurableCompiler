@@ -12,6 +12,6 @@ namespace ConLine
         public IReadOnlyList<IIOType> Outputs { get; }
         public IReadOnlyList<IIOType> Inputs { get; }
 
-        public Task Run(RunOptions options, IStepInput input);
+        public Task<StepValue[]> Run(RunOptions options, StepValue[] input);
     }
 }

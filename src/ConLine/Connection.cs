@@ -32,5 +32,10 @@ namespace ConLine
         {
             return HashCode.Combine(StepName, PropertyName);
         }
+
+        public override string ToString()
+        {
+            return $"{StepName}::{PropertyName}";
+        }
     }
 }

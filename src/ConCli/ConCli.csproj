@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ConCore\ConCore.csproj" />
+    <ProjectReference Include="..\ConDI\ConDI.csproj" />
+    <ProjectReference Include="..\ConLine\ConLine.csproj" />
+  </ItemGroup>
+
 </Project>
