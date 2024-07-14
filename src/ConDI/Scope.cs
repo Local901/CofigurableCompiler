@@ -157,7 +157,7 @@ namespace ConDI
         }
 
         public Func<TType, TResult> PrepairFunction<TResult, TType>(string methodName, KeyValuePair<string, object>[] propertyValues, Type[]? genricTypes = null)
-            where TType: new()
+            where TType: class
         {
             var objectType = typeof(TType);
             var method = objectType.GetMethod(methodName) ?? throw new Exception($"Method {methodName}");

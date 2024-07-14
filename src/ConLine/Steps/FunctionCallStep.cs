@@ -47,20 +47,12 @@ namespace ConLine.Steps
                 var r = typeof(Task<object>).GetProperty("Result")?.GetValue(task);
                 return new StepValue[]
                 {
-                    (StepValue)input.Scope.CreateInstance(typeof(StepValue<>).MakeGenericType(r.GetType()), new KeyValuePair<string, object>[]
-                    {
-                        new KeyValuePair<string, object>("propertyName", "result"),
-                        new KeyValuePair<string, object>("value", r),
-                    })
+                    StepValue.CreateInstance(input.Scope, r.GetType(), "result", r)
                 };
             }
             return new StepValue[]
             {
-                (StepValue)input.Scope.CreateInstance(typeof(StepValue<>).MakeGenericType(result.GetType()), new KeyValuePair<string, object>[]
-                {
-                    new KeyValuePair<string, object>("propertyName", "result"),
-                    new KeyValuePair<string, object>("value", result),
-                })
+                StepValue.CreateInstance(input.Scope, result.GetType(), "result", result)
             };
         }
     }

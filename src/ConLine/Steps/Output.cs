@@ -39,9 +39,25 @@ namespace ConLine.Steps
         {
             return new Task<StepValue[]>(() =>
             {
+                var value = input.StepValues.FirstOrDefault((v) => v.PropertyName == Inputs[0].Name);
+                if (value == null)
+                {
+                    throw new Exception("No output value has be provided.");
+                }
+                if (input is OutputOptions outputOptions)
+                {
+                    input.Scope.PrepairFunction<object, OutputOptions>(
+                        "AddOutputValue",
+                        new KeyValuePair<string, object>[]
+                        {
+                            new KeyValuePair<string, object>("value", typeof(StepValue).GetMethod("GetValueAs").MakeGenericMethod(new Type[] { value.Type }).Invoke(value, null))
+                        },
+                        new Type[] { value.Type }
+                    )(outputOptions);
+                }
                 return new StepValue[]
                 {
-                    new StepValue<object>(Name, input.StepValues[0])
+                    StepValue.CreateInstance(input.Scope, value.Type, Outputs[0].Name, value.GetValueAs<object>())
                 };
             });
         }

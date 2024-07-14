@@ -32,11 +32,7 @@ namespace ConLine.ProcessPipeline
             StepInput = input;
             Pipeline = pipeLine;
             PipelineScope = Pipeline.Injector.CreateScope(StepInput.Scope);
-            Output = (StepValue[])pipeLine.Outputs.Select((s) => PipelineScope.CreateInstance(typeof(StepValue<>).MakeGenericType(s.Type), new KeyValuePair<string, object>[]
-            {
-                new KeyValuePair<string, object>("propertyName", s.Name),
-                new KeyValuePair<string, object>("value", null)
-            })).ToArray();
+            Output = pipeLine.Outputs.Select((s) => StepValue.CreateInstance(PipelineScope, s.Type, s.Name, null)).ToArray();
         }
 
         public Task<StepValue[]> Run()
@@ -116,11 +112,7 @@ namespace ConLine.ProcessPipeline
 
                     }
                     // Add input value with correct property name.
-                    waitingStep.SetInputValue((StepValue)PipelineScope.CreateInstance(typeof(StepValue<>).MakeGenericType(value.Type), new KeyValuePair<string, object>[]
-                    {
-                        new KeyValuePair<string, object>("propertyName", connection.PropertyName),
-                        new KeyValuePair<string, object>("value", typeof(StepValue).GetMethod("GetValueAs").MakeGenericMethod(new Type[] { value.Type }).Invoke(value, null))
-                    }));
+                    waitingStep.SetInputValue(StepValue.CreateInstance(PipelineScope, value.Type, connection.PropertyName, value.GetValueAs<object>()));
 
                     // TODO: check for inputs from memory steps. (They must be defined before this step)
                     // Or set value in waiting steps when memory is set.

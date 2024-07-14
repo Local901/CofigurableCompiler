@@ -12,7 +12,7 @@ namespace ConLine
     public abstract class Pipeline : IPipeLine
     {
         public string Name { get; }
-        public Injector Injector = new();
+        public Injector Injector { get; } = new();
         public bool CanBeEdited { get; protected set; } = true;
         private IReadOnlyList<IIOType>? _outputs;
         public IReadOnlyList<IIOType> Outputs
@@ -42,7 +42,8 @@ namespace ConLine
         }
 
         protected Dictionary<string, IStep> Steps { get; } = new Dictionary<string, IStep>();
-        protected Dictionary<Connection, IList<Connection>> Connections { get; } = new Dictionary<Connection, IList<Connection>>();
+        protected Dictionary<Connection, List<Connection>?> ConnectionsFrom { get; } = new Dictionary<Connection, List<Connection>?>();
+        protected Dictionary<Connection, Connection?> ConnectionTo { get; } = new Dictionary<Connection, Connection?>();
 
         /// <summary>
         /// Create an abstract pipeline.
@@ -59,11 +60,18 @@ namespace ConLine
             {
                 throw new Exception($"Pipeline {Name}: New connections are no longer allowed. Connection {from} -> {to}");
             }
-            var connections = Connections[from];
+            var connectionTo = ConnectionTo[to];
+            if (connectionTo != null)
+            {
+                throw new Exception($"There is already a connection to {to} from {connectionTo}");
+            }
+            ConnectionTo[to] = from;
+
+            var connections = ConnectionsFrom[from];
             if (connections == null)
             {
                 connections = new List<Connection>();
-                Connections[from] = connections;
+                ConnectionsFrom[from] = connections;
             }
             connections.Add(to);
         }
@@ -94,6 +102,16 @@ namespace ConLine
         public Output[] GetOutputSteps()
         {
             return Steps.Values.OfType<Output>().ToArray();
+        }
+
+        public IReadOnlyList<Connection> GetConnectionsFrom(Connection from)
+        {
+            return ConnectionsFrom[from] ?? (IReadOnlyList<Connection>)Array.Empty<Connection>();
+        }
+
+        public Connection? GetConnectionTo(Connection to)
+        {
+            return ConnectionTo[to];
         }
 
         public abstract Task<StepValue[]> Run(RunOptions options, InputOptions input);

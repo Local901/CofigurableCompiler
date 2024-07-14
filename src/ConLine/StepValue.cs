@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ConDI;
+using ConLine.Steps;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,6 +37,21 @@ namespace ConLine
         /// <exception cref="Exception">When the wanted type is not related to the type of the value.</exception>
         /// <returns>The object of that type.</returns>
         public abstract TType? GetValueAs<TType>();
+
+        /// <summary>
+        /// Create an instance of <see cref="StepValue"/>.
+        /// </summary>
+        /// <param name="type">The type of the value.</param>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>A new Step Value.</returns>
+        public static StepValue CreateInstance(IDependencyFactory factory, Type type, string propertyName, object value)
+        {
+            return (StepValue)factory.CreateInstance(typeof(StepValue<>).MakeGenericType(new Type[] { type }), new KeyValuePair<string, object>[] {
+                new KeyValuePair<string, object>("propertyName", propertyName),
+                new KeyValuePair<string, object>("value", value)
+            });
+        }
     }
 
     public class StepValue<TType> : StepValue

@@ -24,7 +24,23 @@ namespace ConLine.Steps
 
         public Task<StepValue[]> Run(RunOptions options, InputOptions input)
         {
-            throw new NotImplementedException();
+            if (input is MemoryOptions memoryOptions)
+            {
+                MemorizeValue(memoryOptions);
+            }
+            return Task.FromResult(input.StepValues);
+        }
+
+        public void MemorizeValue(MemoryOptions input)
+        {
+            var value = input.StepValues.FirstOrDefault((v) => v.PropertyName == Inputs[0].Name);
+            if (value == null)
+            {
+                throw new Exception($"No input was provided to be memorised in {Name}");
+            }
+            typeof(MemoryOptions).GetMethod("SetMemory")
+                ?.MakeGenericMethod(value.Type)
+                .Invoke(input, new object?[] { value.GetValueAs<object>() });
         }
     }
 }

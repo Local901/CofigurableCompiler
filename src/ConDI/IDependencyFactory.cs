@@ -77,6 +77,6 @@ namespace ConDI
         /// <param name="propertyValues">Values for properties that should not be auto created.</param>
         /// <returns>A function to call a function on the provided object.</returns>
         public Func<TType, TResult> PrepairFunction<TResult, TType>(string methodName, KeyValuePair<string, object>[] propertyValues, Type[] genricTypes)
-            where TType : new();
+            where TType : class;
     }
 }
