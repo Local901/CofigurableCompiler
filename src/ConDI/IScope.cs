@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConDI
 {
-    internal interface IScope : IScopeFactory, IDependencyFactory
+    public interface IScope : IScopeFactory, IDependencyFactory
     {
     }
 }

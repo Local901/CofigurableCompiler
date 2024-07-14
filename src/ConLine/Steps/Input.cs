@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConLine.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,12 +33,14 @@ namespace ConLine.Steps
             Outputs = new List<IIOType>() { output ?? input };
         }
 
-        public Task<StepValue[]> Run(RunOptions options, IStepInput input)
+        public Task<StepValue[]> Run(RunOptions options, InputOptions input)
         {
-            return new Task(() =>
+            return new Task<StepValue[]>(() =>
             {
-                var value = input.Values.First((i) => i.Name == Inputs[0].Name);
-                input.SendResult(Outputs[0].Name, value);
+                var value = input.StepValues.First((i) => i.PropertyName == Inputs[0].Name);
+                return new StepValue[] {
+                    new StepValue<object>(Outputs[0].Name, value.GetAs<object>().Value)
+                };
             });
         }
     }

@@ -1,37 +1,45 @@
-﻿using ConLine.Steps;
+﻿using ConDI;
+using ConLine.Options;
+using ConLine.Steps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConLine.StatefulPipeline
+namespace ConLine.ProcessPipeline
 {
-    public class StatefullPipelineRunner
+    public class ProcessPipelineRunner
     {
         private List<RunningStepMemory> RunningSteps = new List<RunningStepMemory>();
         private List<WaitingStepMemory> WaitingSteps = new List<WaitingStepMemory>();
         private List<MemorisedValue> RuntimeMemory = new List<MemorisedValue>();
 
         private RunOptions RunOptions;
-        private IStepInput StepInput;
+        private InputOptions StepInput;
         private IPipeLine Pipeline;
+        private Scope PipelineScope;
 
         private StepValue[] Output;
 
-        public StatefullPipelineRunner(
+        public ProcessPipelineRunner(
             RunOptions options,
-            IStepInput input,
+            InputOptions input,
             IPipeLine pipeLine
         )
         {
             RunOptions = options;
             StepInput = input;
             Pipeline = pipeLine;
-            Output = new StepValue[pipeLine.GetOutputSteps().Length];
+            PipelineScope = Pipeline.Injector.CreateScope(StepInput.Scope);
+            Output = (StepValue[])pipeLine.Outputs.Select((s) => PipelineScope.CreateInstance(typeof(StepValue<>).MakeGenericType(s.Type), new KeyValuePair<string, object>[]
+            {
+                new KeyValuePair<string, object>("propertyName", s.Name),
+                new KeyValuePair<string, object>("value", null)
+            })).ToArray();
         }
 
-        public async Task<StepValue[]> Run()
+        public Task<StepValue[]> Run()
         {
             // Initialize
             foreach (var input in Pipeline.GetInputSteps())
@@ -66,11 +74,27 @@ namespace ConLine.StatefulPipeline
                 });
             }
 
-            return Output;
+            if (WaitingSteps.Count > 0)
+            {
+                Console.WriteLine($"Pipeline {Pipeline.Name}: Fininshed running with waiting steps. {WaitingSteps.Count}");
+            }
+
+            return Task.FromResult(Output);
         }
 
         private void HandleFinishedStep(IStep step, StepValue[] result)
         {
+            // Set output value
+            if (step is Output)
+            {
+                for (int i = 0; i < Pipeline.Outputs.Count; i++)
+                {
+                    var value = result.FirstOrDefault((r) => r.PropertyName == Pipeline.Outputs[i].Name);
+                    if (value == null) return;
+                    Output[i] = value;
+                }
+            }
+
             foreach(var value in result)
             {
                 var connections = Pipeline.GetConnectionsFrom(
@@ -91,9 +115,15 @@ namespace ConLine.StatefulPipeline
                         WaitingSteps.Add(waitingStep);
 
                     }
-                    waitingStep.SetInputValue(value);
+                    // Add input value with correct property name.
+                    waitingStep.SetInputValue((StepValue)PipelineScope.CreateInstance(typeof(StepValue<>).MakeGenericType(value.Type), new KeyValuePair<string, object>[]
+                    {
+                        new KeyValuePair<string, object>("propertyName", connection.PropertyName),
+                        new KeyValuePair<string, object>("value", typeof(StepValue).GetMethod("GetValueAs").MakeGenericMethod(new Type[] { value.Type }).Invoke(value, null))
+                    }));
 
                     // TODO: check for inputs from memory steps. (They must be defined before this step)
+                    // Or set value in waiting steps when memory is set.
 
                     // check if step can be started.
                     var connectedInputs = nextStep.Inputs.Select<IIOType, Connection?>((i) => Pipeline.GetConnectionTo(new Connection(nextStep.Name, i.Name)) != null
@@ -111,13 +141,31 @@ namespace ConLine.StatefulPipeline
                                 nextStep,
                                 nextStep.Run(
                                     RunOptions,
-                                    waitingStep.InputValues.ToArray()
+                                    CreateInputOptions(nextStep, waitingStep.InputValues.ToArray())
                                 )
                             )
                         );
                     }
                 }
             }
+        }
+
+        private InputOptions CreateInputOptions(IStep step, StepValue[] values)
+        {
+            StepValue? outputField = step is Output
+                ? Output.FirstOrDefault((o) => step.Outputs[0].Name == o.PropertyName)
+                : null;
+            MemorisedValue? memoryField = null;
+            if (step is Memory)
+            {
+                memoryField = RuntimeMemory.FirstOrDefault((m) => m.StepName == step.Name);
+                if (memoryField == null)
+                {
+                    memoryField = new MemorisedValue(step.Name, null);
+                    RuntimeMemory.Add((MemorisedValue)memoryField);
+                }
+            }
+            return new CompleteInputOptions(PipelineScope.CreateScope(), values, outputField, memoryField);
         }
     }
 }

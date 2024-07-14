@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConLine.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -33,21 +34,34 @@ namespace ConLine.Steps
             };
         }
 
-        public async Task Run(RunOptions options, IStepInput input)
+        public async Task<StepValue[]> Run(RunOptions options, InputOptions input)
         {
             var result = FunctionHandler.DynamicInvoke(Inputs.Select((inType) =>
-                input.Values.FirstOrDefault((v) =>
-                    v.Name == inType.Name
-                )?.Value ?? inType.DefaultValue)
+                input.StepValues.FirstOrDefault((v) =>
+                    v.PropertyName == inType.Name
+                )?.GetValueAs<object?>() ?? inType.DefaultValue)
             );
             if (result is Task task)
             {
                 task.Wait();
                 var r = typeof(Task<object>).GetProperty("Result")?.GetValue(task);
-                input.SendResult("result", r);
-                return;
+                return new StepValue[]
+                {
+                    (StepValue)input.Scope.CreateInstance(typeof(StepValue<>).MakeGenericType(r.GetType()), new KeyValuePair<string, object>[]
+                    {
+                        new KeyValuePair<string, object>("propertyName", "result"),
+                        new KeyValuePair<string, object>("value", r),
+                    })
+                };
             }
-            input.SendResult("result", result);
+            return new StepValue[]
+            {
+                (StepValue)input.Scope.CreateInstance(typeof(StepValue<>).MakeGenericType(result.GetType()), new KeyValuePair<string, object>[]
+                {
+                    new KeyValuePair<string, object>("propertyName", "result"),
+                    new KeyValuePair<string, object>("value", result),
+                })
+            };
         }
     }
 }

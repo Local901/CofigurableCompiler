@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConLine.StatefulPipeline
+namespace ConLine
 {
     public struct MemorisedValue
     {
         public readonly string StepName;
-        public readonly object? Value;
+        public object? Value;
 
         public MemorisedValue(string stepName, object? value)
         {

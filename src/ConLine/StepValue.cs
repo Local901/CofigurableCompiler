@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -26,11 +27,19 @@ namespace ConLine
         /// <typeparam name="TType">The expected type.</typeparam>
         /// <returns>StepOutput of the provided type if the value is of that type.</returns>
         public abstract StepValue<TType>? GetAs<TType>();
+
+        /// <summary>
+        /// Get the value as the wanted type.
+        /// </summary>
+        /// <typeparam name="TType">Type to return.</typeparam>
+        /// <exception cref="Exception">When the wanted type is not related to the type of the value.</exception>
+        /// <returns>The object of that type.</returns>
+        public abstract TType? GetValueAs<TType>();
     }
 
-    public class StepValue<TType>: StepValue
+    public class StepValue<TType> : StepValue
     {
-        public readonly TType Value;
+        public TType Value;
         public override Type Type => Value?.GetType() ?? typeof(TType);
         public override bool IsArray => Type.IsArray;
 
@@ -42,11 +51,16 @@ namespace ConLine
 
         public override StepValue<TType1>? GetAs<TType1>()
         {
-            if (Value is TType1 newValue)
+            return this as StepValue<TType1>;
+        }
+
+        public override TType1 GetValueAs<TType1>()
+        {
+            if (Value is TType1 v1 && v1 is TType)
             {
-                return new StepValue<TType1>(PropertyName, newValue);
+                return v1;
             }
-            return null;
+            throw new Exception($"{nameof(TType1)} is not an instance of {nameof(TType)}");
         }
     }
 }

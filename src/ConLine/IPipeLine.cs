@@ -6,7 +6,7 @@ namespace ConLine
 {
     public interface IPipeLine : IStep
     {
-        public IInjectorSetup InjectorSetup { get; }
+        public Injector Injector { get; }
         /// <summary>
         /// Can the pipeline still be upated.
         /// </summary>

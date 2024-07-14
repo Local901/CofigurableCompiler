@@ -1,4 +1,5 @@
 ﻿using ConDI;
+using ConLine.Options;
 using ConLine.Steps;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,7 @@ namespace ConLine
     public abstract class Pipeline : IPipeLine
     {
         public string Name { get; }
-        protected Injector Injector = new();
-        public IInjectorSetup InjectorSetup => Injector;
+        public Injector Injector = new();
         public bool CanBeEdited { get; protected set; } = true;
         private IReadOnlyList<IIOType>? _outputs;
         public IReadOnlyList<IIOType> Outputs
@@ -96,6 +96,6 @@ namespace ConLine
             return Steps.Values.OfType<Output>().ToArray();
         }
 
-        public abstract Task Run(RunOptions options, IStepInput input);
+        public abstract Task<StepValue[]> Run(RunOptions options, InputOptions input);
     }
 }
