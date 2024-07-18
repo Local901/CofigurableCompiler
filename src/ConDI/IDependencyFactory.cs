@@ -66,7 +66,7 @@ namespace ConDI
         /// <typeparam name="TDependency"></typeparam>
         /// <exception cref="Exception">The dependency is unknown in the scopes.</exception>
         /// <returns></returns>
-        public Dependency<TDependency> GetDependency<TDependency>();
+        public IDependency<TDependency> GetDependency<TDependency>();
 
         /// <summary>
         /// Prepaire a function to be called

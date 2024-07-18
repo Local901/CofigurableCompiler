@@ -6,13 +6,11 @@ namespace ConDI
 {
     public interface IDependency
     {
-        public DependencyProperties Properties { get; }
-        public object? Instance { get; }
-        public object? CreateInstance();
+        public InstanceScope InstanceScope { get; }
+        public object? GetInstance();
     }
-    public interface IDependency<T> : IDependency
+    public interface IDependency<TInstance> : IDependency
     {
-        public new T? Instance { get; }
-        public new T? CreateInstance();
+        public new TInstance? GetInstance();
     }
 }

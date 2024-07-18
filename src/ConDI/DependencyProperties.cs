@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConDI.InstanceFactories;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,13 +7,14 @@ namespace ConDI
 {
     public struct DependencyProperties
     {
-        public Type Type { get; }
-        public DependencyType DependencyType { get; }
+        public Type Type => InstanceFactory.InstanceType;
+        public InstanceScope InstanceScope { get; }
+        public IInstanceFactory InstanceFactory { get; }
 
-        public DependencyProperties(Type type, DependencyType dependencyType)
+        public DependencyProperties(InstanceScope instanceScope, IInstanceFactory instanceFactory)
         {
-            Type = type;
-            DependencyType = dependencyType;
+            InstanceScope = instanceScope;
+            InstanceFactory = instanceFactory;
         }
     }
 }

@@ -1,52 +1,33 @@
-﻿using System;
+﻿using ConDI.InstanceFactories;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ConDI
 {
-    public abstract class Dependency : IDependency
+    public class Dependency<TInstance> : IDependency<TInstance>
     {
-        public DependencyProperties Properties { get; }
-        protected readonly IDependencyFactory Factory;
+        private TInstance? Instance;
+        public InstanceScope InstanceScope { get; }
+        private readonly InstanceFactory<TInstance> Factory;
+        private readonly IScope Scope;
 
-        public object? Instance
+        public Dependency(InstanceScope instanceScope, InstanceFactory<TInstance> factory, IScope scope)
         {
-            get {
-                if (Properties.DependencyType == DependencyType.Transient) return ((IDependency)this).CreateInstance();
-                return _instance ??= ((IDependency)this).CreateInstance();
-            }
-        }
-        private object? _instance;
-
-        protected Dependency(DependencyProperties properties, IDependencyFactory factory)
-        {
-            Properties = properties;
+            InstanceScope = instanceScope;
             Factory = factory;
+            Scope = scope;
         }
 
-        object? IDependency.CreateInstance()
+        public TInstance? GetInstance()
         {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class Dependency<T> : Dependency, IDependency<T>
-    {
-        public T? Instance => (T)base.Instance;
-
-        public Dependency(DependencyProperties properties, IDependencyFactory factory)
-            : base(properties, factory)
-        { }
-
-        public T? CreateInstance()
-        {
-            return Factory.CreateInstance<T>();
+            return Instance ??= Factory.CreateInstance(Scope);
         }
 
-        object? IDependency.CreateInstance()
+        object? IDependency.GetInstance()
         {
-            return CreateInstance();
+            return GetInstance();
         }
     }
 }

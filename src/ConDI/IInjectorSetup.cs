@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConDI.InstanceFactories;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -22,6 +23,15 @@ namespace ConDI
         /// <typeparam name="TImplementation">The implementation type.</typeparam>
         public void AddSingleton<TReference, TImplementation>()
             where TImplementation : TReference;
+        /// <summary>
+        /// Add a singleton dependency for a reference type with a factory function.
+        /// 
+        /// Singleton dependencies only get created once.
+        /// </summary>
+        /// <param name="generator">Generator function for the instance.</param>
+        /// <typeparam name="TReference">The reference type.</typeparam>
+        public void AddSingleton<TReference>(InstanceGenerator<TReference> generator);
+
 
         /// <summary>
         /// Add a scoped dependency.
@@ -39,6 +49,15 @@ namespace ConDI
         /// <typeparam name="TImplementation">The implementation type.</typeparam>
         public void AddScoped<TReference, TImplementation>()
             where TImplementation : TReference;
+        /// <summary>
+        /// Add a scoped dependency for a reference type with a factory function.
+        /// 
+        /// Scoped dependencies are unique inside a scope.
+        /// </summary>
+        /// <param name="generator">Generator function for the instance.</param>
+        /// <typeparam name="TReference">The refenrence type.</typeparam>
+        public void AddScoped<TReference>(InstanceGenerator<TReference> generator);
+
 
         /// <summary>
         /// Add a trancient dependency.
@@ -48,7 +67,7 @@ namespace ConDI
         /// <typeparam name="TImplementation">The implementation type.</typeparam>
         public void AddTrancient<TImplementation>();
         /// <summary>
-        /// Add a trancient dependency for a reference type..
+        /// Add a trancient dependency for a reference type.
         /// 
         /// Trancients get recreated every time it is needed.
         /// </summary>
@@ -56,5 +75,13 @@ namespace ConDI
         /// <typeparam name="TImplementation">The implementation type.</typeparam>
         public void AddTrancient<TReference, TImplementation>()
             where TImplementation : TReference;
+        /// <summary>
+        /// Add a trancient dependency for a reference type with a factory function.
+        /// 
+        /// Trancients get recreated every time it is needed.
+        /// </summary>
+        /// <param name="generator">Generator function for the instance.</param>
+        /// <typeparam name="TReference">The reference type.</typeparam>
+        public void AddTrancient<TReference>(InstanceGenerator<TReference> generator);
     }
 }

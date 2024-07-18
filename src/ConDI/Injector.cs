@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConDI.InstanceFactories;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,7 +16,11 @@ namespace ConDI
         public void AddScoped<TReference, TImplementation>()
             where TImplementation : TReference
         {
-            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TImplementation), DependencyType.Scoped));
+            Dependencies.Add(typeof(TReference), new DependencyProperties(InstanceScope.Scoped, new ScopedFactory<TImplementation>()));
+        }
+        public void AddScoped<TReference>(InstanceGenerator<TReference> generator)
+        {
+            Dependencies.Add(typeof(TReference), new DependencyProperties(InstanceScope.Scoped, new FunctionFactory<TReference>(generator)));
         }
 
         public void AddSingleton<TImplementation>()
@@ -25,7 +30,11 @@ namespace ConDI
         public void AddSingleton<TReference, TImplementation>()
             where TImplementation : TReference
         {
-            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TImplementation), DependencyType.Singleton));
+            Dependencies.Add(typeof(TReference), new DependencyProperties(InstanceScope.Singleton, new ScopedFactory<TImplementation>()));
+        }
+        public void AddSingleton<TReference>(InstanceGenerator<TReference> generator)
+        {
+            Dependencies.Add(typeof(TReference), new DependencyProperties(InstanceScope.Singleton, new FunctionFactory<TReference>(generator)));
         }
 
         public void AddTrancient<TImplementation>()
@@ -35,7 +44,11 @@ namespace ConDI
         public void AddTrancient<TReference, TImplementation>()
             where TImplementation : TReference
         {
-            Dependencies.Add(typeof(TReference), new DependencyProperties(typeof(TImplementation), DependencyType.Transient));
+            Dependencies.Add(typeof(TReference), new DependencyProperties(InstanceScope.Transient, new ScopedFactory<TImplementation>()));
+        }
+        public void AddTrancient<TReference>(InstanceGenerator<TReference> generator)
+        {
+            Dependencies.Add(typeof(TReference), new DependencyProperties(InstanceScope.Transient, new FunctionFactory<TReference>(generator)));
         }
 
         /// <summary>

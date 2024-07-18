@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ConDI
 {
-    public enum DependencyType
+    public enum InstanceScope
     {
         Singleton,
         Scoped,
