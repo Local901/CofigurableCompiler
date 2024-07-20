@@ -39,8 +39,8 @@ namespace ConCore.Key.Modifiers
                 var result = BlockReader.TraverseBlock(b, Args.ValuePath);
                 if (result == null || !(result is IValueBlock)) return null;
 
-                return (result as IValueBlock).Value;
-            }).ToArray();
+                return (result as IValueBlock)?.Value;
+            }).OfType<string>().ToArray();
         }
     }
 }

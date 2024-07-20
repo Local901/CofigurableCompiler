@@ -11,10 +11,10 @@ namespace ConCore.Key
     {
         public IComponent Component { get; }
 
-        private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasses;
+        private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasses = new();
         public IReadOnlyList<IAlias<Construct, IReadOnlyList<IBlock>>> Aliasses => _aliasses.ToList();
 
-        private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasParents;
+        private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasParents = new();
         public IReadOnlyList<IAlias<Construct, IReadOnlyList<IBlock>>> AliasParents => _aliasParents.ToList();
 
         public Construct (string key, IComponent component)

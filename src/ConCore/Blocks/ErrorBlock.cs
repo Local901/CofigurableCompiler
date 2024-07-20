@@ -8,13 +8,13 @@ namespace ConCore.Blocks
 
         public IKey Key { get; }
 
-        public string Name { get; }
+        public string? Name { get; }
 
         public int Index => Block.Index;
 
         public int EndIndex => Block.EndIndex;
 
-        public ErrorBlock(IBlock block, IKey key, string name)
+        public ErrorBlock(IBlock block, IKey key, string? name)
         {
             Block = block;
             Key = key;
@@ -24,7 +24,7 @@ namespace ConCore.Blocks
         public ErrorBlock(IBlock block, IKey key)
             : this(block, key, null) { }
 
-        public IBlock Copy(string name = null)
+        public IBlock Copy(string? name = null)
         {
             return name == null
                 ? new ErrorBlock(Block, Key)

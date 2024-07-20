@@ -13,8 +13,8 @@ namespace ConCore.FileInfo
 
         public List<FileData> Parents { get; }
 
-        public LangCollection Language { get; set; }
-        public IBlock ParsedContent { get; set; }
+        public LangCollection? Language { get; set; }
+        public IBlock? ParsedContent { get; set; }
 
         public FileData(string path) {
             RelativePath = Path.GetRelativePath(".", path);
@@ -22,11 +22,13 @@ namespace ConCore.FileInfo
             Parents = new List<FileData>();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (obj is FileData) {
-                var fd = obj as FileData;
-                return AbsolutePath == fd.AbsolutePath && Language.Language == fd.Language.Language;
+            if (obj is FileData fileData) {
+                return AbsolutePath == fileData.AbsolutePath &&
+                    Language != null &&
+                    fileData.Language != null &&
+                    Language.Language == fileData.Language.Language;
             }
             return base.Equals(obj);
         }

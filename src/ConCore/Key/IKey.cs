@@ -12,30 +12,30 @@ namespace ConCore.Key
             return $"{Reference}";
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (obj is KeyLangReference) return Reference == (KeyLangReference)obj;
-            if (obj is IKey) return Reference == ((IKey)obj).Reference;
+            if (obj is KeyLangReference reference) return Reference == reference;
+            if (obj is IKey key) return Reference == key.Reference;
             return false;
         }
 
-        public int CompareTo(object other)
+        public int CompareTo(object? other)
         {
             if (other == null) return -1;
             if (other is KeyLangReference) return CompareTo((KeyLangReference)other);
-            if (!(other is IKey)) return -1;
+            if (other is not IKey) return -1;
 
             return CompareTo(((IKey)other).Reference);
         }
 
-        public int CompareTo([AllowNull] KeyLangReference other)
+        public int CompareTo(KeyLangReference? other)
         {
-            int diff = string.Compare(Reference.Lang, other.Lang);
-            if (diff == 0) return string.Compare(Reference.Key, other.Key);
+            int diff = string.Compare(Reference.Lang, other?.Lang);
+            if (diff == 0) return string.Compare(Reference.Key, other?.Key);
             return diff;
         }
 
-        public int CompareTo([AllowNull] IKey other)
+        public int CompareTo(IKey? other)
         {
             return CompareTo(other?.Reference);
         }

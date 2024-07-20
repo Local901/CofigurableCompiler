@@ -6,7 +6,7 @@ namespace ConCore.Key.Collections
 {
     public class KeyCollection
     {
-        private Dictionary<string, LangCollection> Languages = new Dictionary<string, LangCollection>();
+        private readonly Dictionary<string, LangCollection> Languages = new();
 
         public KeyCollection() { }
 
@@ -26,7 +26,7 @@ namespace ConCore.Key.Collections
         /// </summary>
         /// <param name="language"></param>
         /// <returns></returns>
-        public LangCollection GetLanguage(string language)
+        public LangCollection? GetLanguage(string language)
         {
             return Languages.GetValueOrDefault(language);
         }
@@ -36,7 +36,7 @@ namespace ConCore.Key.Collections
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public IKey GetKey(KeyLangReference key)
+        public IKey? GetKey(KeyLangReference key)
         {
             if (key == null) return null;
             return GetLanguage(key.Lang)?.GetKey(key.Key);

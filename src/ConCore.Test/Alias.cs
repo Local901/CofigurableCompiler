@@ -21,7 +21,7 @@ namespace ConCore.Test
             languageLoaderMock.Setup((loader) => loader.LoadConfig(It.IsAny<FileData>(), It.IsAny<KeyCollection>()))
                 .Returns<FileData, KeyCollection>((file, collection) =>
                 {
-                    LangCollection language = collection.GetLanguage("c_lang");
+                    LangCollection? language = collection.GetLanguage("c_lang");
                     if (language != null)
                     {
                         return language;
@@ -34,7 +34,7 @@ namespace ConCore.Test
                     var tPrint = language.Add(new Token("print_token", "print"));
 
                     var tFunction = language.Add(new Token("function_token", "[\\S]+"));
-                    var functionToken = language.GetKey(tFunction.Key) as Token;
+                    var functionToken = (Token)language.GetKey(tFunction.Key);
                     functionToken.AddAlias(language.GetKey(tLoad.Key) as Token);
                     functionToken.AddAlias(language.GetKey(tPrint.Key) as Token);
 

@@ -7,15 +7,15 @@ namespace ConCore.Key.Components
     {
         public readonly int Index;
 
-        public OrderComponentData(IComponentData parent, OrderComponent component)
+        public OrderComponentData(IComponentData? parent, OrderComponent component)
             : this(parent, component, 0) { }
-        public OrderComponentData(IComponentData parent, OrderComponent component, int index)
+        public OrderComponentData(IComponentData? parent, OrderComponent component, int index)
             : base(parent, component)
         {
             Index = index;
         }
 
-        public override IList<IValueComponentData> GetNextComponents()
+        public override IList<IValueComponentData?> GetNextComponents()
         {
             if (Index + 1 == Component.Children.Count)
             {
@@ -37,7 +37,7 @@ namespace ConCore.Key.Components
             if (children.Count == 0) throw new Exception("The list of children should contain components.");
         }
 
-        public override IList<IValueComponentData> GetNextComponents(IComponentData parent)
+        public override IList<IValueComponentData?> GetNextComponents(IComponentData? parent)
         {
             var data = new OrderComponentData(parent, this);
             return Children[0].GetNextComponents(data);

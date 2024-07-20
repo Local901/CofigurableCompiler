@@ -9,6 +9,6 @@ namespace ConCore.Parsing
         /// Parse using the FileLexer and output the a block with the created tree.
         /// </summary>
         /// <param name="startConstruct"></param>
-        IBlock DoParse(KeyLangReference startConstruct);
+        IBlock? DoParse(KeyLangReference startConstruct);
     }
 }

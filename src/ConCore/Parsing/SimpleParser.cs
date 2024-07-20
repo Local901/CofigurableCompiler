@@ -22,7 +22,7 @@ namespace ConCore.Parsing
             KeyCollection = keyCollection;
         }
 
-        public IBlock DoParse(KeyLangReference startConstruct)
+        public IBlock? DoParse(KeyLangReference startConstruct)
         {
             FileLexer.Reset();
 
@@ -55,7 +55,7 @@ namespace ConCore.Parsing
             var keys = factory.GetNextKeys();
             if (keys.Count == 0)
             {
-                nextBlocks = null;
+                nextBlocks = new List<IValueBlock>();
                 return false;
             }
 

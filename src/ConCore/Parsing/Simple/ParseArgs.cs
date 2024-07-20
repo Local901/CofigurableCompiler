@@ -13,16 +13,16 @@ namespace ConCore.Parsing.Simple
 
         public IValueComponentData Data { get; }
 
-        public ILocalRoot LocalRoot { get; }
+        public ILocalRoot? LocalRoot { get; }
 
-        public IBlock Block { get; protected set; }
+        public IBlock? Block { get; protected set; }
 
-        public ParseArgs(IValueComponentData data, ILocalRoot localRoot, IBlock block)
+        public ParseArgs(IValueComponentData data, ILocalRoot? localRoot, IBlock? block)
             : this(data, localRoot)
         {
             Block = block;
         }
-        public ParseArgs(IValueComponentData data, ILocalRoot localRoot)
+        public ParseArgs(IValueComponentData data, ILocalRoot? localRoot)
             : base()
         {
             Status = ParseStatus.None;
@@ -30,7 +30,7 @@ namespace ConCore.Parsing.Simple
             LocalRoot = localRoot;
         }
 
-        public virtual IList<IValueComponentData> GetNextComponents()
+        public virtual IList<IValueComponentData?> GetNextComponents()
         {
             return Data.GetNextComponents();
         }

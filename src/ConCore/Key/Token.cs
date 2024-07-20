@@ -28,22 +28,20 @@ namespace ConCore.Key
                 MakeRegex();
             }
         }
-        public Regex Regex { get; private set; }
+        public Regex? Regex { get; private set; }
         public Token Leader { get; private set; }
 
 
-        private readonly List<IAlias<Token, string>> _aliasses;
+        private readonly List<IAlias<Token, string>> _aliasses = new();
         public IReadOnlyList<IAlias<Token, string>> Aliasses => _aliasses.ToList();
 
-        private readonly List<IAlias<Token, string>> _aliasParents;
+        private readonly List<IAlias<Token, string>> _aliasParents = new();
         public IReadOnlyList<IAlias<Token, string>> AliasParents => _aliasParents.ToList();
 
         public Token(string key, string pattern)
         {
             Reference = new KeyLangReference { Key = key };
             Pattern = pattern;
-            _aliasses = new List<IAlias<Token, string>>();
-            _aliasParents = new List<IAlias<Token, string>>();
         }
 
         /// <summary>
@@ -52,7 +50,7 @@ namespace ConCore.Key
         /// <param name="page">Text to search.</param>
         /// <param name="index">Start index</param>
         /// <returns>Match that was found or null if not found</returns>
-        public Match NextMatch(string page, int index)
+        public Match? NextMatch(string page, int index)
         {
             if (Regex == null) return null;
             return Regex.Match(page, index);
@@ -77,6 +75,7 @@ namespace ConCore.Key
 
         public void AddAlias(IAlias<Token, string> alias)
         {
+            if (alias == null) throw new Exception("Can't add null as an allias.");
             if (_aliasses.Contains(alias)) throw new Exception("Can't add the same alias twice.");
             _aliasses.Add(alias);
             if (!alias.AliasParents.Contains(this)) {
@@ -96,11 +95,11 @@ namespace ConCore.Key
 
         public IKey[] FindAliases(object value, bool includeSelf = true)
         {
-            if (!(value is string))
+            if (value is not string)
             {
                 return new IKey[0];
             }
-            return FindAliasses(value as string, includeSelf);
+            return FindAliasses((string)value, includeSelf);
         }
         public IKey[] FindAliasses(string value, bool includeSelf = true)
         {
@@ -121,11 +120,11 @@ namespace ConCore.Key
 
         public bool IsAlias(IAlias allias)
         {
-            if (!(allias is IAlias<Token, string>))
+            if (allias is not IAlias<Token, string>)
             {
                 return false;
             }
-            return IsAlias(allias as IAlias<Token, string>);
+            return IsAlias((IAlias<Token, string>)allias);
         }
         public bool IsAlias(IAlias<Token, string> allias)
         {
@@ -139,7 +138,7 @@ namespace ConCore.Key
 
         IList<IAlias> IAlias.RootAliases()
         {
-            return RootAlliasses() as IList<IAlias>;
+            return (IList<IAlias>)RootAlliasses();
         }
         public IList<IAlias<Token, string>> RootAlliasses()
         {

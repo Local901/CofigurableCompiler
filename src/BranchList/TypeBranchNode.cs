@@ -6,11 +6,11 @@ using System.Text;
 
 namespace BranchList
 {
-    public class TypeBranchNode<TActual, TReturn> : BranchNode<TypeBranchNode<TActual, TReturn>> 
+    public class TypeBranchNode<TActual, TReturn> : BranchNode<TypeBranchNode<TActual, TReturn>>
         where TActual : TypeBranchNode<TActual, TReturn>, TReturn
         where TReturn : class
     {
-        public new TReturn Parent
+        public new TReturn? Parent
         {
             get => base.Parent as TReturn;
             protected set
@@ -21,13 +21,20 @@ namespace BranchList
         }
         public new List<TReturn> Children { get => base.Children.Cast<TReturn>().ToList(); }
 
-        public new TReturn this[int index] => base[index] as TReturn;
+        public new TReturn this[int index]
+        {
+            get {
+                if (base[index] is TReturn result) return result;
+                throw new Exception("This should never happen.");
+            }
+        }
 
         public void Add(TReturn node)
         {
-            if (node is TActual)
+            var actual = node as TActual;
+            if (actual is TActual)
             {
-                base.Add(node as TActual);
+                base.Add(actual);
                 return;
             }
             throw new ArgumentException($"Object to be added was not of type: {typeof(TActual).FullName}");

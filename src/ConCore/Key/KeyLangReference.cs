@@ -10,10 +10,10 @@ namespace ConCore.Key
         public string Key { get; internal set; }
         public string Lang { get => Language.Language; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null) return false;
-            if (!(obj is KeyLangReference)) return false;
+            if (obj is not KeyLangReference) return false;
             return Key == ((KeyLangReference)obj).Key && Lang == ((KeyLangReference)obj).Lang;
         }
 
@@ -27,11 +27,11 @@ namespace ConCore.Key
             return HashCode.Combine(Key, Lang);
         }
 
-        public int CompareTo([AllowNull] KeyLangReference other)
+        public int CompareTo(KeyLangReference? other)
         {
-            int index = string.Compare(Lang, other.Lang);
+            int index = string.Compare(Lang, other?.Lang);
             if (index != 0) return index;
-            return string.Compare(Key, other.Key);
+            return string.Compare(Key, other?.Key);
         }
     }
 }

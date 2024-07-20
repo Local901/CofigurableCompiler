@@ -8,7 +8,7 @@ namespace BranchList
 {
     public class BranchNode<T> : IBranchNode<T> where T : BranchNode<T>
     {
-        public T Parent { get; protected set; }
+        public T? Parent { get; protected set; }
         public List<T> Children { get; }
 
         public BranchNode()
