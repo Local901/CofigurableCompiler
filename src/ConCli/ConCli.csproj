@@ -13,4 +13,8 @@
     <ProjectReference Include="..\ConLine\ConLine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Steps\" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
-﻿using ConLine.ProcessPipeline;
+﻿using ConCli.Common;
+using ConLine.ProcessPipeline;
 using ConLine.Steps;
 
 namespace ConCli
@@ -26,9 +27,9 @@ namespace ConCli
 
         static void CreatePipeline()
         {
-            var pipeline = new ProcessPipeLine("file parser");
+            var pipeline = new ProcessPipeline("file parser");
 
-            pipeline.AddStep(new Input<string>("filePath"));
+            pipeline.AddStep(new Input<PathInstance>("filePath"));
 
             // single file no imports:
             // read file
