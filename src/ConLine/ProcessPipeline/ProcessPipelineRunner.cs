@@ -40,8 +40,10 @@ namespace ConLine.ProcessPipeline
             // Initialize
             foreach (var input in Pipeline.GetInputSteps())
             {
-                var runningTask = input.Run(RunOptions, StepInput);
-                RunningSteps.Add(new RunningStepMemory(input, runningTask));
+                RunningSteps.Add(new RunningStepMemory(
+                    input,
+                    input.Run(RunOptions, StepInput)
+                ));
             }
 
             // Processing loop
@@ -58,10 +60,11 @@ namespace ConLine.ProcessPipeline
                     }
                     if (runningStep.IsFaulted)
                     {
+                        // TODO: Collect errors and Throw them as a collective pipeline error.
                         Console.WriteLine(runningStep.Exception.ToString());
                         return true;
                     }
-                    if (!runningStep.IsCanceled) return true;
+                    if (runningStep.IsCanceled) return true;
 
                     var output = runningStep.Result;
                     HandleFinishedStep(mem.Step, output);
@@ -118,15 +121,17 @@ namespace ConLine.ProcessPipeline
                     // Or set value in waiting steps when memory is set.
 
                     // check if step can be started.
-                    var connectedInputs = nextStep.Inputs.Select<IIOType, Connection?>((i) => Pipeline.GetConnectionTo(new Connection(nextStep.Name, i.Name)) != null
-                        ? new Connection(nextStep.Name, i.Name)
-                        : null
-                    );
+                    var connectedInputs = nextStep.Inputs
+                        .Select<IIOType, Connection?>((i) => Pipeline.GetConnectionTo(new Connection(nextStep.Name, i.Name)) != null
+                            ? new Connection(nextStep.Name, i.Name)
+                            : null
+                        ).Where((c) => c != null)
+                        .Cast<Connection>()
+                        .ToList();
+
                     if (
                         // All connected inputs have a value
-                        connectedInputs.All((c) => waitingStep.InputValues.Any((v) => v?.PropertyName == c?.PropertyName)) &&
-                        // AND All non optional inputs have a value
-                        nextStep.Inputs.All((i) => i.IsOptional || connectedInputs.Contains(new Connection(nextStep.Name, i.Name)))
+                        connectedInputs.All((c) => waitingStep.InputValues.Any((v) => v?.PropertyName == c.PropertyName))
                     ) {
                         RunningSteps.Add(
                             new RunningStepMemory(
@@ -137,6 +142,7 @@ namespace ConLine.ProcessPipeline
                                 )
                             )
                         );
+                        WaitingSteps.Remove(waitingStep);
                     }
                 }
             }

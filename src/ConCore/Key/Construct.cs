@@ -9,7 +9,7 @@ namespace ConCore.Key
 {
     public class Construct : IKey, IAlias<Construct, IReadOnlyList<IBlock>>
     {
-        public IComponent Component { get; }
+        public Component Component { get; }
 
         private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasses = new();
         public IReadOnlyList<IAlias<Construct, IReadOnlyList<IBlock>>> Aliasses => _aliasses.ToList();
@@ -17,7 +17,7 @@ namespace ConCore.Key
         private readonly List<IAlias<Construct, IReadOnlyList<IBlock>>> _aliasParents = new();
         public IReadOnlyList<IAlias<Construct, IReadOnlyList<IBlock>>> AliasParents => _aliasParents.ToList();
 
-        public Construct (string key, IComponent component)
+        public Construct (string key, Component component)
         {
             Reference = new KeyLangReference { Key = key };
             Component = component;

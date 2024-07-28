@@ -42,7 +42,7 @@ namespace ConCore.Test
                     var tSemiCollon = language.Add(new Token("semi_collon", ";"));
                     var tAssignOp = language.Add(new Token("assignment_opperator", "="));
 
-                    var cVarDef = language.Add(new Construct("variable_definition", new OrderComponent(new List<IComponent>
+                    var cVarDef = language.Add(new Construct("variable_definition", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tIdentifier, "type"),
                         new ValueComponent(tIdentifier, "name"),
@@ -62,22 +62,22 @@ namespace ConCore.Test
                     });
                     language.Add(gValue);
 
-                    var cAssignment = language.Add(new Construct("assignment", new OrderComponent(new List<IComponent>
+                    var cAssignment = language.Add(new Construct("assignment", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(gVariable.Reference),
                         new ValueComponent(tAssignOp),
                         new ValueComponent(gValue.Reference),
                     })));
 
-                    var cReturn = language.Add(new Construct("return", new OrderComponent(new List<IComponent>
+                    var cReturn = language.Add(new Construct("return", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tIdentifier),
                         new ValueComponent(gValue.Reference),
                     })));
 
-                    var cLine = language.Add(new Construct("line", new OrderComponent(new List<IComponent>
+                    var cLine = language.Add(new Construct("line", new OrderComponent(new List<Component>
                     {
-                        new AnyComponent(new List<IComponent>
+                        new AnyComponent(new List<Component>
                         {
                             new ValueComponent(cAssignment),
                             new ValueComponent(cReturn),
@@ -85,7 +85,7 @@ namespace ConCore.Test
                         new ValueComponent(tSemiCollon),
                     })));
 
-                    var cFuncDef = language.Add(new Construct("function_definition", new OrderComponent(new List<IComponent>
+                    var cFuncDef = language.Add(new Construct("function_definition", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tIdentifier, "return_type"),
                         new ValueComponent(tIdentifier, "name"),

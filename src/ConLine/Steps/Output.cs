@@ -37,7 +37,7 @@ namespace ConLine.Steps
 
         public Task<StepValue[]> Run(RunOptions options, InputOptions input)
         {
-            return new Task<StepValue[]>(() =>
+            var task = new Task<StepValue[]>(() =>
             {
                 var value = input.StepValues.FirstOrDefault((v) => v.PropertyName == Inputs[0].Name);
                 if (value == null)
@@ -60,6 +60,8 @@ namespace ConLine.Steps
                     StepValue.CreateInstance(input.Scope, value.Type, Outputs[0].Name, value.GetValueAs<object>())
                 };
             });
+            task.Start();
+            return task;
         }
     }
 }

@@ -14,22 +14,22 @@ namespace ConCore.Key.Components
         ALLWAYS
     }
 
-    public class SpacedRepeatComponent : IComponent
+    public class SpacedRepeatComponent : Component
     {
-        private readonly IComponent ActualComponent;
+        private readonly Component ActualComponent;
 
         public SpacedRepeatComponent(
-            IComponent spacer,
-            IComponent content,
+            Component spacer,
+            Component content,
             SpacerOptions endWithSpacer = SpacerOptions.OPTIONAL,
             int minimum = 0,
             int maximum = 0
         )
         {
-            var list = new List<IComponent>
+            var list = new List<Component>
             {
                 content,
-                new RepeatComponent(new OrderComponent(new List<IComponent>
+                new RepeatComponent(new OrderComponent(new List<Component>
                 {
                     spacer,
                     content,

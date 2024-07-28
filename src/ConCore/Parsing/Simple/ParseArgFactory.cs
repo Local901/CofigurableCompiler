@@ -68,7 +68,7 @@ namespace ConCore.Parsing.Simple
 
         public ILocalRoot CreateRoot(KeyLangReference key)
         {
-            var component = new OrderComponent(new List<IComponent>
+            var component = new OrderComponent(new List<Component>
             {
                 new ValueComponent(null),
                 new ValueComponent(key)

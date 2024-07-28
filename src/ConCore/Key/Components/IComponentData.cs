@@ -8,7 +8,7 @@ namespace ConCore.Key.Components
     public interface IComponentData
     {
         public IComponentData? Parent { get; }
-        public IComponent Component { get; }
+        public Component Component { get; }
 
         public IList<IValueComponentData?> GetNextComponents();
     }

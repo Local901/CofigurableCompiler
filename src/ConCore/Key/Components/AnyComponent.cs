@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace ConCore.Key.Components
 {
-    public class AnyComponent : IComponent
+    public class AnyComponent : Component
     {
-        public AnyComponent(List<IComponent> options)
+        public AnyComponent(List<Component> options)
             : base(options) { }
 
         public override IList<IValueComponentData> GetNextComponents(IComponentData parent)

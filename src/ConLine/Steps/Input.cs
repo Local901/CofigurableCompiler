@@ -19,6 +19,14 @@ namespace ConLine.Steps
         public IReadOnlyList<IIOType> Outputs { get; }
 
         public IReadOnlyList<IIOType> Inputs { get; }
+
+        /// <summary>
+        /// Create an input step. This is a special step that filters the input of a pipeline.
+        /// The name of the input and output proerty is the same as the name of the step.
+        /// </summary>
+        /// <param name="name">Name of the step.</param>
+        /// <param name="type">Type of the input.</param>
+        /// <param name="isOptional">Is the input optional.</param>
         public Input(string name, Type type, bool isOptional = false)
             : this(
                   name,
@@ -35,13 +43,15 @@ namespace ConLine.Steps
 
         public Task<StepValue[]> Run(RunOptions options, InputOptions input)
         {
-            return new Task<StepValue[]>(() =>
+            var task = new Task<StepValue[]>(() =>
             {
                 var value = input.StepValues.First((i) => i.PropertyName == Inputs[0].Name);
                 return new StepValue[] {
-                    new StepValue<object>(Outputs[0].Name, value.GetAs<object>().Value)
+                    new StepValue<object>(Outputs[0].Name, value.GetValueAs<object>())
                 };
             });
+            task.Start();
+            return task;
         }
     }
 }

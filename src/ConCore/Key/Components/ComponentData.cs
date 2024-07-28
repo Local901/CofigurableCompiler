@@ -2,10 +2,10 @@
 
 namespace ConCore.Key.Components
 {
-    public abstract class ComponentData<T> : IComponentData where T : IComponent
+    public abstract class ComponentData<T> : IComponentData where T : Component
     {
         public T Component { get; }
-        IComponent IComponentData.Component => Component;
+        Component IComponentData.Component => Component;
 
         public IComponentData? Parent { get; }
 

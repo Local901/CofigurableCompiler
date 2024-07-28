@@ -42,8 +42,8 @@ namespace ConLine
         }
 
         protected Dictionary<string, IStep> Steps { get; } = new Dictionary<string, IStep>();
-        protected Dictionary<Connection, List<Connection>?> ConnectionsFrom { get; } = new Dictionary<Connection, List<Connection>?>();
-        protected Dictionary<Connection, Connection?> ConnectionTo { get; } = new Dictionary<Connection, Connection?>();
+        protected Dictionary<Connection, List<Connection>> ConnectionsFrom { get; } = new Dictionary<Connection, List<Connection>>();
+        protected Dictionary<Connection, Connection> ConnectionTo { get; } = new Dictionary<Connection, Connection>();
 
         /// <summary>
         /// Create an abstract pipeline.
@@ -60,15 +60,14 @@ namespace ConLine
             {
                 throw new Exception($"Pipeline {Name}: New connections are no longer allowed. Connection {from} -> {to}");
             }
-            var connectionTo = ConnectionTo[to];
-            if (connectionTo != null)
+            if (ConnectionTo.ContainsKey(to))
             {
-                throw new Exception($"There is already a connection to {to} from {connectionTo}");
+                throw new Exception($"There is already a connection to {to} from {ConnectionTo[to]}");
             }
             ConnectionTo[to] = from;
 
-            var connections = ConnectionsFrom[from];
-            if (connections == null)
+            List<Connection>? connections;
+            if (!ConnectionsFrom.TryGetValue(from, out connections))
             {
                 connections = new List<Connection>();
                 ConnectionsFrom[from] = connections;
@@ -106,12 +105,22 @@ namespace ConLine
 
         public IReadOnlyList<Connection> GetConnectionsFrom(Connection from)
         {
-            return ConnectionsFrom[from] ?? (IReadOnlyList<Connection>)Array.Empty<Connection>();
+            List<Connection> connections;
+            if (ConnectionsFrom.TryGetValue(from, out connections))
+            {
+                return connections;
+            }
+            return Array.Empty<Connection>();
         }
 
         public Connection? GetConnectionTo(Connection to)
         {
-            return ConnectionTo[to];
+            Connection connection;
+            if (ConnectionTo.TryGetValue(to, out connection))
+            {
+                return connection;
+            }
+            return null;
         }
 
         public abstract Task<StepValue[]> Run(RunOptions options, InputOptions input);

@@ -31,7 +31,7 @@ namespace ConCore.Key.Components
                 result.AddRange(
                     Parent != null
                         ? Parent.GetNextComponents()
-                        : IComponent.EMPTY_DATA_LIST
+                        : Components.Component.EMPTY_DATA_LIST
                 );
             }
             return result;
@@ -41,7 +41,7 @@ namespace ConCore.Key.Components
     /// <summary>
     /// Repeat child or continue with parent.
     /// </summary>
-    public class RepeatComponent : IComponent
+    public class RepeatComponent : Component
     {
         /// <summary>
         /// The minimum number of repeats that should be done before the loop can be left.
@@ -53,7 +53,7 @@ namespace ConCore.Key.Components
         /// </summary>
         public readonly int Maximum;
 
-        public RepeatComponent(IComponent child, int minimum = 0, int maximum = 0)
+        public RepeatComponent(Component child, int minimum = 0, int maximum = 0)
             : base()
         {
             Minimum = minimum;
@@ -61,7 +61,7 @@ namespace ConCore.Key.Components
 
             if (child == null) throw new ArgumentNullException("Child should be a component.");
             if (child is RepeatComponent) throw new ArgumentException("The child of a repeatComponent can not be another repeatComponent");
-            Add(child);
+            AddChild(child);
         }
 
         public override IList<IValueComponentData> GetNextComponents(IComponentData parent)

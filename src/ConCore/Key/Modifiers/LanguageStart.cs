@@ -1,4 +1,6 @@
-﻿namespace ConCore.Key.Modifiers
+﻿using System;
+
+namespace ConCore.Key.Modifiers
 {
     public struct LanguageStartArgs
     {
@@ -16,7 +18,17 @@
 
         public override IKey FindKey()
         {
-            return Language.GetKey(Args.KeyReference.Key);
+            var key = Language.GetKey(Args.KeyReference.Key);
+            if (key == null)
+            {
+                throw new Exception("No starting key found.");
+            }
+            return key;
+        }
+
+        public override KeyLangReference GetKeyReference()
+        {
+            return Args.KeyReference;
         }
     }
 }

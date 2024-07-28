@@ -41,21 +41,21 @@ namespace ConCore.Test
                     var tPath = language.Add(new Token("path", "[a-zA-Z]+"));
                     var tText = language.Add(new Token("text", "[\\S].*$"));
 
-                    var cLoadFile = language.Add(new Construct("load_file", new OrderComponent(new List<IComponent>
+                    var cLoadFile = language.Add(new Construct("load_file", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tLoad),
                         new ValueComponent(tPath, "path"),
                     })));
 
-                    var cPrintLine = language.Add(new Construct("print_text", new OrderComponent(new List<IComponent>
+                    var cPrintLine = language.Add(new Construct("print_text", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tPrint),
                         new ValueComponent(tPath),
                     })));
 
-                    var languageStart = language.Add(new Construct("structure", new OrderComponent(new List<IComponent>
+                    var languageStart = language.Add(new Construct("structure", new OrderComponent(new List<Component>
                     {
-                        new RepeatComponent(new AnyComponent(new List<IComponent> {
+                        new RepeatComponent(new AnyComponent(new List<Component> {
                             new ValueComponent(cLoadFile),
                             new ValueComponent(cPrintLine),
                         })),

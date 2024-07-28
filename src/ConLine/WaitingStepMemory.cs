@@ -26,6 +26,7 @@ namespace ConLine
                 if (input.Name == inputValue.PropertyName)
                 {
                     inputValues[i] = inputValue;
+                    return;
                 }
             }
             throw new Exception($"No input with name: {inputValue.PropertyName}");

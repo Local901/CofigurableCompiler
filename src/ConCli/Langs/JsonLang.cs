@@ -1,4 +1,5 @@
-﻿using ConCore.FileInfo;
+﻿using ConCli.Common;
+using ConCore.FileInfo;
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
@@ -14,7 +15,7 @@ namespace ConCli.Langs
     public class JsonLang
     {
 
-        public static LangCollection JsonLangConfigLoader(FileData file, KeyCollection keyCollection)
+        public static LangCollection JsonLangConfigLoader(PathInstance path, KeyCollection keyCollection)
         {
             var lang = keyCollection.GetLanguage("json");
             if (lang != null)
@@ -24,7 +25,7 @@ namespace ConCli.Langs
 
             lang = new LangCollection("json");
 
-            var dubblequote_token = lang.Add(new Token("doublequote", "(?<!(\\\\)*\\)\""));
+            var dubblequote_token = lang.Add(new Token("doublequote", "\""));
             var colon_token = lang.Add(new Token("colon", ":"));
             var comma_token = lang.Add(new Token("comma", ","));
             var brace_open = lang.Add(new Token("brace_open", @"\{"));
@@ -35,7 +36,7 @@ namespace ConCli.Langs
             var false_token = lang.Add(new Token("bool_false", "false"));
             var null_token = lang.Add(new Token("null", "null"));
 
-            var integerValue = new Token("integer", "[([1-9][0-9]*)0]");
+            var integerValue = new Token("integer", "(([1-9][0-9]*)|0[^0-9]+)");
             var decimalValue = new Token("decimal", @$"{integerValue.Pattern}\.[0-9]+");
             var number = new Token("number", @$"{integerValue.Pattern}(\.[0-9]+)?([eE][\+-]?[0-9]+)?");
             number.AddAlias(integerValue);
@@ -61,7 +62,7 @@ namespace ConCli.Langs
             var valueType_group_ref = lang.Add(valueType_group);
 
             // A string.
-            var string_construct = lang.Add(new Construct("encoded_string", new OrderComponent(new List<IComponent>
+            var string_construct = lang.Add(new Construct("encoded_string", new OrderComponent(new List<Component>
             {
                 new ValueComponent(dubblequote_token),
                 // TODO: every thing in between (prefured without new lines).
@@ -70,12 +71,12 @@ namespace ConCli.Langs
             valueType_group.Add(string_construct);
 
             // A json object.
-            var object_construct = lang.Add(new Construct("json_object", new OrderComponent(new List<IComponent>
+            var object_construct = lang.Add(new Construct("json_object", new OrderComponent(new List<Component>
             {
                 new ValueComponent(brace_open),
                 new SpacedRepeatComponent(
                     new ValueComponent(comma_token),
-                    new OrderComponent(new List<IComponent> {
+                    new OrderComponent(new List<Component> {
                         new ValueComponent(string_construct),
                         new ValueComponent(colon_token),
                         new ValueComponent(valueType_group_ref),
@@ -87,7 +88,7 @@ namespace ConCli.Langs
             valueType_group.Add(object_construct);
 
             // An non type restricted list
-            var list_construct = lang.Add(new Construct("json_list", new OrderComponent(new List<IComponent>
+            var list_construct = lang.Add(new Construct("json_list", new OrderComponent(new List<Component>
             {
                 new ValueComponent(block_open),
                 new SpacedRepeatComponent(

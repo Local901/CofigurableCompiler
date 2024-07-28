@@ -21,7 +21,7 @@ namespace ConCore.Key.Components
             {
                 return Parent != null
                     ? Parent.GetNextComponents()
-                    : IComponent.EMPTY_DATA_LIST;
+                    : Components.Component.EMPTY_DATA_LIST;
             }
 
             var data = new OrderComponentData(Parent, Component, Index + 1);
@@ -29,9 +29,9 @@ namespace ConCore.Key.Components
         }
     }
 
-    public class OrderComponent : IComponent
+    public class OrderComponent : Component
     {
-        public OrderComponent(List<IComponent> children)
+        public OrderComponent(List<Component> children)
             : base(children)
         {
             if (children.Count == 0) throw new Exception("The list of children should contain components.");

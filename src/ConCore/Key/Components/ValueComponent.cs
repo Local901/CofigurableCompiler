@@ -9,12 +9,12 @@ namespace ConCore.Key.Components
 
         public override IList<IValueComponentData?> GetNextComponents()
         {
-            if (Parent == null) return IComponent.EMPTY_DATA_LIST;
+            if (Parent == null) return Components.Component.EMPTY_DATA_LIST;
             return Parent.GetNextComponents();
         }
     }
 
-    public class ValueComponent : IComponent
+    public class ValueComponent : Component
     {
         public KeyLangReference Reference { get; }
         public string? Name { get; }

@@ -87,16 +87,36 @@ namespace ConDI
 
         public object? CreateInstance(Type type)
         {
-            return typeof(Scope)
-                .GetMethod("CreateInstance")
+            var method = typeof(Scope)
+                .GetMethods()
+                .FirstOrDefault((method) =>
+                    method.Name == "CreateInstance" &&
+                    method.IsGenericMethod &&
+                    method.GetParameters().Length == 0
+                );
+            if (method == null)
+            {
+                throw new Exception("Whoops this shouldn't happen: could not find Generic CreateInstance function on Scope.");
+            }
+            return method
                 ?.MakeGenericMethod(type)
                 .Invoke(this, null);
         }
 
         public object? CreateInstance(Type type, KeyValuePair<string, object>[] propertyValues)
         {
-            return typeof(Scope)
-                .GetMethod("CreateInstance")
+            var method = typeof(Scope)
+                .GetMethods()
+                .FirstOrDefault((method) =>
+                    method.Name == "CreateInstance" &&
+                    method.IsGenericMethod &&
+                    method.GetParameters().Length == 1
+                );
+            if (method == null)
+            {
+                throw new Exception("Whoops this shouldn't happen: could not find Generic CreateInstance function on Scope.");
+            }
+            return method
                 ?.MakeGenericMethod(type)
                 .Invoke(this, new object[] { propertyValues });
         }
@@ -120,8 +140,18 @@ namespace ConDI
 
         public object? GetInstance(Type type)
         {
-            return typeof(Scope)
-                .GetMethod("GetInstance")
+            var method = typeof(Scope)
+                .GetMethods()
+                .FirstOrDefault((method) =>
+                    method.Name == "GetInstance" &&
+                    method.IsGenericMethod &&
+                    method.GetParameters().Length == 0
+                );
+            if (method == null)
+            {
+                throw new Exception("Whoops this shouldn't happen: could not find Generic GetInstance function on Scope.");
+            }
+            return method
                 ?.MakeGenericMethod(type)
                 .Invoke(this, null);
         }

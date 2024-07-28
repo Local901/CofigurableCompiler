@@ -25,6 +25,10 @@ namespace ConLine.Options
 
         public void AddOuputValue<TType>(IEnumerable<TType> values)
         {
+            if (OutputField == null)
+            {
+                throw new Exception("This doesn't have an output.");
+            }
             if (!OutputField.IsArray)
             {
                 throw new Exception("Can't assign an array to a single value.");
@@ -41,6 +45,10 @@ namespace ConLine.Options
 
         public void AddOutputValue<TType>(TType value)
         {
+            if (OutputField == null)
+            {
+                throw new Exception("This doesn't have an output.");
+            }
             if (OutputField.IsArray)
             {
                 var enumerableOutput = OutputField.GetAs<IEnumerable<TType>>();
@@ -53,7 +61,7 @@ namespace ConLine.Options
             var outputField = OutputField.GetAs<TType>();
             if (outputField == null)
             {
-                throw new Exception($"Output value not of corresponding type. Was {nameof(TType)} but expected {outputField.Type.FullName}");
+                throw new Exception($"Output value not of corresponding type. Was {nameof(TType)} but expected {OutputField.Type.FullName}");
             }
             outputField.Value = value;
         }

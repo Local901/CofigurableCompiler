@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConCli": {
+      "commandName": "Project",
+      "commandLineArgs": "test test.json"
+    }
+  }
+}

@@ -17,6 +17,9 @@ namespace ConCli.Common
             OriginalPath = path;
         }
 
+        public static explicit operator string(PathInstance path) => path.ToString();
+        public static explicit operator PathInstance(string path) => new PathInstance(path);
+
         public string RelativePath(string relativeTo)
         {
             return Path.GetRelativePath(relativeTo, AbsolutePath);

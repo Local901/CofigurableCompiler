@@ -3,13 +3,22 @@ using System.Collections.Generic;
 
 namespace ConCore.Key.Components
 {
-    public abstract class IComponent : BranchNode<IComponent>
+    public abstract class Component
     {
+        private List<Component> components = new List<Component>();
+        public IReadOnlyList<Component> Children { get => components; }
         public static readonly List<IValueComponentData?> EMPTY_DATA_LIST = new() { null };
-        public IComponent()
-            : base() { }
-        public IComponent(List<IComponent> children)
-            : base(children) { }
+        public Component()
+            : this(new List<Component>()) { }
+        public Component(List<Component> children)
+        {
+            components = children;
+        }
+
+        protected void AddChild(Component child)
+        {
+            components.Add(child);
+        }
 
         /// <summary>
         /// Return a list of components that are expected after the current one.

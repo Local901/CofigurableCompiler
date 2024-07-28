@@ -36,7 +36,7 @@ namespace ConLine
         /// <typeparam name="TType">Type to return.</typeparam>
         /// <exception cref="Exception">When the wanted type is not related to the type of the value.</exception>
         /// <returns>The object of that type.</returns>
-        public abstract TType? GetValueAs<TType>();
+        public abstract TType GetValueAs<TType>();
 
         /// <summary>
         /// Create an instance of <see cref="StepValue"/>.
@@ -47,9 +47,11 @@ namespace ConLine
         /// <returns>A new Step Value.</returns>
         public static StepValue CreateInstance(IDependencyFactory factory, Type type, string propertyName, object value)
         {
-            return (StepValue)factory.CreateInstance(typeof(StepValue<>).MakeGenericType(new Type[] { type }), new KeyValuePair<string, object>[] {
-                new KeyValuePair<string, object>("propertyName", propertyName),
-                new KeyValuePair<string, object>("value", value)
+            return (StepValue)factory.CreateInstance(
+                typeof(StepValue<>).MakeGenericType(new Type[] { type }),
+                new KeyValuePair<string, object>[] {
+                    new KeyValuePair<string, object>("propertyName", propertyName),
+                    new KeyValuePair<string, object>("value", value)
             });
         }
     }

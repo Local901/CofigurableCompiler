@@ -19,7 +19,7 @@ namespace ConCore.Key
 
         public override string ToString()
         {
-            return $"{Lang}:{Key}";
+            return $"{Lang}::{Key}";
         }
 
         public override int GetHashCode()
