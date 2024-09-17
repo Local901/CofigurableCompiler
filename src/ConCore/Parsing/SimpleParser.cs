@@ -24,8 +24,6 @@ namespace ConCore.Parsing
 
         public IBlock? DoParse(KeyLangReference startConstruct)
         {
-            FileLexer.Reset();
-
             IParseFactory factory = new ParseFactory(startConstruct, KeyCollection, ArgsFactory);
 
             IList<IValueBlock> nextBlocks;

@@ -37,11 +37,12 @@ namespace ConCore.Lexing
 
         public void SetProgressIndex(int index)
         {
+            if (index < Index)
+            {
+                // For now.
+                throw new Exception("Not allowed to go back in file.");
+            }
             Index = Math.Max(0, index);
-        }
-        public void Reset()
-        {
-            SetProgressIndex(0);
         }
 
         public IList<IValueBlock> TryNextBlock(KeyLangReference key)
@@ -84,30 +85,6 @@ namespace ConCore.Lexing
             return blocks;
         }
 
-        public List<IValueBlock> TryAllBlocks(KeyLangReference key)
-        {
-            var blocks = TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(key, true));
-
-            // Create all blocks of valid child aliases.
-            if (options.HasFlag(FileLexerOptions.ResolveAlias))
-            {
-                blocks = ResolveAliasses(blocks).ToList();
-            }
-
-            return blocks;
-        }
-        public List<IValueBlock> TryAllBlocks(IEnumerable<KeyLangReference> keys)
-        {
-            var blocks = TryAllBlocks(_tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
-
-            // Create all blocks of valid child aliases.
-            if (options.HasFlag(FileLexerOptions.ResolveAlias))
-            {
-                blocks = ResolveAliasses(blocks).ToList();
-            }
-
-            return blocks;
-        }
         /// <summary>
         /// Find all blocks using provided tokens.<br/>
         /// <b>It doesn't update the index of the FileLexer.</b>
