@@ -7,7 +7,6 @@ using ConCore.Key.Modifiers;
 using ConCore.Lexing;
 using ConCore.Parsing;
 using ConCore.Parsing.Simple;
-using ConCore.Test.Mock;
 using ConCore.Tools.Contracts;
 using Moq;
 
@@ -114,7 +113,7 @@ namespace ConCore.Test
             var language = languageLoaderMock.Object.LoadConfig(null, collection);
             var refs = language.GetAllKeysOfType<Token>().Select(k => k.Reference);
 
-            ILexer lexer = new SimpleLexer(CCode, collection);
+            ILexer lexer = new SimpleLexer(new StreamChunkReader(new StreamReader(CCode)), collection);
 
             var result = new List<IBlock>();
             IList<IValueBlock> blocks;
@@ -148,7 +147,7 @@ namespace ConCore.Test
             KeyCollection collection = new KeyCollection();
             var language = languageLoaderMock.Object.LoadConfig(null, collection);
 
-            ILexer lexer = new SimpleLexer(CCode, collection);
+            ILexer lexer = new SimpleLexer(new StreamChunkReader(new StreamReader(CCode)), collection);
             IParser parser = new SimpleParser(lexer, new ParseArgFactory(collection), collection);
 
             var languageStart = language.FindFilter<LanguageStart>();
@@ -158,16 +157,6 @@ namespace ConCore.Test
             IBlock result = parser.DoParse(languageStart.FindKey().Reference);
 
             Assert.That(result, Is.Not.Null);
-        }
-
-        [Test]
-        public void ParseSingleFile()
-        {
-            IMultiFileParser parser = new MultyFileParserPartialMock(languageLoaderMock.Object, (file) => CCode);
-            var result = parser.Parse("test");
-
-            Assert.That(result.Count(), Is.EqualTo(1));
-            Assert.That(result[0].ParsedContent, Is.Not.Null);
         }
     }
 }

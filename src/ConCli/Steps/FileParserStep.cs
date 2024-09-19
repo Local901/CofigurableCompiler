@@ -26,8 +26,8 @@ namespace ConCli.Steps
 
         private IBlock ParseFile(PathInstance path, KeyCollection keyCollection, LangCollection langCollection)
         {
-            var wholeFile = File.ReadAllText((string)path);
-            var lexer = new SimpleLexer(wholeFile, keyCollection);
+            var fileReader = new StreamChunkReader(new StreamReader(File.OpenRead((string)path)));
+            var lexer = new SimpleLexer(fileReader, keyCollection);
             var parser = new SimpleParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
 
             var startFilter = langCollection.FindFilter<LanguageStart>();

@@ -28,7 +28,7 @@ namespace ConCore.Key
                 MakeRegex();
             }
         }
-        public Regex? Regex { get; private set; }
+        public Regex Regex { get; private set; }
         public Token Leader { get; private set; }
 
 

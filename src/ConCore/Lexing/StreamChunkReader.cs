@@ -102,14 +102,14 @@ namespace ConCore.Lexing
         }
     }
 
-    public class BlockReader
+    public class StreamChunkReader : ChunkReader
     {
         private readonly StreamReader Stream;
         private bool EndOfFileReached = false;
         private List<BufferPart> Buffer = new List<BufferPart>();
         private int startGlobalIndex = 0;
 
-        public BlockReader(StreamReader stream)
+        public StreamChunkReader(StreamReader stream)
         {
             Stream = stream;
             char[] block = new char[1000];
@@ -150,6 +150,11 @@ namespace ConCore.Lexing
         searchString: // Start the rearch in the loaded data.
             string stringValue = stringBuilder.ToString();
             var results = FindMatches(stringValue, args, startIndex);
+            if (results.Length == 0)
+            {
+                // Or throw Error.
+                return new BlockReadResult[0];
+            }
             int minIndex = results.Min((r) => r.Match.Index);
             var first = results.Where((r) => r.Match.Index <= minIndex);
 
@@ -166,10 +171,11 @@ namespace ConCore.Lexing
                 }
             }
 
-            string precedingValue = stringValue.Substring(startIndex, startGlobalIndex + minIndex);
+            int subStringLength = minIndex - startIndex;
+            string precedingValue = stringValue.Substring(startIndex, subStringLength);
 
             // Update start index;
-            startGlobalIndex += minIndex;
+            startGlobalIndex += subStringLength;
 
             // Remove passed buffer parts
             int globalIndex = bufferPosition.Index + minIndex;
@@ -195,6 +201,10 @@ namespace ConCore.Lexing
                 try
                 {
                     var match = token.Token.Regex.Match(stringValue, startAt);
+                    if (match == null || !match.Success)
+                    {
+                        continue;
+                    }
                     result.Add(new MatchResult
                     {
                         Args = token,

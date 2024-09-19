@@ -84,7 +84,7 @@ namespace ConCore.Test
             languageLoaderMock.Object.LoadConfig(null, collection);
 
             var lexer = new SimpleLexer(
-                $"print hello world\nload file",
+                new StreamChunkReader(new StreamReader($"print hello world\nload file")),
                 collection
                 );
             var language = collection.GetLanguage("test_lang");

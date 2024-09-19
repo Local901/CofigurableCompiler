@@ -18,31 +18,20 @@ namespace ConCore.Lexing
 
     public class SimpleLexer : ILexer
     {
-        private string Page;
-        private int Index;
+        private ChunkReader Reader;
         private readonly KeyCollection _tokenCollection;
         private readonly FileLexerOptions options;
 
         /// <summary>
         /// Make lexer for page text.
         /// </summary>
-        /// <param name="page">text to lex</param>
-        public SimpleLexer(string page, KeyCollection tokenCollection, FileLexerOptions options = FileLexerOptions.None)
+        /// <param name="reader">File reader that returns the first tokens that it comes across.</param>
+        /// <param name="tokenCollection">Collection that contains all loaded languages and tokens.</param>
+        public SimpleLexer(ChunkReader reader, KeyCollection tokenCollection, FileLexerOptions options = FileLexerOptions.None)
         {
-            Page = page;
-            Index = 0;
+            Reader = reader;
             _tokenCollection = tokenCollection;
             this.options = options == FileLexerOptions.None ? FileLexerOptions.ResolveAlias : options;
-        }
-
-        public void SetProgressIndex(int index)
-        {
-            if (index < Index)
-            {
-                // For now.
-                throw new Exception("Not allowed to go back in file.");
-            }
-            Index = Math.Max(0, index);
         }
 
         public IList<IValueBlock> TryNextBlock(KeyLangReference key)
@@ -69,19 +58,12 @@ namespace ConCore.Lexing
                 return blocks;
             }
 
-            var minIndex = blocks.Select((b) => b.Index).Min();
-
-            // Take all first blocks
-            blocks = blocks.Where((b) => b.Index == minIndex).ToList();
-
             // Create all blocks of valid child aliases.
             if (options.HasFlag(FileLexerOptions.ResolveAlias))
             {
                 blocks = ResolveAliasses(blocks).ToList();
             }
 
-            // move to last index
-            SetProgressIndex(blocks.Select((b) => b.EndIndex).Max());
             return blocks;
         }
 
@@ -112,24 +94,22 @@ namespace ConCore.Lexing
                 tokens = tokenList;
             }
 
-            var blocks = tokens.Select(t => new
-            {
-                Match = t.NextMatch(Page, Index),
-                Token = t
-            })
-                .Where(m => m.Match != null)
-                .Where(m => m.Match.Value.Length > 0)
-                .Select(m =>
+            return Reader.NextBlocks(tokens.Select((token) =>
+                    new TokenArgs {
+                        Token = token,
+                        PrecendingModifier = null,
+                        ReadModifier = null
+                    })
+                    .ToArray())
+                .Select((response) =>
                     new Block(
-                        m.Token,
-                        m.Match.Value,
-                        m.Match.Index,
-                        m.Match.Index + m.Match.Value.Length
+                        response.Key,
+                        response.MatchValue,
+                        response.MatchStart.Index,
+                        response.MatchEnd.Index
                     ))
                 .Cast<IValueBlock>()
                 .ToList();
-
-            return blocks;
         }
 
         /// <summary>
