@@ -6,8 +6,8 @@ namespace ConCore.Blocks
     {
         IKey Key { get; }
         string? Name { get; }
-        int Index { get; }
-        int EndIndex { get; }
+        CharacterPosition Index { get; }
+        CharacterPosition EndIndex { get; }
 
         IBlock Copy(string? name = null);
     }

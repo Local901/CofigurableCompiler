@@ -7,10 +7,10 @@ namespace ConCore.Blocks
         public IKey Key { get; protected set; }
         public string? Name { get; protected set; }
         public string Value { get; protected set; }
-        public int Index { get; protected set; }
-        public int EndIndex { get; protected set; }
+        public CharacterPosition Index { get; protected set; }
+        public CharacterPosition EndIndex { get; protected set; }
 
-        public Block(IKey key, string value, int index, int endIndex, string? name = null)
+        public Block(IKey key, string value, CharacterPosition index, CharacterPosition endIndex, string? name = null)
         {
             Key = key;
             Name = name;

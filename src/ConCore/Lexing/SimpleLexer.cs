@@ -105,8 +105,8 @@ namespace ConCore.Lexing
                     new Block(
                         response.Key,
                         response.MatchValue,
-                        response.MatchStart.Index,
-                        response.MatchEnd.Index
+                        response.MatchStart,
+                        response.MatchEnd
                     ))
                 .Cast<IValueBlock>()
                 .ToList();

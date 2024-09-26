@@ -10,9 +10,9 @@ namespace ConCore.Blocks
 
         public string? Name { get; }
 
-        public int Index => Block.Index;
+        public CharacterPosition Index => Block.Index;
 
-        public int EndIndex => Block.EndIndex;
+        public CharacterPosition EndIndex => Block.EndIndex;
 
         public ErrorBlock(IBlock block, IKey key, string? name)
         {

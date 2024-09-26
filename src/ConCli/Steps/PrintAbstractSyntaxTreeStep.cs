@@ -29,7 +29,7 @@ namespace ConCli.Steps
                 {
                     Console.Write("  ");
                 }
-                Console.WriteLine($"{valueBlock.Value}\t\t{valueBlock.Key}");
+                Console.WriteLine($"{valueBlock.Value}\t\t{block.Index.ToString()} {valueBlock.Key}");
             }
         }
 

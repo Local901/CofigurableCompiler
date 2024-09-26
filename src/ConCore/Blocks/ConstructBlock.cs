@@ -12,9 +12,9 @@ namespace ConCore.Blocks
 
         public string? Name { get; private set; }
 
-        public int Index { get; private set; }
+        public CharacterPosition Index { get; private set; }
 
-        public int EndIndex { get; private set; }
+        public CharacterPosition EndIndex { get; private set; }
         public IRelationBlock? Parent { get; set; }
         public IReadOnlyList<IBlock> Content { get; protected set; }
 
