@@ -5,7 +5,14 @@ namespace ConCore.Key
 {
     public abstract class IKey : IComparable, IComparable<KeyLangReference>, IComparable<IKey>
     {
-        public KeyLangReference Reference { get; protected set; }
+        public string Name { get; }
+        public KeyLangReference Reference { get; set; }
+
+        public IKey(string name)
+        {
+            Name = name;
+            Reference = new KeyLangReference(name);
+        }
 
         public override string ToString()
         {

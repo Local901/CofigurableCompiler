@@ -6,7 +6,7 @@ namespace ConCore.Key.Collections
 {
     public class KeyCollection
     {
-        private readonly Dictionary<string, LangCollection> Languages = new();
+        private readonly Dictionary<string, Language> Languages = new();
 
         public KeyCollection() { }
 
@@ -16,9 +16,9 @@ namespace ConCore.Key.Collections
         /// <param name="language"></param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public void AddLanguage(LangCollection language)
+        public void AddLanguage(Language language)
         {
-            Languages.Add(language.Language, language);
+            Languages.Add(language.Name, language);
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace ConCore.Key.Collections
         /// </summary>
         /// <param name="language"></param>
         /// <returns></returns>
-        public LangCollection? GetLanguage(string language)
+        public Language? GetLanguage(string language)
         {
             return Languages.GetValueOrDefault(language);
         }
@@ -39,7 +39,7 @@ namespace ConCore.Key.Collections
         public IKey? GetKey(KeyLangReference key)
         {
             if (key == null) return null;
-            return GetLanguage(key.Lang)?.GetKey(key.Key);
+            return GetLanguage(key.Lang)?.GetKey(key);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace ConCore.Key.Collections
         public List<IKey> GetAllKeys()
         {
             return Languages.Values
-                .SelectMany(lang => lang.GetAllKeys())
+                .SelectMany(lang => lang.AllKeys())
                 .ToList();
         }
         /// <summary>
@@ -71,9 +71,9 @@ namespace ConCore.Key.Collections
         /// <returns></returns>
         public IList<IKey> GetAllSubKeys(KeyLangReference key, bool includeSeft = false)
         {
-            var keys = GetLanguage(key.Lang)?.GetAllSubKeys(key.Key, includeSeft);
+            var keys = GetLanguage(key.Lang)?.AllChildKeys(key, includeSeft);
             if (keys == null) return new List<IKey>();
-            return keys;
+            return keys.ToList();
         }
         /// <summary>
         /// Get all the keys that are related to the refered key.

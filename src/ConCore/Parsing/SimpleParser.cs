@@ -57,7 +57,7 @@ namespace ConCore.Parsing
                 return false;
             }
 
-            nextBlocks = FileLexer.TryNextBlock(keys);
+            nextBlocks = FileLexer.TryNextBlock(keys).Select((result) => result.Block).ToList();
             return nextBlocks != null && nextBlocks.Count != 0;
         }
     }

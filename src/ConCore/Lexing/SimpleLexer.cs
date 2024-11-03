@@ -1,6 +1,7 @@
 ﻿using ConCore.Blocks;
 using ConCore.Key;
 using ConCore.Key.Collections;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,36 +12,76 @@ namespace ConCore.Lexing
     public enum FileLexerOptions
     {
         None = 0,
-        CompleteLanguage = 1,
-        FromAliasRoot = 2,
+        // CompleteLanguage = 1,
+        // FromAliasRoot = 2,
         ResolveAlias = 4,
     }
 
     public class SimpleLexer : ILexer
     {
         private ChunkReader Reader;
-        private readonly KeyCollection _tokenCollection;
+        private readonly Language Language;
         private readonly FileLexerOptions options;
 
         /// <summary>
         /// Make lexer for page text.
         /// </summary>
         /// <param name="reader">File reader that returns the first tokens that it comes across.</param>
-        /// <param name="tokenCollection">Collection that contains all loaded languages and tokens.</param>
-        public SimpleLexer(ChunkReader reader, KeyCollection tokenCollection, FileLexerOptions options = FileLexerOptions.None)
+        /// <param name="language">Collection that contains all the tokens for a language.</param>
+        public SimpleLexer(ChunkReader reader, Language language, FileLexerOptions options = FileLexerOptions.None)
         {
             Reader = reader;
-            _tokenCollection = tokenCollection;
+            Language = language;
             this.options = options == FileLexerOptions.None ? FileLexerOptions.ResolveAlias : options;
         }
 
-        public IList<IValueBlock> TryNextBlock(KeyLangReference key)
+        public IList<LexResult> TryNextBlock(KeyLangReference key)
         {
-            return TryNextBlock(_tokenCollection.GetAllSubKeysOfType<Token>(key, true));
+            return TryNextBlock(Language.AllChildKeys<Token>(key, true)
+                .Select((token) => new TokenArgs
+                {
+                    Token = token,
+                    PrecendingModifier = null,
+                    ReadModifier = null,
+                })
+            );
         }
-        public IList<IValueBlock> TryNextBlock(IEnumerable<KeyLangReference> keys)
+        public IList<LexResult> TryNextBlock(IEnumerable<KeyLangReference> keys)
         {
-            return TryNextBlock(_tokenCollection.GetAllSubKeysOfType<Token>(keys, true));
+            return TryNextBlock(keys.SelectMany((key) => Language.AllChildKeys<Token>(key, true))
+                .Distinct()
+                .Select((token) => new TokenArgs
+                {
+                    Token = token,
+                    PrecendingModifier = null,
+                    ReadModifier = null,
+                })
+            );
+        }
+        public IList<LexResult> TryNextBlock(LexOptions option)
+        {
+            return TryNextBlock(Language.AllChildKeys<Token>(option.Key, true)
+                .Select((token) => new TokenArgs
+                {
+                    Token = token,
+                    PrecendingModifier = option.PrecedingCondition,
+                    ReadModifier = null,
+                })
+            );
+        }
+        public IList<LexResult> TryNextBlock(IEnumerable<LexOptions> options)
+        {
+            return TryNextBlock(
+                options.SelectMany((option) =>
+                    Language.AllChildKeys<Token>(option.Key, true)
+                        .Select((token) => new TokenArgs
+                        {
+                            Token = token,
+                            PrecendingModifier = option.PrecedingCondition,
+                            ReadModifier = null,
+                        })
+                )
+            );
         }
         /// <summary>
         /// Find next block using provided tokens. Will move the progress index to the one that is the higest of the returnd values.
@@ -48,7 +89,7 @@ namespace ConCore.Lexing
         /// <param name="block">Block that gets created.</param>
         /// <param name="tokens">List of tokens.</param>
         /// <returns>Returns true if block is created.</returns>
-        private IList<IValueBlock> TryNextBlock(IEnumerable<Token> tokens)
+        private IList<LexResult> TryNextBlock(IEnumerable<TokenArgs> tokens)
         {
             // find the next match
             var blocks = TryAllBlocks(tokens);
@@ -72,43 +113,46 @@ namespace ConCore.Lexing
         /// <b>It doesn't update the index of the FileLexer.</b>
         /// </summary>
         /// <param name="blocks">Blocks that get created.</param>
-        /// <param name="tokens">List of tokens.</param>
+        /// <param name="args">List of tokenArgs.</param>
         /// <returns>Returns true if block is created.</returns>
-        private List<IValueBlock> TryAllBlocks(IEnumerable<Token> tokens)
+        private List<LexResult> TryAllBlocks(IEnumerable<TokenArgs> args)
         {
-            // Get all tokens of requested languages.
-            if (options.HasFlag(FileLexerOptions.CompleteLanguage))
-            {
-                tokens = tokens.GroupBy((t) => t.Reference.Language)
-                    .SelectMany((group) => group.Key.GetAllKeysOfType<Token>());
-            }
+            //// Get all tokens of requested languages.
+            //if (options.HasFlag(FileLexerOptions.CompleteLanguage))
+            //{
+            //    tokens = tokens.GroupBy((t) => t.Token.Reference.Language)
+            //        .SelectMany((group) => group.Key.AllKeys<Token>());
+            //}
             // Only use root level aliases.
-            if (options.HasFlag(FileLexerOptions.FromAliasRoot))
-            {
-                var roots = tokens.SelectMany((t) => t.RootAlliasses())
-                    .Distinct().Cast<Token>().ToList();
+            //if (options.HasFlag(FileLexerOptions.FromAliasRoot))
+            //{
+            //    var roots = args.SelectMany((t) => t.Token.RootAlliasses())
+            //        .Distinct().Cast<Token>().ToList();
 
-                var tokenList = tokens.Where((t) => t.AliasParents.Count() == 0)
-                    .ToList();
-                tokenList.AddRange(roots.Where((r) => !tokens.Contains(r)));
-                tokens = tokenList;
-            }
+            //    var tokenList = args.Where((t) => t.Token.AliasParents.Count() == 0)
+            //        .ToList();
+            //    tokenList.AddRange(roots.Where((r) => !args.Any((arg) => arg.Token == r)));
+            //    args = tokenList;
+            //}
 
-            return Reader.NextBlocks(tokens.Select((token) =>
-                    new TokenArgs {
-                        Token = token,
-                        PrecendingModifier = null,
-                        ReadModifier = null
-                    })
-                    .ToArray())
+            return Reader.NextBlocks(args.ToArray())
                 .Select((response) =>
-                    new Block(
-                        response.Key,
-                        response.MatchValue,
-                        response.MatchStart,
-                        response.MatchEnd
-                    ))
-                .Cast<IValueBlock>()
+                    new LexResult
+                    {
+                        Block = new Block(
+                            response.Key,
+                            response.MatchValue,
+                            response.MatchStart,
+                            response.MatchEnd
+                        ),
+                        PrecedingBlock = new Block(
+                            null,
+                            response.PrecedingValue,
+                            response.PrecedingStart,
+                            response.MatchStart
+                        )
+                    })
+                .Cast<LexResult>()
                 .ToList();
         }
 
@@ -117,17 +161,35 @@ namespace ConCore.Lexing
         /// </summary>
         /// <param name="blocks">list of blocks to resolve.</param>
         /// <returns></returns>
-        private IEnumerable<IValueBlock> ResolveAliasses(IEnumerable<IValueBlock> blocks)
+        private IEnumerable<LexResult> ResolveAliasses(IEnumerable<LexResult> blocks)
         {
-            return blocks.SelectMany((block) =>
+            return blocks.SelectMany((result) =>
             {
+                IValueBlock block = result.Block;
                 // Keys of ValueBlocks are always tokens.
                 var token = (Token)block.Key;
 
-                return token.FindAliasses(block.Value, false)
-                    .Select((t) => new Block(t, block.Value, block.Index, block.EndIndex, block.Name))
-                    .Prepend(block);
+                return FindAliasses(block, token.Reference, result.PrecedingBlock);
             });
+        }
+
+        private IEnumerable<LexResult> FindAliasses(IValueBlock block, KeyLangReference key, IValueBlock precedingBlock) {
+            var token = Language.GetKey(key) as Token;
+
+            // It has to be a token and it has to match perfectly with the value of the block.
+            if (token == null || token.Regex.Match(block.Value).Value != block.Value) {
+                return new LexResult[0];
+            }
+
+            var result = new LexResult
+            {
+                Block = new Block(token, block.Value, block.Index, block.EndIndex, block.Name),
+                PrecedingBlock = precedingBlock,
+            };
+
+            return Language.GetAliases(key)
+                .SelectMany((alias) => FindAliasses(block, alias, precedingBlock))
+                .Prepend(result);
         }
     }
 }

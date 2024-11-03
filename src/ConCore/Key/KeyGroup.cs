@@ -12,11 +12,8 @@ namespace ConCore.Key
             : this(key, new List<KeyLangReference>())
         { }
         public KeyGroup(string key, List<KeyLangReference> members)
+            : base(key)
         {
-            Reference = new KeyLangReference
-            {
-                Key = key,
-            };
             _members = members;
         }
 

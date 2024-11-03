@@ -14,7 +14,7 @@ namespace ConCore.Lexing
         /// <param name="key">Key of group/token.</param>
         /// <exception cref="NoNextBlockFound"></exception>
         /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
-        IList<IValueBlock> TryNextBlock(KeyLangReference key);
+        IList<LexResult> TryNextBlock(KeyLangReference key);
         /// <summary>
         /// Find next block using tokens connected to the keys.
         /// Progress is updated.
@@ -22,6 +22,22 @@ namespace ConCore.Lexing
         /// <param name="keys">Keys of groups/tokens.</param>
         /// <exception cref="NoNextBlockFound"></exception>
         /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
-        IList<IValueBlock> TryNextBlock(IEnumerable<KeyLangReference> keys);
+        IList<LexResult> TryNextBlock(IEnumerable<KeyLangReference> keys);
+        /// <summary>
+        /// Find next block using tokens connected to the key.
+        /// Progress is updated.
+        /// </summary>
+        /// <param name="options">Options for finding a token.</param>
+        /// <exception cref="NoNextBlockFound"></exception>
+        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
+        IList<LexResult> TryNextBlock(LexOptions options);
+        /// <summary>
+        /// Find next block using tokens connected to the keys.
+        /// Progress is updated.
+        /// </summary>
+        /// <param name="optionsList">List op options for finding keys.</param>
+        /// <exception cref="NoNextBlockFound"></exception>
+        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
+        IList<LexResult> TryNextBlock(IEnumerable<LexOptions> optionsList);
     }
 }

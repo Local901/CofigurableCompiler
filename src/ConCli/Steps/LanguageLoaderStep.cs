@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ConCli.Steps
 {
-    public delegate LangCollection LoadLanguage(PathInstance path, KeyCollection keyCollection);
+    public delegate Language LoadLanguage(PathInstance path, KeyCollection keyCollection);
     public class LanguageLoaderStep : FunctionCallStep<LoadLanguage>
     {
         public LanguageLoaderStep(string name)
@@ -21,11 +21,11 @@ namespace ConCli.Steps
             FunctionHandler = LoadConfig;
         }
 
-        public LangCollection LoadConfig(PathInstance path, KeyCollection keyCollection)
+        public Language LoadConfig(PathInstance path, KeyCollection keyCollection)
         {
             var extension = Path.GetExtension(path.OriginalPath);
 
-            LangCollection? language = null;
+            Language? language = null;
 
             if (extension == ".json")
             {
@@ -37,7 +37,7 @@ namespace ConCli.Steps
                 throw new NotImplementedException();
             }
             // Add language to key collection if it
-            if (keyCollection.GetLanguage(language.Language) == null)
+            if (keyCollection.GetLanguage(language.Name) == null)
             {
                 keyCollection.AddLanguage(language);
             }

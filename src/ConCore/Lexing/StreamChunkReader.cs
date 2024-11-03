@@ -1,5 +1,6 @@
 ﻿using ConCore.Blocks;
 using ConCore.Key;
+using ConCore.Lexing.Conditions;
 using ConCore.Reading;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace ConCore.Lexing
         /// <summary>
         /// Modifier for preceding text. Will only start checking for a match to the token after this fails.
         /// </summary>
-        public ReadModifier? PrecendingModifier;
+        public ReadCondition? PrecendingModifier;
     }
 
     public struct MatchResult

@@ -3,7 +3,6 @@ using ConCore.FileInfo;
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
-using ConCore.Key.Modifiers;
 using ConCore.Lexing;
 using ConCore.Parsing;
 using ConCore.Parsing.Simple;
@@ -25,23 +24,23 @@ namespace ConCore.Test
             languageLoaderMock.Setup((loader) => loader.LoadConfig(It.IsAny<FileData>(), It.IsAny<KeyCollection>()))
                 .Returns<FileData, KeyCollection>((file, collection) =>
                 {
-                    LangCollection language = collection.GetLanguage("c_lang");
+                    Language language = collection.GetLanguage("c_lang");
                     if (language != null)
                     {
                         return language;
                     }
 
-                    language = new LangCollection("c_lang");
-                    var tOpenBrace = language.Add(new Token("open_brace", "{"));
-                    var tCloseBrace = language.Add(new Token("close_brace", "}"));
-                    var tOpenBracket = language.Add(new Token("open_bracket", "\\("));
-                    var tCloseBracket = language.Add(new Token("close_bracket", "\\)"));
-                    var tIntLiteral = language.Add(new Token("int_literal", "[0-9]"));
-                    var tIdentifier = language.Add(new Token("identifier", "[a-zA-Z_][a-zA-Z0-9_]*"));
-                    var tSemiCollon = language.Add(new Token("semi_collon", ";"));
-                    var tAssignOp = language.Add(new Token("assignment_opperator", "="));
+                    language = new Language("c_lang");
+                    var tOpenBrace = language.AddKey(new Token("open_brace", "{"));
+                    var tCloseBrace = language.AddKey(new Token("close_brace", "}"));
+                    var tOpenBracket = language.AddKey(new Token("open_bracket", "\\("));
+                    var tCloseBracket = language.AddKey(new Token("close_bracket", "\\)"));
+                    var tIntLiteral = language.AddKey(new Token("int_literal", "[0-9]"));
+                    var tIdentifier = language.AddKey(new Token("identifier", "[a-zA-Z_][a-zA-Z0-9_]*"));
+                    var tSemiCollon = language.AddKey(new Token("semi_collon", ";"));
+                    var tAssignOp = language.AddKey(new Token("assignment_opperator", "="));
 
-                    var cVarDef = language.Add(new Construct("variable_definition", new OrderComponent(new List<Component>
+                    var cVarDef = language.AddKey(new Construct("variable_definition", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tIdentifier, "type"),
                         new ValueComponent(tIdentifier, "name"),
@@ -52,29 +51,29 @@ namespace ConCore.Test
                         tIdentifier,
                         cVarDef,
                     });
-                    language.Add(gVariable);
+                    language.AddKey(gVariable);
 
                     var gValue = new KeyGroup("values", new List<KeyLangReference>
                     {
                         tIdentifier,
                         tIntLiteral,
                     });
-                    language.Add(gValue);
+                    language.AddKey(gValue);
 
-                    var cAssignment = language.Add(new Construct("assignment", new OrderComponent(new List<Component>
+                    var cAssignment = language.AddKey(new Construct("assignment", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(gVariable.Reference),
                         new ValueComponent(tAssignOp),
                         new ValueComponent(gValue.Reference),
                     })));
 
-                    var cReturn = language.Add(new Construct("return", new OrderComponent(new List<Component>
+                    var cReturn = language.AddKey(new Construct("return", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tIdentifier),
                         new ValueComponent(gValue.Reference),
                     })));
 
-                    var cLine = language.Add(new Construct("line", new OrderComponent(new List<Component>
+                    var cLine = language.AddKey(new Construct("line", new OrderComponent(new List<Component>
                     {
                         new AnyComponent(new List<Component>
                         {
@@ -84,7 +83,7 @@ namespace ConCore.Test
                         new ValueComponent(tSemiCollon),
                     })));
 
-                    var cFuncDef = language.Add(new Construct("function_definition", new OrderComponent(new List<Component>
+                    var cFuncDef = language.AddKey(new Construct("function_definition", new OrderComponent(new List<Component>
                     {
                         new ValueComponent(tIdentifier, "return_type"),
                         new ValueComponent(tIdentifier, "name"),
@@ -96,10 +95,7 @@ namespace ConCore.Test
                     })));
 
 
-                    language.AddFilter(new LanguageStart(new LanguageStartArgs
-                    {
-                        KeyReference = cFuncDef,
-                    }));
+                    language.StartingKeyReference = cFuncDef;
 
                     collection.AddLanguage(language);
                     return language;
@@ -111,16 +107,16 @@ namespace ConCore.Test
         {
             KeyCollection collection = new KeyCollection();
             var language = languageLoaderMock.Object.LoadConfig(null, collection);
-            var refs = language.GetAllKeysOfType<Token>().Select(k => k.Reference);
+            var refs = language.AllKeys<Token>().Select(k => k.Reference);
 
-            ILexer lexer = new SimpleLexer(new StreamChunkReader(new StreamReader(CCode)), collection);
+            ILexer lexer = new SimpleLexer(new StreamChunkReader(new StreamReader(CCode)), language);
 
             var result = new List<IBlock>();
-            IList<IValueBlock> blocks;
+            IList<LexResult> blocks;
             while((blocks = lexer.TryNextBlock(refs)) != null && blocks.Count > 0)
             {
                 Assert.That(blocks, Has.Count.EqualTo(1));
-                result.Add(blocks[0]);
+                result.Add(blocks[0].Block);
             }
             Assert.That(blocks, Is.Not.Null);
 
@@ -147,14 +143,14 @@ namespace ConCore.Test
             KeyCollection collection = new KeyCollection();
             var language = languageLoaderMock.Object.LoadConfig(null, collection);
 
-            ILexer lexer = new SimpleLexer(new StreamChunkReader(new StreamReader(CCode)), collection);
+            ILexer lexer = new SimpleLexer(new StreamChunkReader(new StreamReader(CCode)), language);
             IParser parser = new SimpleParser(lexer, new ParseArgFactory(collection), collection);
 
-            var languageStart = language.FindFilter<LanguageStart>();
+            var languageStart = language.StartingKeyReference;
 
             Assert.That(language, Is.Not.Null);
 
-            IBlock result = parser.DoParse(languageStart.FindKey().Reference);
+            IBlock? result = parser.DoParse(languageStart);
 
             Assert.That(result, Is.Not.Null);
         }

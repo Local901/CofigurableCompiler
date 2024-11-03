@@ -13,7 +13,7 @@ namespace ConCore.FileInfo
 
         public List<FileData> Parents { get; }
 
-        public LangCollection? Language { get; set; }
+        public Language? Language { get; set; }
         public IBlock? ParsedContent { get; set; }
 
         public FileData(string path) {
@@ -28,14 +28,14 @@ namespace ConCore.FileInfo
                 return AbsolutePath == fileData.AbsolutePath &&
                     Language != null &&
                     fileData.Language != null &&
-                    Language.Language == fileData.Language.Language;
+                    Language.Name == fileData.Language.Name;
             }
             return base.Equals(obj);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(AbsolutePath, Language.Language);
+            return HashCode.Combine(AbsolutePath, Language.Name);
         }
     }
 }

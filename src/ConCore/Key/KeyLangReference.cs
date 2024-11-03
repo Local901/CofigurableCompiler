@@ -1,20 +1,28 @@
 ﻿using ConCore.Key.Collections;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ConCore.Key
 {
     public class KeyLangReference : IComparable<KeyLangReference>
     {
-        public LangCollection Language { get; internal set; }
-        public string Key { get; internal set; }
-        public string Lang { get => Language.Language; }
+        public Language? Language { get; }
+        public string Key { get; }
+        public string? Lang { get => Language?.Name; }
+
+        public KeyLangReference(string key)
+            : this(null, key) { }
+
+        public KeyLangReference(Language? language, string key)
+        {
+            Language = language;
+            Key = key;
+        }
 
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;
-            if (obj is not KeyLangReference) return false;
-            return Key == ((KeyLangReference)obj).Key && Lang == ((KeyLangReference)obj).Lang;
+            if (obj is not KeyLangReference other) return false;
+            return Lang == other.Lang && Key == other.Key;
         }
 
         public override string ToString()
@@ -32,6 +40,15 @@ namespace ConCore.Key
             int index = string.Compare(Lang, other?.Lang);
             if (index != 0) return index;
             return string.Compare(Key, other?.Key);
+        }
+
+        public static bool operator ==(KeyLangReference left, KeyLangReference right)
+        {
+            return left.Equals(right);
+        }
+        public static bool operator !=(KeyLangReference left, KeyLangReference right)
+        {
+            return !left.Equals(right);
         }
     }
 }

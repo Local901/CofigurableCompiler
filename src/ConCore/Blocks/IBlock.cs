@@ -4,7 +4,7 @@ namespace ConCore.Blocks
 {
     public interface IBlock
     {
-        IKey Key { get; }
+        IKey? Key { get; }
         string? Name { get; }
         CharacterPosition Index { get; }
         CharacterPosition EndIndex { get; }

@@ -11,6 +11,6 @@ namespace ConCore.Tools.Contracts
         /// <param name="file">All information about a file.</param>
         /// <param name="keyCollection">The collection.</param>
         /// <returns>The collection of the language for the file.</returns>
-        public LangCollection LoadConfig(FileData file, KeyCollection keyCollection);
+        public Language LoadConfig(FileData file, KeyCollection keyCollection);
     }
 }
