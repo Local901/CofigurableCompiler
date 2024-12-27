@@ -1,5 +1,6 @@
 ﻿using BranchList;
 using ConCore.Blocks;
+using ConCore.CustomRegex.Info;
 using ConCore.Key.Components;
 using ConCore.Parsing.Simple.Contracts;
 using System.Collections.Generic;
@@ -11,18 +12,18 @@ namespace ConCore.Parsing.Simple
     {
         public ParseStatus Status { get; set; }
 
-        public IValueComponentData Data { get; }
+        public IValueInfo<bool, Component> Data { get; }
 
         public ILocalRoot? LocalRoot { get; }
 
         public IBlock? Block { get; protected set; }
 
-        public ParseArgs(IValueComponentData data, ILocalRoot? localRoot, IBlock? block)
+        public ParseArgs(IValueInfo<bool, Component> data, ILocalRoot? localRoot, IBlock? block)
             : this(data, localRoot)
         {
             Block = block;
         }
-        public ParseArgs(IValueComponentData data, ILocalRoot? localRoot)
+        public ParseArgs(IValueInfo<bool, Component> data, ILocalRoot? localRoot)
             : base()
         {
             Status = ParseStatus.None;
@@ -30,9 +31,9 @@ namespace ConCore.Parsing.Simple
             LocalRoot = localRoot;
         }
 
-        public virtual IList<IValueComponentData?> GetNextComponents()
+        public virtual IList<IValueInfo<bool, Component>?> GetNextComponents()
         {
-            return Data.GetNextComponents();
+            return Data.DetermainNext(true);
         }
 
         public List<IParseArgs> LocalPath()

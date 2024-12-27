@@ -30,12 +30,12 @@ namespace ConCore.CustomRegex.Steps
             }
         }
 
-        public override RegexInfo<NextInput, Result>[] Start(NextInput value)
+        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
         {
             return DetermainNext(null, value);
         }
 
-        public override IValueInfo<NextInput, Result>[] DetermainNext(
+        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(
             RegexInfo<NextInput, Result>? parent,
             NextInput value
         )
@@ -53,16 +53,16 @@ namespace ConCore.CustomRegex.Steps
                 RepeatIndex = repeat;
             }
 
-            public override IValueInfo<NextInput, Result>[] DetermainNext(NextInput value)
+            public override IList<IValueInfo<NextInput, Result>?> DetermainNext(NextInput value)
             {
-                List<IValueInfo<NextInput, Result>> result = new List<IValueInfo<NextInput, Result>>();
+                var result = new List<IValueInfo<NextInput, Result>?>();
 
                 if (RepeatIndex >= CurrentStep.MinimumRepeats)
                 {
                     if (Parent == null)
                     {
                         // If it end is reached before any iteration is completed
-                        result.Add(new EndInfo<NextInput, Result>());
+                        result.Add(null);
                     }
                     else
                     {
@@ -70,13 +70,13 @@ namespace ConCore.CustomRegex.Steps
                     }
                 }
 
-                if (RepeatIndex < CurrentStep.MaximumRepeats)
+                if (RepeatIndex < CurrentStep.MaximumRepeats || CurrentStep.MaximumRepeats <= 0)
                 {
                     RepeatInfo nextInfo = new RepeatInfo(CurrentStep, Parent, RepeatIndex + 1);
                     result.AddRange(CurrentStep.ChildSteps[0].DetermainNext(nextInfo, value));
                 }
 
-                return result.ToArray();
+                return result.ToList();
             }
         }
     }

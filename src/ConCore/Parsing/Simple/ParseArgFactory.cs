@@ -1,5 +1,6 @@
 ﻿using BranchList;
 using ConCore.Blocks;
+using ConCore.CustomRegex.Info;
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
@@ -19,7 +20,7 @@ namespace ConCore.Parsing.Simple
             Collection = collection;
         }
 
-        public IParseArgs CreateNextArgs(IReadOnlyList<IValueComponentData> componentPath, IParseArgs parent, IBlock block)
+        public IParseArgs CreateNextArgs(IReadOnlyList<IValueInfo<bool, Component>> componentPath, IParseArgs parent, IBlock block)
         {
             if (componentPath == null || componentPath.Count == 0) throw new ArgumentException("ComponentPath should contain at leats one element.");
             if (parent == null) throw new ArgumentException("The parent arg can't be null.");
@@ -34,7 +35,7 @@ namespace ConCore.Parsing.Simple
                 var localRoot = currentParent is ILocalRoot && currentParent.Block == null
                     ? (ILocalRoot)currentParent
                     : currentParent.LocalRoot;
-                IKey key = Collection.GetKey(step.Component.Reference);
+                IKey key = Collection.GetKey(step.Value.Reference);
                 IParseArgs newParent;
 
                 if (key is KeyGroup)
@@ -68,21 +69,21 @@ namespace ConCore.Parsing.Simple
 
         public ILocalRoot CreateRoot(KeyLangReference key)
         {
-            var component = new OrderComponent(new List<Component>
-            {
-                new ValueComponent(null),
-                new ValueComponent(key)
-            });
-            return new ConstructArgs(null, component.GetNextComponents(null)[0], null);
+            var builder = new ComponentBuilder();
+            var component = builder.Ordered(false,
+                builder.Value(null),
+                builder.Value(key)
+            );
+            return new ConstructArgs(null, component.DetermainNext(null, true)[0], null);
         }
 
         public ArgsData GenerateNextArgsData(IParseArgs arg)
         {
-            var node = new ValueBranchNode<IValueComponentData>(null);
+            var node = new ValueBranchNode<IValueInfo<bool, Component>>(null);
             node.AddRange(
                 arg.GetNextComponents()
                     .AsEnumerable()
-                    .Select(data => new ValueBranchNode<IValueComponentData>(data))
+                    .Select(data => new ValueBranchNode<IValueInfo<bool, Component>>(data))
             );
 
             node.Children.ForEach(n => ResolveNode(n));
@@ -98,14 +99,14 @@ namespace ConCore.Parsing.Simple
         /// Extend node as a construct with its own components and as group with its members.
         /// </summary>
         /// <param name="node">A node with children.</param>
-        private void ResolveNode(ValueBranchNode<IValueComponentData> node)
+        private void ResolveNode(ValueBranchNode<IValueInfo<bool, Component>> node)
         {
             if (node == null || node.Value == null)
             {
                 return;
             }
 
-            var key = Collection.GetKey(node.Value.Component.Reference);
+            var key = Collection.GetKey(node.Value.Value.Reference);
 
             if (key == null || key is Token)
             {
@@ -114,10 +115,10 @@ namespace ConCore.Parsing.Simple
             else if (key is Construct)
             {
                 // Get components from the construct.
-                var components = (key as Construct).Component.GetNextComponents(null).ToArray();
+                var components = (key as Construct).Component.DetermainNext(null, true).ToArray();
 
                 // Add the components to the tree.
-                var childNodes = components.Select(d => new ValueBranchNode<IValueComponentData>(d)).ToArray();
+                var childNodes = components.Select(d => new ValueBranchNode<IValueInfo<bool, Component>>(d)).ToArray();
                 node.AddRange(childNodes);
 
                 // Resolve child nodes.
@@ -130,8 +131,8 @@ namespace ConCore.Parsing.Simple
                 // Add the components to the tree.
                 var childNodes = group.Members.Select(m =>
                 {
-                    var component = new ValueComponentData(node.Value, new ValueComponent(m));
-                    return new ValueBranchNode<IValueComponentData>(component);
+                    var component = new ValueInfo<bool, Component>(node.Value, new Component(m));
+                    return new ValueBranchNode<IValueInfo<bool, Component>>(component);
                 }).ToArray();
                 node.AddRange(childNodes);
 

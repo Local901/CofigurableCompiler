@@ -44,11 +44,19 @@ namespace ConCore.Key
 
         public static bool operator ==(KeyLangReference left, KeyLangReference right)
         {
+            if (Object.ReferenceEquals(left, null))
+            {
+                if (Object.ReferenceEquals(right, null))
+                {
+                    return true;
+                }
+                return false;
+            }
             return left.Equals(right);
         }
         public static bool operator !=(KeyLangReference left, KeyLangReference right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
     }
 }

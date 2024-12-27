@@ -17,11 +17,11 @@ namespace ConCore.CustomRegex.Info
         {
             Parent = parent;
         }
-        public override IValueInfo<NextInput, Result>[] DetermainNext(NextInput value)
+        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(NextInput value)
         {
             if (Parent == null)
             {
-                return new IValueInfo<NextInput, Result>[] { new EndInfo<NextInput, Result>() };
+                return new IValueInfo<NextInput, Result>?[] { null };
             }
             return Parent.DetermainNext(value);
         }

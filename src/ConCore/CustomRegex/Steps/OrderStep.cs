@@ -11,26 +11,31 @@ namespace ConCore.CustomRegex.Steps
     internal class OrderStep<NextInput, Result> : RegexStep<NextInput, Result>
     {
         public OrderStep(List<RegexStep<NextInput, Result>> childSteps)
-            : base(childSteps) { }
+            : base(childSteps)
+        {
+            if (childSteps.Count == 0)
+            {
+                Optional = true;
+            }
+        }
 
-        public override RegexInfo<NextInput, Result>[] Start(NextInput charInfo)
+        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput charInfo)
         {
             return DetermainNext(null, charInfo);
         }
 
-        public override IValueInfo<NextInput, Result>[] DetermainNext(
+        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(
             RegexInfo<NextInput, Result>? parent,
             NextInput value
         )
         {
-            List<IValueInfo<NextInput, Result>> result = new List<IValueInfo<NextInput, Result>>();
+            var result = new List<IValueInfo<NextInput, Result>?>();
 
-            if (Optional || ChildSteps.Count == 0)
+            if (Optional)
             {
                 if (parent == null)
                 {
-                    var completeInfo = new EndInfo<NextInput, Result>();
-                    result.Add(completeInfo);
+                    result.Add(null);
                 }
                 else
                 {
@@ -40,13 +45,12 @@ namespace ConCore.CustomRegex.Steps
 
             if (ChildSteps.Count == 0)
             {
-                return result.ToArray();
+                return result;
             }
 
             OrderInfo orderInfo = new OrderInfo(this, parent);
-            ChildSteps[0].DetermainNext(orderInfo, value);
-
-            return result.ToArray();
+            result.AddRange(orderInfo.DetermainNext(value));
+            return result;
         }
 
         private class OrderInfo : RegexInfo<NextInput, Result, OrderStep<NextInput, Result>>
@@ -62,13 +66,13 @@ namespace ConCore.CustomRegex.Steps
                 Index = index;
             }
 
-            public override IValueInfo<NextInput, Result>[] DetermainNext(NextInput value)
+            public override IList<IValueInfo<NextInput, Result>?> DetermainNext(NextInput value)
             {
                 if (Index >= CurrentStep.ChildSteps.Count)
                 {
                     if (Parent == null)
                     {
-                        return new IValueInfo<NextInput, Result>[0];
+                        return new List<IValueInfo<NextInput, Result>?>() { null };
                     }
                     return Parent.DetermainNext(value);
                 }

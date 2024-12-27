@@ -14,16 +14,16 @@ namespace ConCore.CustomRegex.Steps
         public ValidationStep()
             : base() { }
 
-        public sealed override IValueInfo<NextInput, Result>[] Start(NextInput value)
+        public sealed override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
         {
             return DetermainNext(null, value);
         }
-        public sealed override IValueInfo<NextInput, Result>[] DetermainNext(
+        public sealed override IList<IValueInfo<NextInput, Result>?> DetermainNext(
             RegexInfo<NextInput, Result>? parent,
             NextInput value
         )
         {
-            List<IValueInfo<NextInput, Result>> result = new List<IValueInfo<NextInput, Result>>();
+            var result = new List<IValueInfo<NextInput, Result>?>();
             if (parent != null && Optional)
             {
                 result.AddRange(parent.DetermainNext(value));

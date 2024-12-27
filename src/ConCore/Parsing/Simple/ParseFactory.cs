@@ -1,5 +1,6 @@
 ﻿using BranchList;
 using ConCore.Blocks;
+using ConCore.CustomRegex.Info;
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
@@ -42,7 +43,7 @@ namespace ConCore.Parsing.Simple
                     .DataPaths
                     .Select(p => p.Last())
                     .Where(p => p != null))
-                .Select(data => data.Component.Reference)
+                .Select(data => data.Value.Reference)
                 .Distinct()
                 .Where(data => data != null)
                 .ToList();
@@ -89,7 +90,7 @@ namespace ConCore.Parsing.Simple
 
                 // Find all paths that can be used with the block.
                 var paths = argData.GetContinuingPaths()
-                    .Where(path => Keys.IsKeyInGroup(block.Key, path.Last().Component.Reference))
+                    .Where(path => Keys.IsKeyInGroup(block.Key, path.Last().Value.Reference))
                     .ToArray();
 
                 return paths.Select((path) => ArgsFactory.CreateNextArgs(path, arg, block));
@@ -141,7 +142,7 @@ namespace ConCore.Parsing.Simple
                 var block = localRoot.CreateBlock(arg);
 
                 // Create, Update and resolve root arg with block.
-                var rootArg = ArgsFactory.CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
+                var rootArg = ArgsFactory.CreateNextArgs(new List<IValueInfo<bool, Component>> { localRoot.Data }, localRoot.Parent, block);
                 UpdateStatus(rootArg);
                 result.AddRange(ResolveStatus(rootArg));
             }
@@ -171,7 +172,7 @@ namespace ConCore.Parsing.Simple
                 {
                     var localRoot = arg.LocalRoot;
                     var block = localRoot.CreateBlock(arg);
-                    arg = ArgsFactory.CreateNextArgs(new List<IValueComponentData> { localRoot.Data }, localRoot.Parent, block);
+                    arg = ArgsFactory.CreateNextArgs(new List<IValueInfo<bool, Component>> { localRoot.Data }, localRoot.Parent, block);
                     UpdateStatus(arg);
                 }
             });

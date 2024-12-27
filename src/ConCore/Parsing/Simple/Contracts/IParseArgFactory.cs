@@ -1,4 +1,5 @@
 ﻿using ConCore.Blocks;
+using ConCore.CustomRegex.Info;
 using ConCore.Key;
 using ConCore.Key.Components;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace ConCore.Parsing.Simple.Contracts
         /// <param name="block">The block content for the last component</param>
         /// <returns></returns>
         public IParseArgs CreateNextArgs(
-            IReadOnlyList<IValueComponentData> componentPath,
+            IReadOnlyList<IValueInfo<bool, Component>> componentPath,
             IParseArgs parent,
             IBlock block
         );

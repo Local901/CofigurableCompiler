@@ -1,4 +1,5 @@
 ﻿using ConCli.Common;
+using ConCore.CustomRegex;
 using ConCore.FileInfo;
 using ConCore.Key;
 using ConCore.Key.Collections;
@@ -58,43 +59,50 @@ namespace ConCli.Langs
             });
             var valueType_group_ref = lang.AddKey(valueType_group);
 
+            var builder = new ComponentBuilder();
+
             // A string.
-            var string_construct = lang.AddKey(new Construct("encoded_string", new OrderComponent(new List<Component>
-            {
-                new ValueComponent(dubblequote_token),
-                // TODO: every thing in between (prefured without new lines).
-                new ValueComponent(dubblequote_token),
-            })));
+            var string_construct = lang.AddKey(new Construct("encoded_string",
+                builder.Ordered(false,
+                    builder.Value(dubblequote_token),
+                    // TODO: capture inbetween
+                    builder.Value(dubblequote_token)
+                )
+            ));
             valueType_group.Add(string_construct);
 
             // A json object.
-            var object_construct = lang.AddKey(new Construct("json_object", new OrderComponent(new List<Component>
-            {
-                new ValueComponent(brace_open),
-                new SpacedRepeatComponent(
-                    new ValueComponent(comma_token),
-                    new OrderComponent(new List<Component> {
-                        new ValueComponent(string_construct),
-                        new ValueComponent(colon_token),
-                        new ValueComponent(valueType_group_ref),
-                    }),
-                    SpacerOptions.NEVER
-                ),
-                new ValueComponent(brace_close),
-            })));
+            var object_construct = lang.AddKey(new Construct("json_object",
+                builder.Ordered(false,
+                    builder.Value(brace_open),
+                    builder.SeparatedList(
+                        builder.Ordered(false,
+                            builder.Value(string_construct),
+                            builder.Value(colon_token),
+                            builder.Value(valueType_group_ref)
+                        ),
+                        builder.Value(comma_token),
+                        true,
+                        SeparatorOptions.NEVER
+                    ),
+                    builder.Value(brace_close)
+                )
+            ));
             valueType_group.Add(object_construct);
 
             // An non type restricted list
-            var list_construct = lang.AddKey(new Construct("json_list", new OrderComponent(new List<Component>
-            {
-                new ValueComponent(block_open),
-                new SpacedRepeatComponent(
-                    new ValueComponent(comma_token),
-                    new ValueComponent(valueType_group_ref),
-                    SpacerOptions.NEVER
-                ),
-                new ValueComponent(block_close),
-            })));
+            var list_construct = lang.AddKey(new Construct("json_list",
+                builder.Ordered(false,
+                    builder.Value(block_open),
+                    builder.SeparatedList(
+                        builder.Value(valueType_group_ref),
+                        builder.Value(comma_token),
+                        true,
+                        SeparatorOptions.NEVER
+                    ),
+                    builder.Value(block_close)
+                )
+            ));
             valueType_group.Add(list_construct);
 
             lang.StartingKeyReference = valueType_group_ref;

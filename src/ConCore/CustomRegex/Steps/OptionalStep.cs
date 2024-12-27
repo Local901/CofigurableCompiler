@@ -16,22 +16,22 @@ namespace ConCore.CustomRegex.Steps
             NextStep = nextStep;
         }
 
-        public override RegexInfo<NextInput, Result>[] Start(NextInput value)
+        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
         {
-            return NextStep.Start(value).Append(new EndInfo<NextInput, Result>()).ToArray();
+            return NextStep.Start(value).Append(null).ToArray();
         }
 
-        public override IValueInfo<NextInput, Result>[] DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value)
+        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value)
         {
             if (parent == null)
             {
                 return NextStep.DetermainNext(parent, value)
-                    .Append(new EndInfo<NextInput, Result>())
-                    .ToArray();
+                    .Append(null)
+                    .ToList();
             }
             return NextStep.DetermainNext(parent, value)
                 .Concat(parent.DetermainNext(value))
-                .ToArray();
+                .ToList();
         }
     }
 }

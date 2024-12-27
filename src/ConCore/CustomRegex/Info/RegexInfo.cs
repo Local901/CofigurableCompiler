@@ -18,7 +18,7 @@ namespace ConCore.CustomRegex.Info
         /// </summary>
         /// <param name="value">The current value</param>
         /// <returns></returns>
-        public abstract IValueInfo<NextInput, Result>[] DetermainNext(NextInput value);
+        public abstract IList<IValueInfo<NextInput, Result>?> DetermainNext(NextInput value);
     }
 
     public abstract class RegexInfo<NextInput, Result, T> : RegexInfo<NextInput, Result>

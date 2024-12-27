@@ -7,6 +7,13 @@ using ConCore.CustomRegex.Steps;
 
 namespace ConCore.CustomRegex
 {
+    public enum SeparatorOptions
+    {
+        NEVER,
+        OPTIONAL,
+        ALWAYS
+    }
+
     public class RegexBuilder<NextInput, Result>
     {
         public RegexStep<NextInput, Result> Ordered(bool optional, params RegexStep<NextInput, Result>[] steps)
@@ -16,7 +23,7 @@ namespace ConCore.CustomRegex
         public RegexStep<NextInput, Result> Ordered(RegexStep<NextInput, Result>[] steps, bool optional = false)
         {
             var step = new OrderStep<NextInput, Result>(steps.ToList());
-            step.Optional = optional;
+            step.Optional = step.Optional || optional;
             return step;
         }
 
@@ -27,7 +34,7 @@ namespace ConCore.CustomRegex
         public RegexStep<NextInput, Result> Any(RegexStep<NextInput, Result>[] steps, bool optional = false)
         {
             var step = new AnyStep<NextInput, Result>(steps.ToList());
-            step.Optional = optional;
+            step.Optional = step.Optional || optional;
             return step;
         }
 
@@ -45,23 +52,34 @@ namespace ConCore.CustomRegex
             RegexStep<NextInput, Result> main,
             RegexStep<NextInput, Result> separator,
             bool optional = false,
-            bool allowEndingSeparator = true
+            SeparatorOptions allowEndingSeparator = SeparatorOptions.OPTIONAL,
+            int minimum = 0,
+            int maximum = 0
         )
         {
-            var result = Ordered(optional,
+            var steps = new List<RegexStep<NextInput, Result>>() {
                 main,
                 Repeat(
                     Ordered(false,
                         separator,
                         main
-                    )
+                    ),
+                    maximum - 1,
+                    minimum - 1
                 )
-            );
-            if (allowEndingSeparator)
+            };
+            switch(allowEndingSeparator)
             {
-                return Ordered(optional, result, Optional(separator));
+                case SeparatorOptions.NEVER:
+                    break;
+                case SeparatorOptions.OPTIONAL:
+                    steps.Add(Optional(separator));
+                    break;
+                case SeparatorOptions.ALWAYS:
+                    steps.Add(separator);
+                    break;
             }
-            return result;
+            return Ordered(steps.ToArray(), optional);
         }
 
         public RegexStep<NextInput, Result> Value(Result value)

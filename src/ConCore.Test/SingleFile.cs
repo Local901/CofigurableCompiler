@@ -40,11 +40,13 @@ namespace ConCore.Test
                     var tSemiCollon = language.AddKey(new Token("semi_collon", ";"));
                     var tAssignOp = language.AddKey(new Token("assignment_opperator", "="));
 
-                    var cVarDef = language.AddKey(new Construct("variable_definition", new OrderComponent(new List<Component>
-                    {
-                        new ValueComponent(tIdentifier, "type"),
-                        new ValueComponent(tIdentifier, "name"),
-                    })));
+                    var builder = new ComponentBuilder();
+                    var cVarDef = language.AddKey(new Construct("variable_definition",
+                        builder.Ordered(false,
+                            builder.Value(tIdentifier, "type"),
+                            builder.Value(tIdentifier, "name")
+                        )
+                    ));
 
                     var gVariable = new KeyGroup("variables", new List<KeyLangReference>
                     {
@@ -60,39 +62,42 @@ namespace ConCore.Test
                     });
                     language.AddKey(gValue);
 
-                    var cAssignment = language.AddKey(new Construct("assignment", new OrderComponent(new List<Component>
-                    {
-                        new ValueComponent(gVariable.Reference),
-                        new ValueComponent(tAssignOp),
-                        new ValueComponent(gValue.Reference),
-                    })));
+                    var cAssignment = language.AddKey(new Construct("assignment",
+                        builder.Ordered(false,
+                            builder.Value(gVariable.Reference),
+                            builder.Value(tAssignOp),
+                            builder.Value(gValue.Reference)
+                        )
+                    ));
 
-                    var cReturn = language.AddKey(new Construct("return", new OrderComponent(new List<Component>
-                    {
-                        new ValueComponent(tIdentifier),
-                        new ValueComponent(gValue.Reference),
-                    })));
+                    var cReturn = language.AddKey(new Construct("return",
+                        builder.Ordered(false,
+                            builder.Value(tIdentifier),
+                            builder.Value(gValue.Reference)
+                        )
+                    ));
 
-                    var cLine = language.AddKey(new Construct("line", new OrderComponent(new List<Component>
-                    {
-                        new AnyComponent(new List<Component>
-                        {
-                            new ValueComponent(cAssignment),
-                            new ValueComponent(cReturn),
-                        }),
-                        new ValueComponent(tSemiCollon),
-                    })));
+                    var cLine = language.AddKey(new Construct("line",
+                        builder.Ordered(false,
+                            builder.Any(false,
+                                builder.Value(cAssignment),
+                                builder.Value(cReturn)
+                            ),
+                            builder.Value(cReturn)
+                        )
+                    ));
 
-                    var cFuncDef = language.AddKey(new Construct("function_definition", new OrderComponent(new List<Component>
-                    {
-                        new ValueComponent(tIdentifier, "return_type"),
-                        new ValueComponent(tIdentifier, "name"),
-                        new ValueComponent(tOpenBracket),
-                        new ValueComponent(tCloseBracket),
-                        new ValueComponent(tOpenBrace),
-                        new RepeatComponent(new ValueComponent(cLine)),
-                        new ValueComponent(tCloseBrace),
-                    })));
+                    var cFuncDef = language.AddKey(new Construct("function_definition",
+                        builder.Ordered(false,
+                            builder.Value(tIdentifier, "return_type"),
+                            builder.Value(tIdentifier, "name"),
+                            builder.Value(tOpenBracket),
+                            builder.Value(tCloseBracket),
+                            builder.Value(tOpenBrace),
+                            builder.Repeat(builder.Value(cLine)),
+                            builder.Value(tCloseBrace)
+                        )
+                    ));
 
 
                     language.StartingKeyReference = cFuncDef;

@@ -1,7 +1,6 @@
 ﻿using ConCore.Blocks;
 using ConCore.Key;
 using ConCore.Lexing.Conditions;
-using ConCore.Reading;
 using System;
 using System.Collections.Generic;
 using System.IO;

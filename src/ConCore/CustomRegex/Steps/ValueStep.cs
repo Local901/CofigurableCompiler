@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ConCore.CustomRegex.Info;
-using ConCore.Reading.Regex;
 
 namespace ConCore.CustomRegex.Steps
 {
     public class ValueStep<NextInput, Result> : ValidationStep<NextInput, Result>
     {
-        private Result result;
+        private readonly Result result;
 
         public ValueStep(Result result)
         {

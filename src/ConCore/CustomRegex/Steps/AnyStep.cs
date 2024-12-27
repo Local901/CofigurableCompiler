@@ -13,14 +13,14 @@ namespace ConCore.CustomRegex.Steps
         public AnyStep(List<RegexStep<NextInput, Result>> childSteps)
             : base(childSteps) { }
 
-        public override RegexInfo<NextInput, Result>[] Start(NextInput value)
+        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
         {
             return DetermainNext(null, value);
         }
 
-        public override IValueInfo<NextInput, Result>[] DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value)
+        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value)
         {
-            List<RegexInfo<NextInput, Result>> result = new List<RegexInfo<NextInput, Result>>();
+            var result = new List<IValueInfo<NextInput, Result>?>();
 
             if (Optional || ChildSteps.Count == 0)
             {
@@ -31,12 +31,12 @@ namespace ConCore.CustomRegex.Steps
                 else
                 {
                     // This step is optional or doesn't check anything.
-                    result.Add(new EndInfo<NextInput, Result>());
+                    result.Add(null);
                 }
             }
 
             result.AddRange(ChildSteps.SelectMany((step) => step.DetermainNext(parent, value)));
-            return result.ToArray();
+            return result;
         }
     }
 }

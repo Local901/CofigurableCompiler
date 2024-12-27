@@ -39,25 +39,29 @@ namespace ConCore.Test
                     var tPath = language.AddKey(new Token("path", "[a-zA-Z]+"));
                     var tText = language.AddKey(new Token("text", "[\\S].*$"));
 
-                    var cLoadFile = language.AddKey(new Construct("load_file", new OrderComponent(new List<Component>
-                    {
-                        new ValueComponent(tLoad),
-                        new ValueComponent(tPath, "path"),
-                    })));
+                    var builder = new ComponentBuilder();
+                    var cLoadFile = language.AddKey(new Construct("load_file",
+                        builder.Ordered(false,
+                            builder.Value(tLoad),
+                            builder.Value(tPath, "path")
+                        )
+                    ));
 
-                    var cPrintLine = language.AddKey(new Construct("print_text", new OrderComponent(new List<Component>
-                    {
-                        new ValueComponent(tPrint),
-                        new ValueComponent(tPath),
-                    })));
+                    var cPrintLine = language.AddKey(new Construct("print_text",
+                        builder.Ordered(false,
+                            builder.Value(tPrint),
+                            builder.Value(tPath)
+                        )
+                    ));
 
-                    var languageStart = language.AddKey(new Construct("structure", new OrderComponent(new List<Component>
-                    {
-                        new RepeatComponent(new AnyComponent(new List<Component> {
-                            new ValueComponent(cLoadFile),
-                            new ValueComponent(cPrintLine),
-                        })),
-                    })));
+                    var languageStart = language.AddKey(new Construct("structure",
+                        builder.Ordered(false,
+                            builder.Repeat(builder.Any(false,
+                                builder.Value(cLoadFile),
+                                builder.Value(cPrintLine)
+                            ))
+                        )
+                    ));
 
                     language.StartingKeyReference = languageStart;
 

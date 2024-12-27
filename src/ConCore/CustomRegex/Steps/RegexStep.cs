@@ -25,13 +25,13 @@ namespace ConCore.CustomRegex.Steps
         /// </summary>
         /// <param name="value">The first value.</param>
         /// <returns>Info objects that matched the value.</returns>
-        public abstract RegexInfo<NextInput, Result>[] Start(NextInput value);
+        public abstract IList<IValueInfo<NextInput, Result>?> Start(NextInput value);
         /// <summary>
         /// Determine all next info that match the value.
         /// </summary>
         /// <param name="parent">The parent info to callback to when step is finished.</param>
         /// <param name="value">The value to check.</param>
         /// <returns>Info objects that match the value.</returns>
-        public abstract IValueInfo<NextInput, Result>[] DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value);
+        public abstract IList<IValueInfo<NextInput, Result>?> DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value);
     }
 }

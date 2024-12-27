@@ -1,4 +1,5 @@
 ﻿using ConCore.Blocks;
+using ConCore.CustomRegex.Info;
 using ConCore.Key.Components;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ namespace ConCore.Parsing.Simple.Contracts
         /// <summary>
         /// The component related to this step in parsing.
         /// </summary>
-        public IValueComponentData Data { get; }
+        public IValueInfo<bool, Component> Data { get; }
         /// <summary>
         /// The reference to the root object that this step originates from. LocalRoot can be null to indecate the root of the entire tree.
         /// </summary>
@@ -31,7 +32,7 @@ namespace ConCore.Parsing.Simple.Contracts
         /// </summary>
         public List<IParseArgs> Children { get; }
 
-        public IList<IValueComponentData?> GetNextComponents();
+        public IList<IValueInfo<bool, Component>?> GetNextComponents();
 
         public List<IParseArgs> Ends();
         /// <summary>
