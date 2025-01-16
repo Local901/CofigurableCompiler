@@ -16,13 +16,13 @@ namespace ConCore.CustomRegex
 
     public class RegexBuilder<NextInput, Result>
     {
-        public RegexStep<NextInput, Result> Ordered(bool optional, params RegexStep<NextInput, Result>[] steps)
+        public RegexStep<NextInput, Result> Ordered(bool optional = false, params RegexStep<NextInput, Result>[] steps)
         {
             return Ordered(steps, optional);
         }
         public RegexStep<NextInput, Result> Ordered(RegexStep<NextInput, Result>[] steps, bool optional = false)
         {
-            var step = new OrderStep<NextInput, Result>(steps.ToList());
+            var step = new OrderStep<NextInput, Result>(steps);
             step.Optional = step.Optional || optional;
             return step;
         }
@@ -33,7 +33,7 @@ namespace ConCore.CustomRegex
         }
         public RegexStep<NextInput, Result> Any(RegexStep<NextInput, Result>[] steps, bool optional = false)
         {
-            var step = new AnyStep<NextInput, Result>(steps.ToList());
+            var step = new AnyStep<NextInput, Result>(steps);
             step.Optional = step.Optional || optional;
             return step;
         }
@@ -57,17 +57,22 @@ namespace ConCore.CustomRegex
             int maximum = 0
         )
         {
-            var steps = new List<RegexStep<NextInput, Result>>() {
-                main,
-                Repeat(
-                    Ordered(false,
-                        separator,
-                        main
-                    ),
-                    maximum - 1,
-                    minimum - 1
-                )
-            };
+            var steps = new List<RegexStep<NextInput, Result>>() { main };
+
+            // Don't add the repeat of only one element is allowed.
+            if ( maximum == 0 || maximum > 1)
+            {
+                steps.Add(
+                    Repeat(
+                        Ordered(false,
+                            separator,
+                            main
+                        ),
+                        maximum - 1,
+                        minimum - 1
+                    )
+                );
+            }
             switch(allowEndingSeparator)
             {
                 case SeparatorOptions.NEVER:
@@ -79,7 +84,7 @@ namespace ConCore.CustomRegex
                     steps.Add(separator);
                     break;
             }
-            return Ordered(steps.ToArray(), optional);
+            return Ordered(steps.ToArray(), optional || minimum == 0);
         }
 
         public RegexStep<NextInput, Result> Value(Result value)

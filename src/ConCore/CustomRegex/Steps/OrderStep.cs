@@ -10,7 +10,7 @@ namespace ConCore.CustomRegex.Steps
 {
     internal class OrderStep<NextInput, Result> : RegexStep<NextInput, Result>
     {
-        public OrderStep(List<RegexStep<NextInput, Result>> childSteps)
+        public OrderStep(IList<RegexStep<NextInput, Result>> childSteps)
             : base(childSteps)
         {
             if (childSteps.Count == 0)
@@ -55,7 +55,8 @@ namespace ConCore.CustomRegex.Steps
 
         private class OrderInfo : RegexInfo<NextInput, Result, OrderStep<NextInput, Result>>
         {
-            private int Index;
+            public readonly int Index;
+            private OrderInfo? nextInfo;
 
             public OrderInfo(
                 OrderStep<NextInput, Result> step,
@@ -77,7 +78,7 @@ namespace ConCore.CustomRegex.Steps
                     return Parent.DetermainNext(value);
                 }
 
-                OrderInfo nextInfo = new OrderInfo(CurrentStep, Parent, Index + 1);
+                nextInfo ??= new OrderInfo(CurrentStep, Parent, Index + 1);
                 return CurrentStep.ChildSteps[Index].DetermainNext(nextInfo, value);
             }
         }

@@ -9,8 +9,6 @@ namespace ConCore.CustomRegex.Steps
 {
     public abstract class ValidationStep<NextInput, Result> : RegexStep<NextInput, Result>
     {
-        public ValidationStep(List<RegexStep<NextInput, Result>> nextSteps)
-            : base(nextSteps) { }
         public ValidationStep()
             : base() { }
 

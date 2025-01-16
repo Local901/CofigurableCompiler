@@ -10,7 +10,7 @@ namespace ConCore.CustomRegex.Steps
 {
     internal class AnyStep<NextInput, Result> : RegexStep<NextInput, Result>
     {
-        public AnyStep(List<RegexStep<NextInput, Result>> childSteps)
+        public AnyStep(IList<RegexStep<NextInput, Result>> childSteps)
             : base(childSteps) { }
 
         public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)

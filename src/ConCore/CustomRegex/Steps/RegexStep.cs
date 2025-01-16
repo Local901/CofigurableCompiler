@@ -7,13 +7,13 @@ namespace ConCore.CustomRegex.Steps
 {
     public abstract class RegexStep<NextInput, Result>
     {
-        public List<RegexStep<NextInput, Result>> ChildSteps { get; }
+        public IList<RegexStep<NextInput, Result>> ChildSteps { get; }
 
         // Step options
         public bool Optional { get; set; } = false;
         // End step options
 
-        protected RegexStep(List<RegexStep<NextInput, Result>> childSteps)
+        protected RegexStep(IList<RegexStep<NextInput, Result>> childSteps)
         {
             ChildSteps = childSteps;
         }

@@ -209,7 +209,12 @@ namespace ConDI
                 (InstanceFactory<TDependency>)dependencyProp.InstanceFactory,
                 this
             );
-            Instances.Add(typeof(TDependency), result);
+
+            // Don't save transient dependencies
+            if (dependencyProp.InstanceScope != InstanceScope.Transient)
+            {
+                Instances.Add(typeof(TDependency), result);
+            }
             return result;
         }
 

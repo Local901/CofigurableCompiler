@@ -9,27 +9,24 @@ namespace ConCore.CustomRegex.Steps
 {
     internal class OptionalStep<NextInput, Result> : RegexStep<NextInput, Result>
     {
-        private readonly RegexStep<NextInput, Result> NextStep;
-
         public OptionalStep(RegexStep<NextInput, Result> nextStep)
-        {
-            NextStep = nextStep;
-        }
+            : base(new RegexStep<NextInput, Result>[] { nextStep })
+        { }
 
         public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
         {
-            return NextStep.Start(value).Append(null).ToArray();
+            return ChildSteps[0].Start(value).Append(null).ToArray();
         }
 
         public override IList<IValueInfo<NextInput, Result>?> DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value)
         {
             if (parent == null)
             {
-                return NextStep.DetermainNext(parent, value)
+                return ChildSteps[0].DetermainNext(parent, value)
                     .Append(null)
                     .ToList();
             }
-            return NextStep.DetermainNext(parent, value)
+            return ChildSteps[0].DetermainNext(parent, value)
                 .Concat(parent.DetermainNext(value))
                 .ToList();
         }

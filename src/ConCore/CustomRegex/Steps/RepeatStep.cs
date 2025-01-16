@@ -14,7 +14,7 @@ namespace ConCore.CustomRegex.Steps
         public int MaximumRepeats { get; }
 
         public RepeatStep(RegexStep<NextInput, Result> childStep, int minimum = 0, int maximum = 0)
-            : base(new List<RegexStep<NextInput, Result>>() { childStep })
+            : base(new RegexStep<NextInput, Result>[] { childStep })
         {
             if (childStep.Optional)
             {
@@ -45,7 +45,8 @@ namespace ConCore.CustomRegex.Steps
 
         private class RepeatInfo : RegexInfo<NextInput, Result, RepeatStep<NextInput, Result>>
         {
-            public int RepeatIndex { get; }
+            public readonly int RepeatIndex;
+            private RepeatInfo? nextInfo;
 
             public RepeatInfo(RepeatStep<NextInput, Result> step, RegexInfo<NextInput, Result>? parent, int repeat = 0)
                 : base(step, parent)
@@ -72,11 +73,11 @@ namespace ConCore.CustomRegex.Steps
 
                 if (RepeatIndex < CurrentStep.MaximumRepeats || CurrentStep.MaximumRepeats <= 0)
                 {
-                    RepeatInfo nextInfo = new RepeatInfo(CurrentStep, Parent, RepeatIndex + 1);
+                    nextInfo ??= new RepeatInfo(CurrentStep, Parent, RepeatIndex + 1);
                     result.AddRange(CurrentStep.ChildSteps[0].DetermainNext(nextInfo, value));
                 }
 
-                return result.ToList();
+                return result;
             }
         }
     }

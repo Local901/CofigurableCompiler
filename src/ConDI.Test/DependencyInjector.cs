@@ -57,7 +57,7 @@ namespace ConDI.Test
             var i2 = scope.GetInstance<EmptyClass>();
             Assert.IsNotNull(i1);
             Assert.IsNotNull(i2);
-            Assert.That(i1, Is.Not.EqualTo(i2));
+            Assert.False(Object.ReferenceEquals(i1, i2));
         }
     }
 }
