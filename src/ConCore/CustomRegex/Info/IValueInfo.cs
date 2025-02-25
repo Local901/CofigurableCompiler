@@ -15,8 +15,6 @@ namespace ConCore.CustomRegex.Info
         /// </summary>
         public Result Value { get; }
 
-        public virtual bool EndReached { get => Value == null; }
-
         public IValueInfo(Result value)
             : base()
         {

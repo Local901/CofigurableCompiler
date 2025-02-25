@@ -11,6 +11,6 @@ namespace ConCore.Lexing
     public struct LexOptions
     {
         public readonly KeyLangReference Key;
-        public readonly ReadCondition PrecedingCondition;
+        public readonly ReadCondition? PrecedingCondition;
     }
 }

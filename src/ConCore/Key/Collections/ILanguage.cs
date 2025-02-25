@@ -43,14 +43,14 @@ namespace ConCore.Key.Collections
         /// <returns>A list of all keys of type T.</returns>
         IEnumerable<T> AllKeys<T>() where T : IKey;
         /// <summary>
-        /// Get A list of all the sub keys (recursive).
+        /// Get A list of all the sub keys (recursive, no KeyGroups).
         /// </summary>
         /// <param name="key">The reference to the key.</param>
         /// <param name="includeSelf">Chould the resultinh list include the key.</param>
         /// <returns>List of keys that are the children of the refered key.</returns>
         IEnumerable<IKey> AllChildKeys(KeyLangReference? keyReference, bool includeSelf = false);
         /// <summary>
-        /// Get A list of all the sub keys of type T (recursive).
+        /// Get A list of all the sub keys of type T (recursive, no KeyGroups).
         /// </summary>
         /// <typeparam name="T">A <see cref="IKey"/> type to return just those types.</typeparam>
         /// <param name="key">The reference to the key.</param>

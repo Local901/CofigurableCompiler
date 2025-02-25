@@ -42,7 +42,7 @@ namespace ConCore.Key
             return string.Compare(Key, other?.Key);
         }
 
-        public static bool operator ==(KeyLangReference left, KeyLangReference right)
+        public static bool operator ==(KeyLangReference? left, KeyLangReference? right)
         {
             if (Object.ReferenceEquals(left, null))
             {
@@ -54,7 +54,7 @@ namespace ConCore.Key
             }
             return left.Equals(right);
         }
-        public static bool operator !=(KeyLangReference left, KeyLangReference right)
+        public static bool operator !=(KeyLangReference? left, KeyLangReference? right)
         {
             return !(left == right);
         }
