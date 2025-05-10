@@ -12,7 +12,7 @@ namespace ConCore.Parsing
         /// <param name="startConstruct"></param>
         [Obsolete("Parser will be instanced. (New Function Parse)")]
         IBlock? DoParse(KeyLangReference startConstruct);
-
+        IBlock? Parse(KeyLangReference startRef);
         IBlock? Parse();
     }
 }

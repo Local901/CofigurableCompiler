@@ -21,6 +21,12 @@ namespace ConCore.Blocks
         /// </summary>
         public readonly int LineNumber;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index">The global index of the character. (0-based)</param>
+        /// <param name="lineIndex">The index of the character in the line. (0-based)</param>
+        /// <param name="lineNumber">The line number. (0-based)</param>
         public CharacterPosition(int index, int lineIndex, int lineNumber)
         {
             Index = index;

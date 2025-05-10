@@ -24,7 +24,12 @@ namespace ConCore.Parsing
 
         public IBlock? DoParse(KeyLangReference startConstruct)
         {
-            IParseFactory factory = new ParseFactory(startConstruct, KeyCollection, ArgsFactory);
+            return Parse(startConstruct);
+        }
+
+        public IBlock? Parse(KeyLangReference startRef)
+        {
+            IParseFactory factory = new ParseFactory(startRef, KeyCollection, ArgsFactory);
 
             IList<IValueBlock> nextBlocks;
             while (TryGetNextBlock(out nextBlocks, factory))
@@ -41,6 +46,11 @@ namespace ConCore.Parsing
 
             // TODO: look for the errors.
             return ends.FirstOrDefault()?.Block;
+        }
+
+        public IBlock? Parse()
+        {
+            throw new System.NotImplementedException();
         }
 
         /// <summary>

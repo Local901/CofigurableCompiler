@@ -127,6 +127,17 @@ namespace ConCore.Lexing
                 }
                 index -= part.Length;
             }
+            // If it is the last character of the last buffer + 1. Fake end of file character position.
+            if (index == 0)
+            {
+                var lastPart = Buffer.Last();
+                CharacterPosition previousPosition = lastPart.GetPosition(lastPart.Length - 1);
+                return new CharacterPosition(
+                    previousPosition.Index + 1,
+                    previousPosition.LineIndex + 1,
+                    previousPosition.LineNumber
+                );
+            }
             throw new IndexOutOfRangeException("Index outside loaded range of characters.");
         }
 
@@ -147,7 +158,7 @@ namespace ConCore.Lexing
             var bufferPosition = Buffer[0].GetPosition(0);
             int startIndex = startGlobalIndex - bufferPosition.Index;
 
-        searchString: // Start the rearch in the loaded data.
+        searchString: // Start the search in the loaded data.
             string stringValue = stringBuilder.ToString();
             var results = FindMatches(stringValue, args, startIndex);
             if (results.Length == 0)
@@ -155,13 +166,32 @@ namespace ConCore.Lexing
                 // Or throw Error.
                 return new BlockReadResult[0];
             }
-            int minIndex = results.Min((r) => r.Match.Index);
-            var first = results.Where((r) => r.Match.Index <= minIndex);
+            MatchResult? match = null;
+            foreach (MatchResult m in results)
+            {
+                if (!match.HasValue)
+                {
+                    match = m;
+                    continue;
+                }
+                if (m.Match.Index < match.Value.Match.Index)
+                {
+                    match = m;
+                    continue;
+                }
+                if (m.Match.Index == match.Value.Match.Index && m.Match.Length > match.Value.Match.Length)
+                {
+                    match = m;
+                    continue;
+                }
+            }
 
             if (
-                (first.Count() == 0 && !EndOfFileReached) ||
-                // Check if any of the first matches is connected with the end of the string.
-                first.Any((r) => (r.Match.Index + r.Match.Length) == stringValue.Length)
+                !EndOfFileReached && (
+                    (!match.HasValue && !EndOfFileReached) ||
+                    // Check if any of the first match ends in the last loaded buffer.
+                    (match.HasValue && Buffer.Last().GetPosition(0).Index < startGlobalIndex + match.Value.Match.Index + match.Value.Match.Length - startIndex)
+                )
             ) {
                 BufferPart? buffer;
                 if ((buffer = LoadNextBuffer()) != null)
@@ -171,26 +201,36 @@ namespace ConCore.Lexing
                 }
             }
 
+            // Return nothing if nothing is found.
+            if (!match.HasValue)
+            {
+                return new BlockReadResult[0];
+            }
+            MatchResult result = match.Value;
+            int minIndex = result.Match.Index;
+
             int subStringLength = minIndex - startIndex;
             string precedingValue = stringValue.Substring(startIndex, subStringLength);
 
             // Update start index;
-            startGlobalIndex += subStringLength;
+            startGlobalIndex += subStringLength + result.Match.Length;
 
             // Remove passed buffer parts
-            int globalIndex = bufferPosition.Index + minIndex;
+            int globalIndex = bufferPosition.Index + subStringLength + result.Match.Length;
             Buffer.RemoveAll((b) => (b.GetPosition(0).Index + b.Length - 1) < globalIndex);
 
-            // Return results.
-            return first.Select((r) => new BlockReadResult
-            {
-                Key = r.Args.Token,
-                MatchValue = r.Match.Value,
-                PrecedingValue = precedingValue,
-                MatchStart = IndexToPosition(r.Match.Index),
-                MatchEnd = IndexToPosition(r.Match.Index + r.Match.Length),
-                PrecedingStart = IndexToPosition(startIndex)
-            }).ToArray();
+            // Return result.
+            return new BlockReadResult[] {
+                new BlockReadResult
+                {
+                    Key = result.Args.Token,
+                    MatchValue = result.Match.Value,
+                    PrecedingValue = precedingValue,
+                    MatchStart = IndexToPosition(result.Match.Index),
+                    MatchEnd = IndexToPosition(result.Match.Index + result.Match.Length),
+                    PrecedingStart = IndexToPosition(startIndex)
+                }
+            };
         }
 
         private MatchResult[] FindMatches(string stringValue, TokenArgs[] tokens, int startAt = 0)

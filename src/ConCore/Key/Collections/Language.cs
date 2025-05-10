@@ -102,9 +102,9 @@ namespace ConCore.Key.Collections
             var subKeys = AllChildKeys(groupReference, true);
             var result = subKeys.Any((gk) => keyObject.Equals(gk));
 
-            if (result || !Aliases.ContainsKey(keyObject.Reference))
+            if (result)
             {
-                return result;
+                return true;
             }
 
             // Is any of the keys an alias and is one of them the parent of the key;

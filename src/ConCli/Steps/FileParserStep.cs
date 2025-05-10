@@ -27,7 +27,8 @@ namespace ConCli.Steps
         {
             var fileReader = new StreamChunkReader(new StreamReader(File.OpenRead((string)path)));
             var lexer = new SimpleLexer(fileReader, langCollection);
-            var parser = new SimpleParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
+            //var parser = new SimpleParser(lexer, new ParseArgFactory(keyCollection), keyCollection);
+            var parser = new SimpleParser3(langCollection, lexer);
 
             var startingKey = langCollection.StartingKeyReference;
             if (startingKey == null)
