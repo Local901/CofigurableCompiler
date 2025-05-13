@@ -3,7 +3,7 @@ using ConCore.CustomRegex.Info;
 using ConCore.Key.Collections;
 using ConCore.Key;
 using ConCore.Lexing;
-using ConCore.Parsing.Simple3.Stack;
+using ConCore.Parsing.Simple.Stack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ConCore.Key.Components;
 
-namespace ConCore.Parsing.Simple3
+namespace ConCore.Parsing.Simple
 {
     public interface IBot
     {

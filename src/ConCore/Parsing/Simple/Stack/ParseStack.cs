@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConCore.Parsing.Simple3.Stack
+namespace ConCore.Parsing.Simple.Stack
 {
     public interface ParseStack<ITEM>
     {

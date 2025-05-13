@@ -1,8 +1,8 @@
 ﻿using ConCore.CustomRegex.Info;
 using ConCore.Key.Collections;
 using ConCore.Key;
-using ConCore.Parsing.Simple3.Stack;
-using ConCore.Parsing.Simple3;
+using ConCore.Parsing.Simple.Stack;
+using ConCore.Parsing.Simple;
 using System;
 using System.Collections.Generic;
 using System.Linq;

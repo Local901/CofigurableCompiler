@@ -4,14 +4,14 @@ using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
 using ConCore.Lexing;
-using ConCore.Parsing.Simple3.Stack;
+using ConCore.Parsing.Simple.Stack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConCore.Parsing.Simple3
+namespace ConCore.Parsing.Simple
 {
     public class ParentInfo
     {

@@ -1,25 +1,29 @@
 ﻿using ConCore.Blocks;
+using ConCore.CustomRegex.Info;
+using ConCore.CustomRegex.Steps;
 using ConCore.Key;
 using ConCore.Key.Collections;
+using ConCore.Key.Components;
 using ConCore.Lexing;
 using ConCore.Parsing.Simple;
-using ConCore.Parsing.Simple.Contracts;
+using ConCore.Parsing.Simple.Stack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ConCore.Parsing
 {
     public class SimpleParser : IParser
     {
-        private ILexer FileLexer;
-        private IParseArgFactory ArgsFactory;
-        private KeyCollection KeyCollection;
+        private readonly ILanguage Language;
+        private readonly ILexer Lexer;
 
-        public SimpleParser(ILexer filelexer, IParseArgFactory argsFactory, KeyCollection keyCollection)
+        public SimpleParser(ILanguage language, ILexer lexer)
         {
-            FileLexer = filelexer;
-            ArgsFactory = argsFactory;
-            KeyCollection = keyCollection;
+            Language = language;
+            Lexer = lexer;
         }
 
         public IBlock? DoParse(KeyLangReference startConstruct)
@@ -27,48 +31,71 @@ namespace ConCore.Parsing
             return Parse(startConstruct);
         }
 
-        public IBlock? Parse(KeyLangReference startRef)
-        {
-            IParseFactory factory = new ParseFactory(startRef, KeyCollection, ArgsFactory);
-
-            IList<IValueBlock> nextBlocks;
-            while (TryGetNextBlock(out nextBlocks, factory))
-            {
-                factory.UseBlocks(nextBlocks);
-            }
-
-            var ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();
-            if (ends.Count() == 0)
-            {
-                factory.CompleteEnds();
-                ends = factory.Completed.Where(c => c.Round == factory.NumberOfRounds).ToList();
-            }
-
-            // TODO: look for the errors.
-            return ends.FirstOrDefault()?.Block;
-        }
-
         public IBlock? Parse()
         {
-            throw new System.NotImplementedException();
+            return Parse(Language.StartingKeyReference);
         }
 
-        /// <summary>
-        /// Get the next block from the FileLexer.
-        /// </summary>
-        /// <param name="nextBlocks"></param>
-        /// <returns>True if the block has been created.</returns>
-        private bool TryGetNextBlock(out IList<IValueBlock> nextBlocks, IParseFactory factory)
+        public IBlock? Parse(KeyLangReference startRef)
         {
-            var keys = factory.GetNextKeys();
-            if (keys.Count == 0)
+            ParseStack<IBlock> stack = new LinkedParseStack<IBlock>();
+
+            // Make initial bots
+            List<IBot> bots = Language.AllChildKeys(startRef, true)
+                .SelectMany((key) =>
+                {
+                    if (key is Token token)
+                    {
+                        return new IBot[] {
+                            new Bot(
+                                stack.GetRoot(),
+                                new ValueInfo<bool, Component>(new Component(key.Reference))
+                            )};
+                    }
+                    if (key is Construct construct)
+                    {
+                        return new LayerInstance(
+                            stack.GetRoot(),
+                            new ValueInfo<bool, Component>(new Component(key.Reference)),
+                            Language
+                        ).GetBots(Language, stack.GetRoot());
+                    }
+                    return new IBot[0];
+                })
+                .Where((key) => key != null)
+                .ToList();
+            // All bots that can end.
+            List<EndedBot> endBots = new List<EndedBot>();
+            List<ILayer?> layers = GetLayers(bots);
+
+            // Get tokens.
+            var lexOptions = bots.SelectMany((bot) => bot.GetLexOptions(Language)).ToArray();
+            var lexResults = Lexer.TryNextBlock(lexOptions);
+
+            while (lexResults.Count != 0)
             {
-                nextBlocks = new List<IValueBlock>();
-                return false;
+                var nextBots = bots.SelectMany((bot) => bot.DetermainNext(Language, stack, lexResults)).ToList();
+                var nextEndBots = nextBots.OfType<EndedBot>().ToList();
+                var nextLayers = GetLayers(nextBots);
+                var missingLayers = layers.Where((layer) => !nextLayers.Contains(layer)).ToList();
+
+                // Prep next round.
+                bots = nextBots;
+                lexOptions = bots.SelectMany((bot) => bot.GetLexOptions(Language)).ToArray();
+                lexResults = Lexer.TryNextBlock(lexOptions);
+                endBots = nextEndBots;
+                layers = nextLayers;
             }
 
-            nextBlocks = FileLexer.TryNextBlock(keys).Select((result) => result.Block).ToList();
-            return nextBlocks != null && nextBlocks.Count != 0;
+            return endBots.FirstOrDefault()?.TokenReference.Item;
+        }
+
+        private List<ILayer?> GetLayers(IEnumerable<IBot> bots)
+        {
+            return bots.Where((bot) => !(bot is EndedBot))
+                .Select((bot) => bot.Layer)
+                .Distinct()
+                .ToList();
         }
     }
 }
