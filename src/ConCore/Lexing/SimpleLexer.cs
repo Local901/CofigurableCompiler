@@ -20,7 +20,7 @@ namespace ConCore.Lexing
 
     public class SimpleLexer : ILexer
     {
-        private ChunkReader Reader;
+        private TokenReader Reader;
         private readonly Language Language;
         private readonly FileLexerOptions options;
 
@@ -29,14 +29,14 @@ namespace ConCore.Lexing
         /// </summary>
         /// <param name="reader">File reader that returns the first tokens that it comes across.</param>
         /// <param name="language">Collection that contains all the tokens for a language.</param>
-        public SimpleLexer(ChunkReader reader, Language language, FileLexerOptions options = FileLexerOptions.Default)
+        public SimpleLexer(TokenReader reader, Language language, FileLexerOptions options = FileLexerOptions.Default)
         {
             Reader = reader;
             Language = language;
             this.options = options == FileLexerOptions.Default ? FileLexerOptions.ResolveAlias : options;
         }
 
-        public List<LexResult> TryNextBlock(KeyLangReference key)
+        public LexResult? TryNextBlock(KeyLangReference key)
         {
             return TryNextBlock(Language.AllChildKeys<Token>(key, true)
                 .Select((token) => new TokenArgs
@@ -47,7 +47,7 @@ namespace ConCore.Lexing
                 })
             );
         }
-        public List<LexResult> TryNextBlock(IEnumerable<KeyLangReference> keys)
+        public LexResult? TryNextBlock(IEnumerable<KeyLangReference> keys)
         {
             return TryNextBlock(keys.SelectMany((key) => Language.AllChildKeys<Token>(key, true))
                 .Distinct()
@@ -59,7 +59,7 @@ namespace ConCore.Lexing
                 })
             );
         }
-        public List<LexResult> TryNextBlock(LexOptions option)
+        public LexResult? TryNextBlock(LexOptions option)
         {
             return TryNextBlock(Language.AllChildKeys<Token>(option.Key, true)
                 .Select((token) => new TokenArgs
@@ -70,7 +70,7 @@ namespace ConCore.Lexing
                 })
             );
         }
-        public List<LexResult> TryNextBlock(IEnumerable<LexOptions> options)
+        public LexResult? TryNextBlock(IEnumerable<LexOptions> options)
         {
             return TryNextBlock(
                 options.SelectMany((option) =>
@@ -90,23 +90,25 @@ namespace ConCore.Lexing
         /// <param name="block">Block that gets created.</param>
         /// <param name="tokens">List of tokens.</param>
         /// <returns>Returns true if block is created.</returns>
-        private List<LexResult> TryNextBlock(IEnumerable<TokenArgs> tokens)
+        private LexResult? TryNextBlock(IEnumerable<TokenArgs> tokens)
         {
             // find the next match
-            var blocks = TryAllBlocks(tokens);
+            LexResult? block = ReadBlock(tokens);
 
-            if (blocks.Count == 0)
+            if (!block.HasValue)
             {
-                return blocks;
+                return null;
             }
+
+            LexResult result = block.Value;
 
             // Create all blocks of valid child aliases.
             if (options.HasFlag(FileLexerOptions.ResolveAlias))
             {
-                blocks = ResolveAliasses(blocks).ToList();
+                result = ResolveAliasses(result);
             }
 
-            return blocks;
+            return result;
         }
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace ConCore.Lexing
         /// <param name="blocks">Blocks that get created.</param>
         /// <param name="args">List of tokenArgs.</param>
         /// <returns>Returns true if block is created.</returns>
-        private List<LexResult> TryAllBlocks(IEnumerable<TokenArgs> args)
+        private LexResult? ReadBlock(IEnumerable<TokenArgs> args)
         {
             //// Get all tokens of requested languages.
             //if (options.HasFlag(FileLexerOptions.CompleteLanguage))
@@ -136,38 +138,38 @@ namespace ConCore.Lexing
             //    args = tokenList;
             //}
 
-            return Reader.NextBlocks(args.ToArray())
-                .Select((response) =>
-                    new LexResult
-                    {
-                        Block = new Block(
-                            response.Key,
-                            response.MatchValue,
-                            response.MatchStart,
-                            response.MatchEnd
-                        ),
-                        PrecedingBlock = new Block(
-                            null,
-                            response.PrecedingValue,
-                            response.PrecedingStart,
-                            response.MatchStart
-                        )
-                    })
-                .Cast<LexResult>()
-                .ToList();
+            BlockReadResult? optionalResult = Reader.NextBlock(args.ToArray());
+
+            if (!optionalResult.HasValue)
+            {
+                return null;
+            }
+
+            BlockReadResult result = optionalResult.Value;
+
+            return new LexResult
+            {
+                Block = new Block(
+                    result.Key,
+                    result.MatchValue,
+                    result.MatchStart,
+                    result.MatchEnd
+                ),
+                PrecedingBlock = new Block(
+                    null,
+                    result.PrecedingValue,
+                    result.PrecedingStart,
+                    result.MatchStart
+                )
+            };
         }
 
         /// <summary>
-        /// Resolve all aliases and return a complete list of all valid blocks.
+        /// Resolve all aliases and return a lex result that matches the first deepest alias.
         /// </summary>
-        /// <param name="blocks">list of blocks to resolve.</param>
-        /// <returns></returns>
-        private IEnumerable<LexResult> ResolveAliasses(IEnumerable<LexResult> blocks)
-        {
-            return blocks.Select(FindAlias);
-        }
-
-        private LexResult FindAlias(LexResult origional)
+        /// <param name="origional">Result to resolve.</param>
+        /// <returns>Lex result mapped to its alias.</returns>
+        private LexResult ResolveAliasses(LexResult origional)
         {
             IKey? foundAlias = origional.Block.Key;
 

@@ -70,11 +70,12 @@ namespace ConCore.Parsing
 
             // Get tokens.
             var lexOptions = bots.SelectMany((bot) => bot.GetLexOptions(Language)).ToArray();
-            var lexResults = Lexer.TryNextBlock(lexOptions);
+            LexResult? optionalLexResult = Lexer.TryNextBlock(lexOptions);
 
-            while (lexResults.Count != 0)
+            while (optionalLexResult.HasValue)
             {
-                var nextBots = bots.SelectMany((bot) => bot.DetermainNext(Language, stack, lexResults)).ToList();
+                LexResult lexResult = optionalLexResult.Value;
+                var nextBots = bots.SelectMany((bot) => bot.DetermainNext(Language, stack, lexResult)).ToList();
                 var nextEndBots = nextBots.OfType<EndedBot>().ToList();
                 var nextLayers = GetLayers(nextBots);
                 var missingLayers = layers.Where((layer) => !nextLayers.Contains(layer)).ToList();
@@ -82,7 +83,7 @@ namespace ConCore.Parsing
                 // Prep next round.
                 bots = nextBots;
                 lexOptions = bots.SelectMany((bot) => bot.GetLexOptions(Language)).ToArray();
-                lexResults = Lexer.TryNextBlock(lexOptions);
+                optionalLexResult = Lexer.TryNextBlock(lexOptions);
                 endBots = nextEndBots;
                 layers = nextLayers;
             }

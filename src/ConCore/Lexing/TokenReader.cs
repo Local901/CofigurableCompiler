@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace ConCore.Lexing
 {
-    public interface ChunkReader
+    public interface TokenReader
     {
         /// <summary>
-        /// Get list of blocks that appear first next in the text.
+        /// Get the block that appears next in the text.
         /// </summary>
         /// <param name="args">Information about the tokens.</param>
-        /// <returns>All the results found.</returns>
-        BlockReadResult[] NextBlocks(TokenArgs[] args);
+        /// <returns>The result found.</returns>
+        BlockReadResult? NextBlock(TokenArgs[] args);
     }
 }

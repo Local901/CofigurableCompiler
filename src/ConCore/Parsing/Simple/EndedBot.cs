@@ -32,7 +32,7 @@ namespace ConCore.Parsing.Simple
             Construct = construct;
         }
 
-        public IEnumerable<IBot> DetermainNext(ILanguage language, ParseStack<IBlock> stack, IReadOnlyList<LexResult> lexResults)
+        public IEnumerable<IBot> DetermainNext(ILanguage language, ParseStack<IBlock> stack, LexResult lexResults)
         {
             yield break;
         }

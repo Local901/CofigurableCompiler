@@ -102,7 +102,7 @@ namespace ConCore.Lexing
         }
     }
 
-    public class StreamChunkReader : ChunkReader
+    public class StreamChunkReader : TokenReader
     {
         private readonly StreamReader Stream;
         private bool EndOfFileReached = false;
@@ -141,7 +141,7 @@ namespace ConCore.Lexing
             throw new IndexOutOfRangeException("Index outside loaded range of characters.");
         }
 
-        public BlockReadResult[] NextBlocks(TokenArgs[] args)
+        public BlockReadResult? NextBlock(TokenArgs[] args)
         {
             // Ignore modifiers for now.
             if (!EndOfFileReached && Buffer.Count < 2)
@@ -164,7 +164,7 @@ namespace ConCore.Lexing
             if (results.Length == 0)
             {
                 // Or throw Error.
-                return new BlockReadResult[0];
+                return null;
             }
             MatchResult? match = null;
             foreach (MatchResult m in results)
@@ -204,7 +204,7 @@ namespace ConCore.Lexing
             // Return nothing if nothing is found.
             if (!match.HasValue)
             {
-                return new BlockReadResult[0];
+                return null;
             }
             MatchResult result = match.Value;
             int minIndex = result.Match.Index;
@@ -220,16 +220,14 @@ namespace ConCore.Lexing
             Buffer.RemoveAll((b) => (b.GetPosition(0).Index + b.Length - 1) < globalIndex);
 
             // Return result.
-            return new BlockReadResult[] {
-                new BlockReadResult
-                {
-                    Key = result.Args.Token,
-                    MatchValue = result.Match.Value,
-                    PrecedingValue = precedingValue,
-                    MatchStart = IndexToPosition(result.Match.Index),
-                    MatchEnd = IndexToPosition(result.Match.Index + result.Match.Length),
-                    PrecedingStart = IndexToPosition(startIndex)
-                }
+            return new BlockReadResult
+            {
+                Key = result.Args.Token,
+                MatchValue = result.Match.Value,
+                PrecedingValue = precedingValue,
+                MatchStart = IndexToPosition(result.Match.Index),
+                MatchEnd = IndexToPosition(result.Match.Index + result.Match.Length),
+                PrecedingStart = IndexToPosition(startIndex)
             };
         }
 

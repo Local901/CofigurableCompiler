@@ -13,31 +13,31 @@ namespace ConCore.Lexing
         /// </summary>
         /// <param name="key">Key of group/token.</param>
         /// <exception cref="NoNextBlockFound"></exception>
-        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
-        List<LexResult> TryNextBlock(KeyLangReference key);
+        /// <returns>>Returns next block found.</returns>
+        LexResult? TryNextBlock(KeyLangReference key);
         /// <summary>
         /// Find next block using tokens connected to the keys.
         /// Progress is updated.
         /// </summary>
         /// <param name="keys">Keys of groups/tokens.</param>
         /// <exception cref="NoNextBlockFound"></exception>
-        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
-        List<LexResult> TryNextBlock(IEnumerable<KeyLangReference> keys);
+        /// <returns>>Returns next block found.</returns>
+        LexResult? TryNextBlock(IEnumerable<KeyLangReference> keys);
         /// <summary>
         /// Find next block using tokens connected to the key.
         /// Progress is updated.
         /// </summary>
         /// <param name="options">Options for finding a token.</param>
         /// <exception cref="NoNextBlockFound"></exception>
-        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
-        List<LexResult> TryNextBlock(LexOptions options);
+        /// <returns>>Returns next block found.</returns>
+        LexResult? TryNextBlock(LexOptions options);
         /// <summary>
         /// Find next block using tokens connected to the keys.
         /// Progress is updated.
         /// </summary>
         /// <param name="optionsList">List op options for finding keys.</param>
         /// <exception cref="NoNextBlockFound"></exception>
-        /// <returns>Returns a list of blocks found next. Skipping ones that are found later than the first posible.</returns>
-        List<LexResult> TryNextBlock(IEnumerable<LexOptions> optionsList);
+        /// <returns>Returns next block found.</returns>
+        LexResult? TryNextBlock(IEnumerable<LexOptions> optionsList);
     }
 }
