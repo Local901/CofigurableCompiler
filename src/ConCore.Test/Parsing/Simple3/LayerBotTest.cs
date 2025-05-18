@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ConCore.Blocks;
-using ConCore.Parsing.Simple3.Stack;
-using ConCore.Parsing.Simple3;
+using ConCore.Parsing.Simple.Stack;
+using ConCore.Parsing.Simple;
 using ConCore.CustomRegex.Info;
 using ConCore.Lexing;
 
@@ -36,33 +36,6 @@ namespace ConCore.Test.Parsing.Simple3
             ));
 
             language.StartingKeyReference = lineC;
-        }
-
-        [Test]
-        public void ShouldAcceptLexResult()
-        {
-            var stack = new LinkedParseStack<IBlock>();
-            var layer = new LayerInstance(
-                stack.GetRoot(),
-                new ValueInfo<bool, Component>(new Component(language.StartingKeyReference)),
-                language
-            );
-
-            var result = layer.DetermainNext(language, stack, new LexResult[]
-            {
-                new LexResult()
-                {
-                    Block = new Block(
-                        language.GetKey(new KeyLangReference(language, "start")),
-                        "start",
-                        new CharacterPosition(0, 0, 0),
-                        new CharacterPosition(4, 4, 0)
-                    )
-                }
-            }).ToList();
-
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].Info.Value.Reference, Is.EqualTo(new KeyLangReference(language, "end")));
         }
     }
 }

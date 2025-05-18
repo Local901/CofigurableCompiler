@@ -1,5 +1,4 @@
-﻿using BranchList;
-using ConCore.Key;
+﻿using ConCore.Key;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,12 +42,12 @@ namespace ConCore.Blocks
             };
 
             // set Parent to be the copy for all children.
-            copy.Content.ForEach(c => 
+            foreach(var c in copy.Content)
             {
                 if (c is IRelationBlock relationBlock) {
                     relationBlock.Parent = copy;
                 }
-            });
+            }
 
             return copy;
         }

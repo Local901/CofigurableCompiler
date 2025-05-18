@@ -26,6 +26,11 @@ namespace ConCore.Lexing
             return Key == other.Key && PrecedingCondition == other.PrecedingCondition;
         }
 
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Key);
+        }
+
         public static bool operator ==(LexOptions? left, LexOptions? right)
         {
             if (Object.ReferenceEquals(left, null))

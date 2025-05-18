@@ -6,40 +6,58 @@ using System.Threading.Tasks;
 
 namespace ConCore.Lexing.Conditions
 {
-    public enum ReadConditionType
+    public class ConditionResponse
     {
-        /// <summary>
-        /// The token has to start emediatly at the found start index
-        /// </summary>
-        STRICT,
-        /// <summary>
-        /// The token has to apear somewear at or after the found start index.
-        /// </summary>
-        PRECEDING,
+        public readonly IReadOnlyList<int> Splits;
+        public int EndPoint { get => Splits.Last(); }
+
+        public readonly bool CanStartAtAnyPoint;
+        public readonly int MinimumStartPoint;
+        public readonly int? MaximumStartPoint;
+
+        public ConditionResponse(
+            IReadOnlyList<int> splits,
+            bool canStartAtAnyPoint = false,
+            int minimumStartPoint = 0,
+            int? maximumStartPoint = null
+        ) {
+            Splits = splits;
+            CanStartAtAnyPoint = canStartAtAnyPoint;
+            MinimumStartPoint = minimumStartPoint;
+            MaximumStartPoint = maximumStartPoint;
+        }
     }
 
+    /// <summary>
+    /// A condition to indecate when the next value is allowed to match.
+    /// </summary>
     public abstract class ReadCondition
     {
-        public readonly ReadConditionType Type;
-
-        public ReadCondition(ReadConditionType type)
+        /// <summary>
+        /// Is the value a match for this condition.
+        /// </summary>
+        /// <param name="value">The value to check.</param>
+        /// <returns>True is the value matches the condition.</returns>
+        public virtual bool IsMatch(string value)
         {
-            Type = type;
+            return true;
         }
 
         /// <summary>
-        /// Find the index that a token may start on for a given text.
+        /// Get a starting point.
         /// </summary>
-        /// <param name="text">The text for which to find the start index.</param>
-        /// <param name="startIndex">The index from which to start checking.</param>
-        /// <returns>The start index the token may start on. If -1 no start index found.</returns>
-        public abstract int StartIndex(string text, int startIndex = 0);
+        /// <param name="startIndex"></param>
+        /// <param name="text"></param>
+        /// <param name="endPoints"></param>
+        /// <returns>The endpoint that matches one of the endpoints.</returns>
+        public abstract ConditionResponse? GetStartingPoints(int startIndex, string text, IReadOnlyList<int> endPoints);
+
         /// <summary>
-        /// Find all indeces that a token may start on for a given text.
+        /// Get A number of endpoints for a text starting from the starting index.
         /// </summary>
-        /// <param name="text">The text for which to find the start indeces.</param>
-        /// <param name="startIndex">The index from which to start checking.</param>
-        /// <returns>A array of indeces that a token may start on. This aaray can be empty mhen no starting points are found</returns>
-        public abstract int[] AllStartIndeces(string text, int startIndex = 0);
+        /// <param name="startIndex"></param>
+        /// <param name="text"></param>
+        /// <returns>List of endpoints.</returns>
+        public abstract IEnumerable<ConditionResponse> GetEndpoints(int startIndex, string text);
     }
 }
