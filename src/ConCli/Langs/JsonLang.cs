@@ -4,6 +4,7 @@ using ConCore.FileInfo;
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
+using ConCore.Key.Conditions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,13 +61,21 @@ namespace ConCli.Langs
             var valueType_group_ref = lang.AddKey(valueType_group);
 
             var builder = new ComponentBuilder();
+            var conBuilder = new ConditionBuilder();
 
             // A string.
             var string_construct = lang.AddKey(new Construct("encoded_string",
                 builder.Ordered(false,
                     builder.Value(dubblequote_token),
                     // TODO: capture inbetween
-                    builder.Value(dubblequote_token)
+                    builder.Value(
+                        dubblequote_token,
+                        new PrecedingOptions(
+                            conBuilder.Regex("(?:[^\"\"\\\\]|\\\\(?:[\"\"\\\\/bfnrt]|u[0-9a-fA-F]{4}))*"),
+                            true,
+                            "value"
+                        )
+                    )
                 )
             ));
             valueType_group.Add(string_construct);

@@ -1,5 +1,5 @@
 ﻿using ConCore.Key;
-using ConCore.Lexing.Conditions;
+using ConCore.Key.Conditions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

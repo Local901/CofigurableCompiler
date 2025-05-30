@@ -3,6 +3,7 @@ using ConCore.CustomRegex.Info;
 using ConCore.Key;
 using ConCore.Key.Collections;
 using ConCore.Key.Components;
+using ConCore.Key.Conditions;
 using ConCore.Lexing;
 using ConCore.Parsing.Simple.Stack;
 using System;
@@ -63,9 +64,9 @@ namespace ConCore.Parsing.Simple
             ParseStack<IBlock>.StackInterface nextReference = TokenReference;
             if (hasPreceding == CheckPreceding.Correct)
             {
-                nextReference = nextReference.Add(lexResults.PrecedingBlock);
+                nextReference = nextReference.Add(lexResults.PrecedingBlock.Copy(Info!.Value.PrecedingOptions?.Name));
             }
-            nextReference = nextReference.Add(lexResults.Block.Copy(Info.Value.Name));
+            nextReference = nextReference.Add(lexResults.Block.Copy(Info!.Value.Name));
 
             // Create bots for next round.
             var nextInfos = Info.DetermainNext(false);
@@ -104,15 +105,31 @@ namespace ConCore.Parsing.Simple
 
         protected virtual CheckPreceding CheckPrecedingBlock(IValueBlock precedingBlock)
         {
-            // TODO: If a preceding value/filter thingy is added to component. Add a check to just say yes.
+            var precedingOptions = Info?.Value.PrecedingOptions;
+            if (precedingOptions == null)
+            {
+                return CheckPreceding.NotUsed;
+            }
 
-            return CheckPreceding.NotUsed;
+            // TODO: manage conditionArgs
+            ReadCondition condition = precedingOptions.TemplateCondition.Build(new ConditionArgs());
+
+            if (condition.IsMatch(precedingBlock.Value))
+            {
+                return CheckPreceding.Correct;
+            }
+
+            return CheckPreceding.Incorrect;
         }
 
         public virtual IEnumerable<LexOptions> GetLexOptions(ILanguage language)
         {
             if (Info == null) yield break;
-            yield return new LexOptions(Info.Value.Reference);
+            yield return new LexOptions(
+                Info.Value.Reference,
+                // TODO: manage conditionArgs
+                Info.Value.PrecedingOptions?.TemplateCondition.Build(new ConditionArgs())
+            );
         }
     }
 }

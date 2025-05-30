@@ -113,7 +113,7 @@ namespace ConCore.Parsing.Simple
     {
         public override Construct? Construct { get; }
         public override ILayer? Layer { get; }
-        public IValueInfo<bool, Component>? Info { get; }
+        public IValueInfo<bool, Component> Info { get; }
         public ParseStack<IBlock>.StackInterface TokenReference { get; }
         private readonly ConstructReferenceInfo LayerInfo;
 

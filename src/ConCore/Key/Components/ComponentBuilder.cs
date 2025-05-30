@@ -9,5 +9,10 @@ namespace ConCore.Key.Components
         {
             return Value(new Component(reference, name));
         }
+
+        public RegexStep<bool, Component> Value(KeyLangReference reference, PrecedingOptions options, string? name = null)
+        {
+            return Value(new Component(reference, options, name));
+        }
     }
 }
