@@ -238,7 +238,10 @@ namespace ConCore.Lexing
             {
                 try
                 {
-                    var match = token.Token.Regex.Match(stringValue, startAt);
+                    var startPoints = token.PrecendingModifier?.GetStartPoints(startAt, stringValue).Select((r) => r.EndPoint).ToArray();
+                    var match = startPoints == null
+                        ? token.Token.Regex.Match(stringValue, startAt)
+                        : token.Token.Regex.Matches(stringValue, startAt).FirstOrDefault((m) => startPoints.Contains(m.Index));
                     if (match == null || !match.Success)
                     {
                         continue;
