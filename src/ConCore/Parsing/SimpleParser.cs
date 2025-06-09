@@ -61,13 +61,6 @@ namespace ConCore.Parsing
                             reference
                         )
                     );
-                    //bots.AddRange(
-                    //    new LayerInstance(
-                    //        stack.GetRoot(),
-                    //        new ValueInfo<bool, Component>(new Component(startRef)),
-                    //        reference
-                    //    ).GetBots(Language, stack.GetRoot(), referenceCollection)
-                    //);
                 }
             }
 
