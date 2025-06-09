@@ -29,7 +29,7 @@ namespace ConCore.Parsing.Simple
 
         public ParseStack<IBlock>.StackInterface TokenReference { get; }
 
-        public IValueInfo<bool, Component>? Info { get; }
+        public override IValueInfo<bool, Component>? Info { get; }
 
         protected Bot(ParseStack<IBlock>.StackInterface stackInterface, IValueInfo<bool, Component>? info, ILayer? layer, Construct? construct)
         {
@@ -44,8 +44,12 @@ namespace ConCore.Parsing.Simple
         public Bot(ParseStack<IBlock>.StackInterface stackInterface, IValueInfo<bool, Component>? info)
             : this(stackInterface, info, default(ILayer), null) { }
 
-        public virtual IEnumerable<IBot> DetermainNext(ILanguage language, ParseStack<IBlock> stack, LexResult lexResults)
-        {
+        public virtual IEnumerable<IBot> DetermainNext(
+            ILanguage language,
+            ParseStack<IBlock> stack,
+            ConstructReferenceCollection referenceCollection,
+            LexResult lexResults
+        ) {
             // If it is a end placeholder bot yield emediatly.
             if (Info == null) yield break;
 
@@ -75,7 +79,7 @@ namespace ConCore.Parsing.Simple
             foreach (IValueInfo<bool, Component>? info in nextInfos)
             {
                 if (info == null) continue;
-                foreach (IBot bot in CreateBot(language, nextReference, info))
+                foreach (IBot bot in CreateBot(language, referenceCollection, nextReference, info))
                 {
                     yield return bot;
                 }
@@ -88,7 +92,7 @@ namespace ConCore.Parsing.Simple
                 if (Layer != null)
                 {
                     // If a parent layer is found try to determain next of the parent layer.
-                    foreach (IBot bot in Layer.DetermainNext(language, stack, endBot))
+                    foreach (IBot bot in Layer.DetermainNext(language, stack, referenceCollection, endBot))
                     {
                         yield return bot;
                     }
@@ -101,25 +105,6 @@ namespace ConCore.Parsing.Simple
             }
 
             yield break;
-        }
-
-        protected virtual CheckPreceding CheckPrecedingBlock(IValueBlock precedingBlock)
-        {
-            var precedingOptions = Info?.Value.PrecedingOptions;
-            if (precedingOptions == null)
-            {
-                return CheckPreceding.NotUsed;
-            }
-
-            // TODO: manage conditionArgs
-            ReadCondition condition = precedingOptions.TemplateCondition.Build(new ConditionArgs());
-
-            if (condition.IsMatch(precedingBlock.Value))
-            {
-                return CheckPreceding.Correct;
-            }
-
-            return CheckPreceding.Incorrect;
         }
 
         public virtual IEnumerable<LexOptions> GetLexOptions(ILanguage language)

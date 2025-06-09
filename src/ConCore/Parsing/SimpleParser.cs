@@ -39,31 +39,38 @@ namespace ConCore.Parsing
         public IBlock? Parse(KeyLangReference startRef)
         {
             ParseStack<IBlock> stack = new LinkedParseStack<IBlock>();
+            var referenceCollection = new ConstructReferenceCollection(Language);
+
 
             // Make initial bots
-            List<IBot> bots = Language.AllChildKeys(startRef, true)
-                .SelectMany((key) =>
-                {
-                    if (key is Token token)
-                    {
-                        return new IBot[] {
-                            new Bot(
-                                stack.GetRoot(),
-                                new ValueInfo<bool, Component>(new Component(key.Reference))
-                            )};
-                    }
-                    if (key is Construct construct)
-                    {
-                        return new LayerInstance(
-                            stack.GetRoot(),
-                            new ValueInfo<bool, Component>(new Component(key.Reference)),
-                            Language
-                        ).GetBots(Language, stack.GetRoot());
-                    }
-                    return new IBot[0];
-                })
-                .Where((key) => key != null)
+            List<IBot> bots = Language.AllChildKeys<Token>(startRef, true)
+                .Select<Token, IBot>((key) => new Bot(
+                    stack.GetRoot(),
+                    new ValueInfo<bool, Component>(new Component(key.Reference))
+                ))
                 .ToList();
+
+            {
+                var reference = referenceCollection.GetReference(startRef);
+                if (reference != null)
+                {
+                    bots.Add(
+                        new LayerBot(
+                            stack.GetRoot(),
+                            new ValueInfo<bool, Component>(new Component(startRef)),
+                            reference
+                        )
+                    );
+                    //bots.AddRange(
+                    //    new LayerInstance(
+                    //        stack.GetRoot(),
+                    //        new ValueInfo<bool, Component>(new Component(startRef)),
+                    //        reference
+                    //    ).GetBots(Language, stack.GetRoot(), referenceCollection)
+                    //);
+                }
+            }
+
             // All bots that can end.
             List<EndedBot> endBots = new List<EndedBot>();
             List<ILayer?> layers = GetLayers(bots);
@@ -75,7 +82,7 @@ namespace ConCore.Parsing
             while (optionalLexResult.HasValue)
             {
                 LexResult lexResult = optionalLexResult.Value;
-                var nextBots = bots.SelectMany((bot) => bot.DetermainNext(Language, stack, lexResult)).ToList();
+                var nextBots = bots.SelectMany((bot) => bot.DetermainNext(Language, stack, referenceCollection, lexResult)).ToList();
                 var nextEndBots = nextBots.OfType<EndedBot>().ToList();
                 var nextLayers = GetLayers(nextBots);
                 var missingLayers = layers.Where((layer) => !nextLayers.Contains(layer)).ToList();

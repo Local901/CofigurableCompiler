@@ -19,7 +19,7 @@ namespace ConCore.Parsing.Simple
         IValueInfo<bool, Component>? Info { get; }
         ParseStack<IBlock>.StackInterface TokenReference { get; }
 
-        IEnumerable<IBot> GetBots(ILanguage language, ParseStack<IBlock>.StackInterface stackInterface);
-        IEnumerable<IBot> DetermainNext(ILanguage language, ParseStack<IBlock> stack, IBot childBot);
+        IEnumerable<IBot> GetBots(ILanguage language, ParseStack<IBlock>.StackInterface stackInterface, ConstructReferenceCollection referenceCollection);
+        IEnumerable<IBot> DetermainNext(ILanguage language, ParseStack<IBlock> stack, ConstructReferenceCollection referenceCollection, IBot childBot);
     }
 }

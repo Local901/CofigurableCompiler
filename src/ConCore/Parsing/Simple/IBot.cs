@@ -19,7 +19,7 @@ namespace ConCore.Parsing.Simple
         ILayer? Layer { get; }
         IValueInfo<bool, Component>? Info { get; }
         ParseStack<IBlock>.StackInterface TokenReference { get; }
-        IEnumerable<IBot> DetermainNext(ILanguage language, ParseStack<IBlock> stack, LexResult lexResults);
+        IEnumerable<IBot> DetermainNext(ILanguage language, ParseStack<IBlock> stack, ConstructReferenceCollection referenceCollection, LexResult lexResults);
         IEnumerable<LexOptions> GetLexOptions(ILanguage language);
     }
 }
