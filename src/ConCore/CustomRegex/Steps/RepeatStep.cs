@@ -8,13 +8,13 @@ using ConCore.CustomRegex.Info;
 
 namespace ConCore.CustomRegex.Steps
 {
-    internal class RepeatStep<NextInput, Result> : RegexStep<NextInput, Result>
+    internal class RepeatStep<Context, Result> : RegexStep<Context, Result>
     {
         public int MinimumRepeats { get; }
         public int MaximumRepeats { get; }
 
-        public RepeatStep(RegexStep<NextInput, Result> childStep, int minimum = 0, int maximum = 0)
-            : base(new RegexStep<NextInput, Result>[] { childStep })
+        public RepeatStep(RegexStep<Context, Result> childStep, int minimum = 0, int maximum = 0)
+            : base([childStep])
         {
             if (childStep.Optional)
             {
@@ -30,33 +30,33 @@ namespace ConCore.CustomRegex.Steps
             }
         }
 
-        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
+        public override IList<IValueInfo<Context, Result>?> Start(Context value)
         {
             return DetermainNext(null, value);
         }
 
-        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(
-            RegexInfo<NextInput, Result>? parent,
-            NextInput value
+        public override IList<IValueInfo<Context, Result>?> DetermainNext(
+            RegexInfo<Context, Result>? parent,
+            Context value
         )
         {
             return new RepeatInfo(this, parent).DetermainNext(value);
         }
 
-        private class RepeatInfo : RegexInfo<NextInput, Result, RepeatStep<NextInput, Result>>
+        private class RepeatInfo : RegexInfo<Context, Result, RepeatStep<Context, Result>>
         {
             public readonly int RepeatIndex;
             private RepeatInfo? nextInfo;
 
-            public RepeatInfo(RepeatStep<NextInput, Result> step, RegexInfo<NextInput, Result>? parent, int repeat = 0)
+            public RepeatInfo(RepeatStep<Context, Result> step, RegexInfo<Context, Result>? parent, int repeat = 0)
                 : base(step, parent)
             {
                 RepeatIndex = repeat;
             }
 
-            public override IList<IValueInfo<NextInput, Result>?> DetermainNext(NextInput value)
+            public override IList<IValueInfo<Context, Result>?> DetermainNext(Context value)
             {
-                var result = new List<IValueInfo<NextInput, Result>?>();
+                var result = new List<IValueInfo<Context, Result>?>();
 
                 if (RepeatIndex >= CurrentStep.MinimumRepeats)
                 {

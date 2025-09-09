@@ -7,7 +7,7 @@ using ConCore.CustomRegex.Info;
 
 namespace ConCore.CustomRegex.Steps
 {
-    public class ValueStep<NextInput, Result> : ValidationStep<NextInput, Result>
+    public class ValueStep<Context, Result> : ValidationStep<Context, Result>
     {
         private readonly Result result;
 
@@ -16,15 +16,15 @@ namespace ConCore.CustomRegex.Steps
             this.result = result;
         }
 
-        protected override IValueInfo<NextInput, Result> CreateInfo(
-            RegexInfo<NextInput, Result>? parent,
-            NextInput value
+        protected override IValueInfo<Context, Result> CreateInfo(
+            RegexInfo<Context, Result>? parent,
+            Context value
         )
         {
-            return new ValueInfo<NextInput, Result>(parent, result);
+            return new ValueInfo<Context, Result>(parent, result, value);
         }
 
-        protected override bool ValidateValue(NextInput value)
+        protected override bool ValidateValue(Context value)
         {
             return true;
         }

@@ -46,7 +46,7 @@ namespace ConCore.Parsing
             List<IBot> bots = Language.AllChildKeys<Token>(startRef, true)
                 .Select<Token, IBot>((key) => new Bot(
                     stack.GetRoot(),
-                    new ValueInfo<bool, Component>(new Component(key.Reference))
+                    new ValueInfo<bool, Component>(new Component(key.Reference), false)
                 ))
                 .ToList();
 
@@ -57,7 +57,7 @@ namespace ConCore.Parsing
                     bots.Add(
                         new LayerBot(
                             stack.GetRoot(),
-                            new ValueInfo<bool, Component>(new Component(startRef)),
+                            new ValueInfo<bool, Component>(new Component(startRef), false),
                             reference
                         )
                     );

@@ -8,19 +8,19 @@ using ConCore.CustomRegex.Info;
 
 namespace ConCore.CustomRegex.Steps
 {
-    internal class AnyStep<NextInput, Result> : RegexStep<NextInput, Result>
+    internal class AnyStep<Context, Result> : RegexStep<Context, Result>
     {
-        public AnyStep(IList<RegexStep<NextInput, Result>> childSteps)
+        public AnyStep(IList<RegexStep<Context, Result>> childSteps)
             : base(childSteps) { }
 
-        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
+        public override IList<IValueInfo<Context, Result>?> Start(Context value)
         {
             return DetermainNext(null, value);
         }
 
-        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value)
+        public override IList<IValueInfo<Context, Result>?> DetermainNext(RegexInfo<Context, Result>? parent, Context value)
         {
-            var result = new List<IValueInfo<NextInput, Result>?>();
+            var result = new List<IValueInfo<Context, Result>?>();
 
             if (Optional || ChildSteps.Count == 0)
             {

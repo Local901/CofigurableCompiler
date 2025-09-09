@@ -8,9 +8,9 @@ using ConCore.CustomRegex.Info;
 
 namespace ConCore.CustomRegex.Steps
 {
-    internal class OrderStep<NextInput, Result> : RegexStep<NextInput, Result>
+    internal class OrderStep<Context, Result> : RegexStep<Context, Result>
     {
-        public OrderStep(IList<RegexStep<NextInput, Result>> childSteps)
+        public OrderStep(IList<RegexStep<Context, Result>> childSteps)
             : base(childSteps)
         {
             if (childSteps.Count == 0)
@@ -19,17 +19,17 @@ namespace ConCore.CustomRegex.Steps
             }
         }
 
-        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput charInfo)
+        public override IList<IValueInfo<Context, Result>?> Start(Context charInfo)
         {
             return DetermainNext(null, charInfo);
         }
 
-        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(
-            RegexInfo<NextInput, Result>? parent,
-            NextInput value
+        public override IList<IValueInfo<Context, Result>?> DetermainNext(
+            RegexInfo<Context, Result>? parent,
+            Context value
         )
         {
-            var result = new List<IValueInfo<NextInput, Result>?>();
+            var result = new List<IValueInfo<Context, Result>?>();
 
             if (Optional)
             {
@@ -53,27 +53,27 @@ namespace ConCore.CustomRegex.Steps
             return result;
         }
 
-        private class OrderInfo : RegexInfo<NextInput, Result, OrderStep<NextInput, Result>>
+        private class OrderInfo : RegexInfo<Context, Result, OrderStep<Context, Result>>
         {
             public readonly int Index;
             private OrderInfo? nextInfo;
 
             public OrderInfo(
-                OrderStep<NextInput, Result> step,
-                RegexInfo<NextInput, Result>? parent,
+                OrderStep<Context, Result> step,
+                RegexInfo<Context, Result>? parent,
                 int index = 0
             ) : base(step, parent)
             {
                 Index = index;
             }
 
-            public override IList<IValueInfo<NextInput, Result>?> DetermainNext(NextInput value)
+            public override IList<IValueInfo<Context, Result>?> DetermainNext(Context value)
             {
                 if (Index >= CurrentStep.ChildSteps.Count)
                 {
                     if (Parent == null)
                     {
-                        return new List<IValueInfo<NextInput, Result>?>() { null };
+                        return new List<IValueInfo<Context, Result>?>() { null };
                     }
                     return Parent.DetermainNext(value);
                 }

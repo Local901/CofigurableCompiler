@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace ConCore.CustomRegex.Info
 {
-    public class ValueInfo<NextInput, Result> : IValueInfo<NextInput, Result>
+    public class ValueInfo<Context, Result> : IValueInfo<Context, Result>
     {
-        private RegexInfo<NextInput, Result>? Parent { get; }
+        private RegexInfo<Context, Result>? Parent { get; }
 
-        public ValueInfo(Result value)
-            : this(null, value) { }
-        public ValueInfo(RegexInfo<NextInput, Result>? parent, Result value)
-            : base(value)
+        public ValueInfo(Result value, Context context)
+            : this(null, value, context) { }
+        public ValueInfo(RegexInfo<Context, Result>? parent, Result value, Context context)
+            : base(value, context)
         {
             Parent = parent;
         }
-        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(NextInput value)
+        public override IList<IValueInfo<Context, Result>?> DetermainNext(Context value)
         {
             if (Parent == null)
             {
-                return new IValueInfo<NextInput, Result>?[] { null };
+                return [null];
             }
             return Parent.DetermainNext(value);
         }

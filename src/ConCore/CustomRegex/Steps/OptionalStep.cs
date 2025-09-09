@@ -7,18 +7,18 @@ using ConCore.CustomRegex.Info;
 
 namespace ConCore.CustomRegex.Steps
 {
-    internal class OptionalStep<NextInput, Result> : RegexStep<NextInput, Result>
+    internal class OptionalStep<Context, Result> : RegexStep<Context, Result>
     {
-        public OptionalStep(RegexStep<NextInput, Result> nextStep)
-            : base(new RegexStep<NextInput, Result>[] { nextStep })
+        public OptionalStep(RegexStep<Context, Result> nextStep)
+            : base([nextStep])
         { }
 
-        public override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
+        public override IList<IValueInfo<Context, Result>?> Start(Context value)
         {
             return ChildSteps[0].Start(value).Append(null).ToArray();
         }
 
-        public override IList<IValueInfo<NextInput, Result>?> DetermainNext(RegexInfo<NextInput, Result>? parent, NextInput value)
+        public override IList<IValueInfo<Context, Result>?> DetermainNext(RegexInfo<Context, Result>? parent, Context value)
         {
             if (parent == null)
             {

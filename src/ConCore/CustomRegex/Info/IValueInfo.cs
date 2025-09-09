@@ -6,19 +6,24 @@ using System.Threading.Tasks;
 
 namespace ConCore.CustomRegex.Info
 {
-    public abstract class IValueInfo<NextInput, Result> : RegexInfo<NextInput, Result>
+    public abstract class IValueInfo<CONTEXT, RESULT> : RegexInfo<CONTEXT, RESULT>
     {
         /// <summary>
         /// The character position of the first character.
         /// 
         /// Value is null if nothing was checked.
         /// </summary>
-        public Result Value { get; }
+        public RESULT Value { get; }
+        /// <summary>
+        /// Step context recieved from previous.
+        /// </summary>
+        public CONTEXT Context { get; }
 
-        public IValueInfo(Result value)
+        public IValueInfo(RESULT value, CONTEXT context)
             : base()
         {
             Value = value;
+            Context = context;
         }
     }
 }

@@ -7,21 +7,21 @@ using ConCore.CustomRegex.Info;
 
 namespace ConCore.CustomRegex.Steps
 {
-    public abstract class ValidationStep<NextInput, Result> : RegexStep<NextInput, Result>
+    public abstract class ValidationStep<Context, Result> : RegexStep<Context, Result>
     {
         public ValidationStep()
             : base() { }
 
-        public sealed override IList<IValueInfo<NextInput, Result>?> Start(NextInput value)
+        public sealed override IList<IValueInfo<Context, Result>?> Start(Context value)
         {
             return DetermainNext(null, value);
         }
-        public sealed override IList<IValueInfo<NextInput, Result>?> DetermainNext(
-            RegexInfo<NextInput, Result>? parent,
-            NextInput value
+        public sealed override IList<IValueInfo<Context, Result>?> DetermainNext(
+            RegexInfo<Context, Result>? parent,
+            Context value
         )
         {
-            var result = new List<IValueInfo<NextInput, Result>?>();
+            var result = new List<IValueInfo<Context, Result>?>();
             if (parent != null && Optional)
             {
                 result.AddRange(parent.DetermainNext(value));
@@ -40,13 +40,13 @@ namespace ConCore.CustomRegex.Steps
         /// </summary>
         /// <param name="value">Value to check with.</param>
         /// <returns></returns>
-        protected abstract bool ValidateValue(NextInput value);
+        protected abstract bool ValidateValue(Context value);
         /// <summary>
         /// Create a info object
         /// </summary>
         /// <param name="parent">The parent info object that called this step.</param>
         /// <param name="value">The value to send back.</param>
         /// <returns></returns>
-        protected abstract IValueInfo<NextInput, Result> CreateInfo(RegexInfo<NextInput, Result>? parent, NextInput value);
+        protected abstract IValueInfo<Context, Result> CreateInfo(RegexInfo<Context, Result>? parent, Context value);
     }
 }
